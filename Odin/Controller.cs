@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
 
@@ -7,96 +8,148 @@ namespace Odin
 {
     public abstract class Controller
     {
-        private Dictionary<string, MethodInfo> methods;
-        private DefaultActionAttribute defaultActionAttribute;
+        private readonly Dictionary<string, MethodInfo> methods;
+        private readonly DefaultActionAttribute defaultActionAttribute;
         private Dictionary<string, Controller> SubCommands { get; }
+
+        public Logger Logger { get; set; }
 
         protected Controller()
         {
-            this.methods = GetType().GetMethods().ToDictionary(row => row.Name);
+            this.methods = GetActionMethods().ToDictionary(row => row.Name);
             this.defaultActionAttribute = GetType().GetCustomAttribute(typeof(DefaultActionAttribute)) as DefaultActionAttribute;
             Name = GetType().Name.Replace("Controller", "");
             SubCommands = new Dictionary<string, Controller>();
+            Logger = new Logger();
+            this.Description = GetDescription();
         }
+
+        private IEnumerable<MethodInfo> GetActionMethods()
+        {
+            return this
+                .GetType()
+                .GetMethods()
+                .Where(m => m.GetCustomAttribute<ActionAttribute>() != null)
+                ;
+        }
+
+        private string GetDescription()
+        {
+            var attribute = this.GetType().GetCustomAttribute<System.ComponentModel.DescriptionAttribute>(inherit:true);
+            if (attribute != null)
+            {
+                return attribute.Description;
+            }
+            return this.GetType().Name;
+        }
+
+        public string Description { get; }
 
         protected virtual void RegisterSubCommand(Controller controller)
         {
             this.SubCommands[controller.Name] = controller;
         }
 
-
         public string Name { get; set; }
 
-        public virtual void Execute(string[] args)
+        public virtual int Execute(string[] args)
         {
             if (args.Any())
             {
                 var first = args.First();
                 if (methods.ContainsKey(first))
                 {
-                    InvokeMethod(first, args.Skip(1).ToArray());
-                    return;
+                    var result = InvokeMethod(first, args.Skip(1).ToArray());
+                    if (result < 0) this.Help();
+                    return result;
                 }
 
                 var subCommand = GetControllerByName(first);
                 if (subCommand != null)
                 {
                     var theRest = args.Skip(1).ToArray();
-                    subCommand.Execute(theRest);
+                    return subCommand.Execute(theRest);
                 }
 
+                this.Logger.Error("Unrecognized command sequence: {0}", string.Join(" ", args));
             }
             else if (defaultActionAttribute != null)
             {
-                InvokeMethod(defaultActionAttribute.MethodName, args);
-            }
-            else
-            {
-                throw new NotSupportedException();
+                var result = InvokeMethod(defaultActionAttribute.MethodName, args);
+                if (result < 0) this.Help();
+                return result;
             }
 
+            this.Help();
+            return -1;
         }
 
-        private void InvokeMethod(string name, string[] args)
+        public IEnumerable<ParameterMap> Map(string[] args)
+        {
+            ParameterMap map = null;
+            for (var i = 0; i < args.Length; i++)
+            {
+                var arg = args[i];
+                if (arg.StartsWith("--"))
+                {
+                    if (map != null)
+                    {
+                        yield return map;
+                    }
+
+                    map = new ParameterMap()
+                    {
+                        Switch = arg
+                    };
+                } else if (map != null)
+                {
+                    map.RawValues.Add(arg);
+                }
+            }
+
+            if (map != null)
+                yield return map;
+        } 
+
+        private int InvokeMethod(string name, string[] args)
         {
             var methodInfo = methods[name];
 
-            var parametersByName = methodInfo.GetParameters().ToDictionary(p => p.Name);
             var parameters = methodInfo.GetParameters().OrderBy(p => p.Position).ToArray();
+            var parameterMap = Map(args).ToList();
 
+            Merge(parameters, parameterMap);
 
-            var query = from parameter in parameters
-                        select GetParameterValue(parameter, args);
-            var parameterValues = query.ToArray();
-            methodInfo.Invoke(this, parameterValues);
+            var orderedMaps = parameterMap.OrderBy(row => row.ParameterInfo.Position).ToArray();
+            var values = orderedMaps.Select(row => row.GetValue()).ToArray();
+
+            var result = methodInfo.Invoke(this, values);
+
+            if (result is int)
+            {
+                return (int) result;
+            }
+
+            return 0;
         }
 
-        private object GetParameterValue(ParameterInfo parameter, string[] args)
+        private void Merge(ParameterInfo[] parameters, List<ParameterMap> parameterMaps)
         {
-            var index = Array.IndexOf(args, $"--{parameter.Name}");
-            if (index == -1)
-                return Type.Missing;
-
-            var next = index + 1;
-            if (next < args.Length)
+            foreach (var parameter in parameters)
             {
-                var value = args[next];
-                return value;
+                var parameterMap = parameterMaps.SingleOrDefault(row => row.IsMatch(parameter));
+                if (parameterMap != null)
+                {
+                    parameterMap.ParameterInfo = parameter;
+                }
+                else
+                {
+                    parameterMaps.Add(new ParameterMap()
+                    {
+                        ParameterInfo = parameter
+                    });
+                }
             }
-            else if (parameter.IsOptional)
-            {
-                return Type.Missing;
-            }
-            else
-            {
-
-            }
-            return null;
-        }
-
-        private bool HasParameterValue(ParameterInfo parameter, string[] args)
-        {
-            return args.Contains($"--{parameter.Name}");
         }
 
         private Controller GetControllerByName(string name)
@@ -106,6 +159,22 @@ namespace Odin
                 return SubCommands[name];
             }
             return null;
+        }
+
+        public virtual string GenerateHelp(string actionOrSubCommand = "")
+        {
+            var builder = new System.Text.StringBuilder();
+
+            builder.Append(this.Description);
+
+            var result = builder.ToString();
+
+            return result;
+        }
+
+        public void Help(string actionOrSubCommand = "")
+        {
+            this.Logger.Info(this.GenerateHelp(actionOrSubCommand));
         }
     }
 }

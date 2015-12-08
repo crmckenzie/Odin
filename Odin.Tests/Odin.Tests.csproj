@@ -48,10 +48,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ControllerTests.cs" />
     <Compile Include="EntryPointTests.cs" />
     <Compile Include="NotTheDefaultController.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="DefaultController.cs" />
+    <Compile Include="StringBuilderLogger.cs" />
     <Compile Include="SubCommandController.cs" />
   </ItemGroup>
   <ItemGroup>

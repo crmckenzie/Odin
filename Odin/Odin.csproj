@@ -40,9 +40,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ActionAttribute.cs" />
     <Compile Include="Controller.cs" />
     <Compile Include="DefaultActionAttribute.cs" />
     <Compile Include="EntryPoint.cs" />
+    <Compile Include="Logger.cs" />
+    <Compile Include="ParameterMap.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

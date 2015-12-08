@@ -9,6 +9,7 @@ namespace Odin.Tests
     [DefaultAction("DoSomething")]
     public class SubCommandController : Controller
     {
+        [Action]
         public virtual void DoSomething()
         {
             
