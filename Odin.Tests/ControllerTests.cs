@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using NSubstitute;
 using NUnit.Framework;
@@ -253,7 +254,7 @@ namespace Odin.Tests
 
             var i = 0;
             Assert.That(lines[++i], Is.EqualTo("SUB COMMANDS"));
-            Assert.That(lines[++i], Is.EqualTo("SubCommand                         Provides a component of testability for subcommands."));
+            Assert.That(lines[++i], Is.EqualTo("SubCommand                    Provides a component of testability for subcommands."));
             Assert.That(lines[++i], Is.EqualTo("To get help for subcommands"));
             Assert.That(lines[++i], Is.EqualTo("\tDefault <subcommand> Help"));
         }
@@ -263,6 +264,7 @@ namespace Odin.Tests
         {
             // When
             var result = this.Subject.GenerateHelp();
+            Console.WriteLine(result);
 
             // Then
             var lines = result
@@ -275,44 +277,49 @@ namespace Odin.Tests
 
             var i = 0;
             Assert.That(lines[++i].Trim(), Is.EqualTo("AlwaysReturnsMinus2"));
-            Assert.That(lines[++i].Trim(), Is.EqualTo("DoSomething (default)"));
+            Assert.That(lines[++i].Trim(), Is.EqualTo("DoSomething (default)         A description of the DoSomething() method."));
+            Assert.That(lines[++i], Is.EqualTo("\t--argument1               Lorem ipsum dolor sit amet, consectetur adipiscing elit"));
+            Assert.That(lines[++i], Is.EqualTo("\t--argument2               sed do eiusmod tempor incididunt ut labore et dolore magna aliqua"));
+            Assert.That(lines[++i], Is.EqualTo("\t--argument3               Ut enim ad minim veniam"));
             Assert.That(lines[++i].Trim(), Is.EqualTo("SomeOtherControllerAction"));
             Assert.That(lines[++i].Trim(), Is.EqualTo("WithOptionalStringArg"));
+            Assert.That(lines[++i].TrimEnd(), Is.EqualTo("\t--argument"));
             Assert.That(lines[++i].Trim(), Is.EqualTo("WithOptionalStringArgs"));
+            Assert.That(lines[++i].TrimEnd(), Is.EqualTo("\t--argument1"));
+            Assert.That(lines[++i].TrimEnd(), Is.EqualTo("\t--argument2"));
+            Assert.That(lines[++i].TrimEnd(), Is.EqualTo("\t--argument3"));
             Assert.That(lines[++i].Trim(), Is.EqualTo("WithRequiredStringArg"));
+            Assert.That(lines[++i].TrimEnd(), Is.EqualTo("\t--argument"));
             Assert.That(lines[++i].Trim(), Is.EqualTo("WithRequiredStringArgs"));
+            Assert.That(lines[++i].TrimEnd(), Is.EqualTo("\t--argument1"));
+            Assert.That(lines[++i].TrimEnd(), Is.EqualTo("\t--argument2"));
             Assert.That(lines[++i].Trim(), Is.EqualTo("WithSwitch"));
+            Assert.That(lines[++i].TrimEnd(), Is.EqualTo("\t--argument"));
             Assert.That(lines[++i].Trim(), Is.EqualTo("To get help for actions"));
-            Assert.That(lines[++i], Is.EqualTo("\tDefault <action> Help"));
+            Assert.That(lines[++i], Is.EqualTo("\tDefault Help <action>"));
         }
 
-        //[Test]
-        //public void HelpDisplaysDefaultActionArguments()
-        //{
-        //    // When
-        //    var result = this.Subject.GenerateHelp();
+        [Test]
+        public void HelpForIndividualAction()
+        {
+            // When
+            var result = this.Subject.GenerateHelp("DoSomething");
+            Console.WriteLine(result);
 
-        //    // Then
-        //    var lines = result
-        //        .Split('\n')
-        //        .Where(row => !string.IsNullOrWhiteSpace(row))
-        //        .Select(row => row.Replace("\r", ""))
-        //        .SkipWhile(row => row != "ARGUMENTS")
-        //        .ToArray()
-        //        ;
+            // Then
+            var lines = result
+                .Split('\n')
+                .Where(row => !string.IsNullOrWhiteSpace(row))
+                .Select(row => row.Replace("\r", ""))
+                .ToArray()
+                ;
 
-        //    var i = 0;
-        //    Assert.That(lines[++i].Trim(), Is.EqualTo("AlwaysReturnsMinus2"));
-        //    Assert.That(lines[++i].Trim(), Is.EqualTo("DoSomething (default)"));
-        //    Assert.That(lines[++i].Trim(), Is.EqualTo("SomeOtherControllerAction"));
-        //    Assert.That(lines[++i].Trim(), Is.EqualTo("WithOptionalStringArg"));
-        //    Assert.That(lines[++i].Trim(), Is.EqualTo("WithOptionalStringArgs"));
-        //    Assert.That(lines[++i].Trim(), Is.EqualTo("WithRequiredStringArg"));
-        //    Assert.That(lines[++i].Trim(), Is.EqualTo("WithRequiredStringArgs"));
-        //    Assert.That(lines[++i].Trim(), Is.EqualTo("WithSwitch"));
-        //    Assert.That(lines[++i].Trim(), Is.EqualTo("To get help for actions"));
-        //    Assert.That(lines[++i], Is.EqualTo("\tDefault <action> Help"));
-        //}
+            var i = 0;
+            Assert.That(lines[i].Trim(), Is.EqualTo("DoSomething (default)         A description of the DoSomething() method."));
+            Assert.That(lines[++i], Is.EqualTo("\t--argument1               Lorem ipsum dolor sit amet, consectetur adipiscing elit"));
+            Assert.That(lines[++i], Is.EqualTo("\t--argument2               sed do eiusmod tempor incididunt ut labore et dolore magna aliqua"));
+            Assert.That(lines[++i], Is.EqualTo("\t--argument3               Ut enim ad minim veniam"));
+        }
 
         #endregion
     }

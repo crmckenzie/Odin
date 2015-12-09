@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
+using System.Text;
 
 namespace Odin
 {
@@ -64,7 +65,7 @@ namespace Odin
                     return result;
                 }
 
-                var subCommand = GetControllerByName(first);
+                var subCommand = GetSubCommandByName(first);
                 if (subCommand != null)
                 {
                     var theRest = args.Skip(1).ToArray();
@@ -87,9 +88,8 @@ namespace Odin
         public IEnumerable<ParameterMap> Map(string[] args)
         {
             ParameterMap map = null;
-            for (var i = 0; i < args.Length; i++)
+            foreach (var arg in args)
             {
-                var arg = args[i];
                 if (arg.StartsWith("--"))
                 {
                     if (map != null)
@@ -101,15 +101,26 @@ namespace Odin
                     {
                         Switch = arg
                     };
-                } else if (map != null)
+                }
+                else
                 {
-                    map.RawValues.Add(arg);
+                    map?.RawValues.Add(arg);
                 }
             }
 
             if (map != null)
                 yield return map;
-        } 
+        }
+
+
+        private IEnumerable<ParameterMap> Map(MethodInfo methodInfo)
+        {
+            return methodInfo.GetParameters().Select(row => new ParameterMap()
+            {
+                ParameterInfo = row,
+                Switch = $"--{row.Name}",
+            });
+        }
 
         private int InvokeMethod(string name, string[] args)
         {
@@ -152,7 +163,7 @@ namespace Odin
             }
         }
 
-        private Controller GetControllerByName(string name)
+        private Controller GetSubCommandByName(string name)
         {
             if (SubCommands.ContainsKey(name))
             {
@@ -161,9 +172,18 @@ namespace Odin
             return null;
         }
 
-        public virtual string GenerateHelp(string actionOrSubCommand = "")
+        public virtual string GenerateHelp(string actionName = "")
         {
+
             var builder = new System.Text.StringBuilder();
+
+            if (!string.IsNullOrWhiteSpace(actionName))
+            {
+                var method = methods[actionName];
+                var help = GetHelpForMethod(method);
+                return help;
+            }
+
 
             builder.AppendLine(this.Description);
 
@@ -171,16 +191,18 @@ namespace Odin
             {
                 builder
                     .AppendLine()
+                    .AppendLine()
                     .AppendLine("SUB COMMANDS");
 
                 foreach (var subCommand in SubCommands.Values)
                 {
-                    builder.AppendFormat("{0,-30}", subCommand.Name)
-                        .Append("     ")
+                    builder
+                        .AppendFormat("{0,-30}", subCommand.Name)
                         .AppendLine(subCommand.Description)
                         ;
                 }
 
+                builder.AppendLine();
                 builder.AppendLine("To get help for subcommands");
                 builder.AppendFormat("\t{0} <subcommand> Help", this.Name);
             }
@@ -194,26 +216,38 @@ namespace Odin
 
                 foreach (var method in methods.Values.OrderBy(m => m.Name))
                 {
-                    var isDefaultAction = method.Name == defaultActionAttribute?.MethodName;
-                    var name = isDefaultAction ? $"{method.Name} (default)" : method.Name;
-
-                    builder.AppendLine($"{name,-30}{GetMethodDescription(method)}");
+                    var methodHelp = GetHelpForMethod(method);
+                    builder.AppendLine(methodHelp);
                 }
 
+                builder.AppendLine();
                 builder.AppendLine("To get help for actions");
-                builder.AppendFormat("\t{0} <action> Help", this.Name)
+                builder.AppendFormat("\t{0} Help <action>", this.Name)
                     .AppendLine();
-            }
-
-            if (defaultActionAttribute != null)
-            {
-                builder.AppendLine("ARGUMENTS");
             }
 
             var result = builder.ToString();
 
             return result;
         }
+
+        private string GetHelpForMethod(MethodInfo method)
+        {
+            var builder = new System.Text.StringBuilder();
+            var isDefaultAction = method.Name == defaultActionAttribute?.MethodName;
+            var name = isDefaultAction ? $"{method.Name} (default)" : method.Name;
+
+            builder.AppendLine($"{name,-30}{GetMethodDescription(method)}");
+
+            var parameterMaps = Map(method);
+            foreach (var parameterMap in parameterMaps)
+            {
+                var description = parameterMap.GetDescription();
+                builder.AppendLine($"\t{parameterMap.Switch,-26}{description}");
+            }
+            return builder.ToString();
+        }
+
 
         private string GetMethodDescription(MethodInfo method)
         {

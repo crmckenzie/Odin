@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
 
@@ -67,6 +68,14 @@ namespace Odin
         public bool IsMatch(ParameterInfo parameter)
         {
             return Switch == $"--{parameter.Name}";
+        }
+
+        public string GetDescription()
+        {
+            var attr = ParameterInfo.GetCustomAttribute<DescriptionAttribute>();
+            if (attr != null)
+                return attr.Description;
+            return "";
         }
     }
 }

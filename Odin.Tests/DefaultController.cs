@@ -30,9 +30,13 @@ namespace Odin.Tests
         }
 
         [Action]
+        [Description("A description of the DoSomething() method.")]
         public void DoSomething(
+            [Description("Lorem ipsum dolor sit amet, consectetur adipiscing elit")]
             string argument1 = "value1-not-passed", 
+            [Description("sed do eiusmod tempor incididunt ut labore et dolore magna aliqua")]
             string argument2 = "value2-not-passed", 
+            [Description("Ut enim ad minim veniam")]
             string argument3 = "value3-not-passed")
         {
             this.MethodArguments = new object[] {argument1, argument2, argument3};
