@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -9,7 +8,7 @@ namespace Odin
 {
     public abstract class Controller
     {
-        private readonly Dictionary<string, MethodInfo> _methods;
+        private readonly Dictionary<string, ActionMap> _actionMaps;
         private readonly DefaultActionAttribute _defaultActionAttribute;
         private Dictionary<string, Controller> SubCommands { get; }
 
@@ -17,12 +16,28 @@ namespace Odin
 
         protected Controller()
         {
-            this._methods = GetActionMethods().ToDictionary(row => row.Name);
+            // order matters with these assignments
             this._defaultActionAttribute = GetType().GetCustomAttribute(typeof(DefaultActionAttribute)) as DefaultActionAttribute;
+            this._actionMaps = GetActionMaps();
+
             Name = GetType().Name.Replace("Controller", "");
             SubCommands = new Dictionary<string, Controller>();
             Logger = new Logger();
             this.Description = GetDescription();
+        }
+
+        private Dictionary<string, ActionMap> GetActionMaps()
+        {
+            return GetActionMethods()
+                .Select(row => new ActionMap(this, row, IsDefaultAction(row)))
+                .ToDictionary(row => row.Name)
+                ;
+        }
+
+        private bool IsDefaultAction(MethodInfo methodInfo)
+        {
+            if (_defaultActionAttribute == null) return false;
+            return _defaultActionAttribute.MethodName == methodInfo.Name;
         }
 
         private IEnumerable<MethodInfo> GetActionMethods()
@@ -58,7 +73,7 @@ namespace Odin
             if (args.Any())
             {
                 var first = args.First();
-                if (_methods.ContainsKey(first))
+                if (_actionMaps.ContainsKey(first))
                 {
                     var result = InvokeMethod(first, args.Skip(1).ToArray());
                     if (result < 0) this.Help();
@@ -112,55 +127,15 @@ namespace Odin
                 yield return map;
         }
 
-
-        private IEnumerable<ParameterMap> Map(MethodInfo methodInfo)
-        {
-            return methodInfo.GetParameters().Select(row => new ParameterMap()
-            {
-                ParameterInfo = row,
-                Switch = $"--{row.Name}",
-            });
-        }
-
         private int InvokeMethod(string name, string[] args)
         {
-            var methodInfo = _methods[name];
+            var actionMap = _actionMaps[name];
 
-            var parameters = methodInfo.GetParameters().OrderBy(p => p.Position).ToArray();
-            var parameterMap = Map(args).ToList();
+            var invocation = actionMap.GenerateInvocation(args);
+            if (!invocation.CanInvoke()) return -1;
 
-            Merge(parameters, parameterMap);
-
-            var orderedMaps = parameterMap.OrderBy(row => row.ParameterInfo.Position).ToArray();
-            var values = orderedMaps.Select(row => row.GetValue()).ToArray();
-
-            var result = methodInfo.Invoke(this, values);
-
-            if (result is int)
-            {
-                return (int) result;
-            }
-
-            return 0;
-        }
-
-        private void Merge(ParameterInfo[] parameters, List<ParameterMap> parameterMaps)
-        {
-            foreach (var parameter in parameters)
-            {
-                var parameterMap = parameterMaps.SingleOrDefault(row => row.IsMatch(parameter));
-                if (parameterMap != null)
-                {
-                    parameterMap.ParameterInfo = parameter;
-                }
-                else
-                {
-                    parameterMaps.Add(new ParameterMap()
-                    {
-                        ParameterInfo = parameter
-                    });
-                }
-            }
+            var result = invocation.Invoke();
+            return result;
         }
 
         private Controller GetSubCommandByName(string name)
@@ -176,9 +151,8 @@ namespace Odin
         {
             if (!string.IsNullOrWhiteSpace(actionName))
             {
-                var method = _methods[actionName];
-                var help = GetHelpForMethod(method);
-                return help;
+                var actionMap = _actionMaps[actionName];
+                return actionMap.Help();
             }
 
             var builder = new System.Text.StringBuilder();
@@ -187,7 +161,7 @@ namespace Odin
             if (SubCommands.Any())
                 GetSubCommandsHelp(builder);
 
-            if (_methods.Any())
+            if (_actionMaps.Any())
                 GetMethodsHelp(builder);
 
             var result = builder.ToString();
@@ -202,9 +176,9 @@ namespace Odin
                 .AppendLine()
                 .AppendLine("ACTIONS");
 
-            foreach (var method in _methods.Values.OrderBy(m => m.Name))
+            foreach (var method in _actionMaps.Values.OrderBy(m => m.Name))
             {
-                var methodHelp = GetHelpForMethod(method);
+                var methodHelp = method.Help();;
                 builder.AppendLine(methodHelp);
             }
 
@@ -232,33 +206,6 @@ namespace Odin
             builder.AppendLine();
             builder.AppendLine("To get help for subcommands");
             builder.AppendFormat("\t{0} <subcommand> Help", this.Name);
-        }
-
-        private string GetHelpForMethod(MethodInfo method)
-        {
-            var builder = new System.Text.StringBuilder();
-            var isDefaultAction = method.Name == _defaultActionAttribute?.MethodName;
-            var name = isDefaultAction ? $"{method.Name} (default)" : method.Name;
-
-            builder.AppendLine($"{name,-30}{GetMethodDescription(method)}");
-
-            var parameterMaps = Map(method);
-            foreach (var parameterMap in parameterMaps)
-            {
-                var description = parameterMap.GetDescription();
-                builder.AppendLine($"\t{parameterMap.Switch,-26}{description}");
-            }
-            return builder.ToString();
-        }
-
-
-        private string GetMethodDescription(MethodInfo method)
-        {
-            var descriptionAttr = method.GetCustomAttribute<DescriptionAttribute>();
-            if (descriptionAttr == null)
-                return "";
-
-            return descriptionAttr.Description;
         }
 
         [Action]

@@ -41,11 +41,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ActionAttribute.cs" />
+    <Compile Include="ActionInvocation.cs" />
+    <Compile Include="ActionMap.cs" />
     <Compile Include="Controller.cs" />
     <Compile Include="DefaultActionAttribute.cs" />
     <Compile Include="EntryPoint.cs" />
     <Compile Include="Logger.cs" />
     <Compile Include="ParameterMap.cs" />
+    <Compile Include="ParameterValue.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

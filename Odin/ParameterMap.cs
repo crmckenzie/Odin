@@ -28,6 +28,12 @@ namespace Odin
         public List<object> RawValues { get; set; }
 
         public ParameterInfo ParameterInfo { get; set; }
+        public int Position => ParameterInfo.Position;
+
+        public bool IsOptional()
+        {
+            return ParameterInfo.IsOptional;
+        }
 
         public object GetValue()
         {
@@ -47,12 +53,12 @@ namespace Odin
             return Coerce(RawValues);
         }
 
-        private bool IsBooleanSwitch()
+        public bool IsBooleanSwitch()
         {
             return ParameterInfo.ParameterType == typeof (bool);
         }
 
-        private object Coerce(object value)
+        public object Coerce(object value)
         {
             var key = this.ParameterInfo.ParameterType;
             if (Coercion.ContainsKey(key))
@@ -76,6 +82,11 @@ namespace Odin
             if (attr != null)
                 return attr.Description;
             return "";
+        }
+
+        public bool IsSwitch(string arg)
+        {
+            return arg.StartsWith("--");
         }
     }
 }

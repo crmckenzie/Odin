@@ -90,6 +90,18 @@ namespace Odin.Tests
 
             this.Subject.Received().WithRequiredStringArgs("value1", "value2");
         }
+
+        [Test]
+        public void CanMatchArgsByParameterOrder()
+        {
+            var args = new[] { "WithRequiredStringArgs", "value1", "value2" };
+
+            var result = this.Subject.Execute(args);
+
+            Assert.That(result, Is.EqualTo(0));
+            this.Subject.Received().WithRequiredStringArgs("value1", "value2");
+        }
+
         #endregion
 
         #region Switches
