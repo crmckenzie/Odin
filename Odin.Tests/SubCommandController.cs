@@ -11,6 +11,16 @@ namespace Odin.Tests
     [DefaultAction("DoSomething")]
     public class SubCommandController : Controller
     {
+        public SubCommandController(Logger logger) : base()
+        {
+            this.Logger = logger;
+        }
+
+        public SubCommandController() : base()
+        {
+            
+        }
+
         [Action]
         public virtual void DoSomething()
         {

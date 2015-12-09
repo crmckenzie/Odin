@@ -9,16 +9,16 @@ namespace Odin
 {
     public abstract class Controller
     {
-        private readonly Dictionary<string, MethodInfo> methods;
-        private readonly DefaultActionAttribute defaultActionAttribute;
+        private readonly Dictionary<string, MethodInfo> _methods;
+        private readonly DefaultActionAttribute _defaultActionAttribute;
         private Dictionary<string, Controller> SubCommands { get; }
 
         public Logger Logger { get; set; }
 
         protected Controller()
         {
-            this.methods = GetActionMethods().ToDictionary(row => row.Name);
-            this.defaultActionAttribute = GetType().GetCustomAttribute(typeof(DefaultActionAttribute)) as DefaultActionAttribute;
+            this._methods = GetActionMethods().ToDictionary(row => row.Name);
+            this._defaultActionAttribute = GetType().GetCustomAttribute(typeof(DefaultActionAttribute)) as DefaultActionAttribute;
             Name = GetType().Name.Replace("Controller", "");
             SubCommands = new Dictionary<string, Controller>();
             Logger = new Logger();
@@ -58,7 +58,7 @@ namespace Odin
             if (args.Any())
             {
                 var first = args.First();
-                if (methods.ContainsKey(first))
+                if (_methods.ContainsKey(first))
                 {
                     var result = InvokeMethod(first, args.Skip(1).ToArray());
                     if (result < 0) this.Help();
@@ -74,9 +74,9 @@ namespace Odin
 
                 this.Logger.Error("Unrecognized command sequence: {0}", string.Join(" ", args));
             }
-            else if (defaultActionAttribute != null)
+            else if (_defaultActionAttribute != null)
             {
-                var result = InvokeMethod(defaultActionAttribute.MethodName, args);
+                var result = InvokeMethod(_defaultActionAttribute.MethodName, args);
                 if (result < 0) this.Help();
                 return result;
             }
@@ -124,7 +124,7 @@ namespace Odin
 
         private int InvokeMethod(string name, string[] args)
         {
-            var methodInfo = methods[name];
+            var methodInfo = _methods[name];
 
             var parameters = methodInfo.GetParameters().OrderBy(p => p.Position).ToArray();
             var parameterMap = Map(args).ToList();
@@ -174,67 +174,70 @@ namespace Odin
 
         public virtual string GenerateHelp(string actionName = "")
         {
-
-            var builder = new System.Text.StringBuilder();
-
             if (!string.IsNullOrWhiteSpace(actionName))
             {
-                var method = methods[actionName];
+                var method = _methods[actionName];
                 var help = GetHelpForMethod(method);
                 return help;
             }
 
-
+            var builder = new System.Text.StringBuilder();
             builder.AppendLine(this.Description);
 
             if (SubCommands.Any())
-            {
-                builder
-                    .AppendLine()
-                    .AppendLine()
-                    .AppendLine("SUB COMMANDS");
+                GetSubCommandsHelp(builder);
 
-                foreach (var subCommand in SubCommands.Values)
-                {
-                    builder
-                        .AppendFormat("{0,-30}", subCommand.Name)
-                        .AppendLine(subCommand.Description)
-                        ;
-                }
-
-                builder.AppendLine();
-                builder.AppendLine("To get help for subcommands");
-                builder.AppendFormat("\t{0} <subcommand> Help", this.Name);
-            }
-
-            if (methods.Any())
-            {
-                builder
-                    .AppendLine()
-                    .AppendLine()
-                    .AppendLine("ACTIONS");
-
-                foreach (var method in methods.Values.OrderBy(m => m.Name))
-                {
-                    var methodHelp = GetHelpForMethod(method);
-                    builder.AppendLine(methodHelp);
-                }
-
-                builder.AppendLine();
-                builder.AppendLine("To get help for actions");
-                builder.AppendFormat("\t{0} Help <action>", this.Name)
-                    .AppendLine();
-            }
+            if (_methods.Any())
+                GetMethodsHelp(builder);
 
             var result = builder.ToString();
 
             return result;
         }
 
+        private void GetMethodsHelp(StringBuilder builder)
+        {
+            builder
+                .AppendLine()
+                .AppendLine()
+                .AppendLine("ACTIONS");
+
+            foreach (var method in _methods.Values.OrderBy(m => m.Name))
+            {
+                var methodHelp = GetHelpForMethod(method);
+                builder.AppendLine(methodHelp);
+            }
+
+            builder.AppendLine();
+            builder.AppendLine("To get help for actions");
+            builder.AppendFormat("\t{0} Help <action>", this.Name)
+                .AppendLine();
+        }
+
+        private void GetSubCommandsHelp(StringBuilder builder)
+        {
+            builder
+                .AppendLine()
+                .AppendLine()
+                .AppendLine("SUB COMMANDS");
+
+            foreach (var subCommand in SubCommands.Values)
+            {
+                builder
+                    .AppendFormat("{0,-30}", subCommand.Name)
+                    .AppendLine(subCommand.Description)
+                    ;
+            }
+
+            builder.AppendLine();
+            builder.AppendLine("To get help for subcommands");
+            builder.AppendFormat("\t{0} <subcommand> Help", this.Name);
+        }
+
         private string GetHelpForMethod(MethodInfo method)
         {
             var builder = new System.Text.StringBuilder();
-            var isDefaultAction = method.Name == defaultActionAttribute?.MethodName;
+            var isDefaultAction = method.Name == _defaultActionAttribute?.MethodName;
             var name = isDefaultAction ? $"{method.Name} (default)" : method.Name;
 
             builder.AppendLine($"{name,-30}{GetMethodDescription(method)}");
@@ -258,9 +261,13 @@ namespace Odin
             return descriptionAttr.Description;
         }
 
-        public void Help(string actionOrSubCommand = "")
+        [Action]
+        public void Help(
+            [Description("The name of the action to provide help for.")]
+            string actionName = "")
         {
-            this.Logger.Info(this.GenerateHelp(actionOrSubCommand));
+            var help = this.GenerateHelp(actionName);
+            this.Logger.Info(help);
         }
     }
 }

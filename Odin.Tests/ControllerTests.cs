@@ -7,6 +7,12 @@ using NUnit.Framework;
 
 namespace Odin.Tests
 {
+    //TODO: Support aliases on controllers
+    //TODO: Support aliases on methods
+    //TODO: Support aliases on parameters
+    //TODO: Support custom conventions
+    //TODO: Support custom argument parsers
+
     [TestFixture]
     public class ControllerTests
     {
@@ -14,7 +20,7 @@ namespace Odin.Tests
         public void BeforeEach()
         {
             this.Logger = new StringBuilderLogger();
-            this.SubCommandController = Substitute.ForPartsOf<SubCommandController>();
+            this.SubCommandController = Substitute.ForPartsOf<SubCommandController>(this.Logger);
             this.SubCommandController.Name = "SubCommand";
             this.Subject = Substitute.ForPartsOf<DefaultController>(this.SubCommandController, this.Logger);
             this.Subject.Name = "Default";
@@ -281,6 +287,8 @@ namespace Odin.Tests
             Assert.That(lines[++i], Is.EqualTo("\t--argument1               Lorem ipsum dolor sit amet, consectetur adipiscing elit"));
             Assert.That(lines[++i], Is.EqualTo("\t--argument2               sed do eiusmod tempor incididunt ut labore et dolore magna aliqua"));
             Assert.That(lines[++i], Is.EqualTo("\t--argument3               Ut enim ad minim veniam"));
+            Assert.That(lines[++i].Trim(), Is.EqualTo("Help"));
+            Assert.That(lines[++i], Is.EqualTo("\t--actionName              The name of the action to provide help for."));
             Assert.That(lines[++i].Trim(), Is.EqualTo("SomeOtherControllerAction"));
             Assert.That(lines[++i].Trim(), Is.EqualTo("WithOptionalStringArg"));
             Assert.That(lines[++i].TrimEnd(), Is.EqualTo("\t--argument"));
@@ -319,6 +327,36 @@ namespace Odin.Tests
             Assert.That(lines[++i], Is.EqualTo("\t--argument1               Lorem ipsum dolor sit amet, consectetur adipiscing elit"));
             Assert.That(lines[++i], Is.EqualTo("\t--argument2               sed do eiusmod tempor incididunt ut labore et dolore magna aliqua"));
             Assert.That(lines[++i], Is.EqualTo("\t--argument3               Ut enim ad minim veniam"));
+        }
+
+        [Test]
+        public void HelpForSubCommands()
+        {
+            // When
+            var result = this.Subject.Execute(new [] { "SubCommand", "Help"});
+
+            // Then
+            Assert.That(result, Is.EqualTo(0), this.Logger.ErrorBuilder.ToString());
+            this.SubCommandController.Received().Help();
+
+            var lines = this.Logger.InfoBuilder.ToString()
+                .Split('\n')
+                .Where(row => !string.IsNullOrWhiteSpace(row))
+                .Select(row => row.Replace("\r", ""))
+                .ToArray()
+                ;
+
+            var i = 0;
+            Assert.That(lines[i].Trim(), Is.EqualTo("Provides a component of testability for subcommands."));
+            Assert.That(lines[++i].Trim(), Is.EqualTo("ACTIONS"));
+            Assert.That(lines[++i].Trim(), Is.EqualTo("DoSomething (default)"));
+            Assert.That(lines[++i].Trim(), Is.EqualTo("Help"));
+            Assert.That(lines[++i], Is.EqualTo("\t--actionName              The name of the action to provide help for."));
+            Assert.That(lines[++i].Trim(), Is.EqualTo("To get help for actions"));
+
+            //TODO: This line should include the root controller.
+            Assert.That(lines[++i], Is.EqualTo("\tSubCommand Help <action>"));
+
         }
 
         #endregion
