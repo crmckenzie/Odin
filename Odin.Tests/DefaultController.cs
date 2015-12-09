@@ -30,9 +30,12 @@ namespace Odin.Tests
         }
 
         [Action]
-        public virtual void DoSomething()
+        public void DoSomething(
+            string argument1 = "value1-not-passed", 
+            string argument2 = "value2-not-passed", 
+            string argument3 = "value3-not-passed")
         {
-
+            this.MethodArguments = new object[] {argument1, argument2, argument3};
         }
 
         [Action]
@@ -66,7 +69,10 @@ namespace Odin.Tests
         }
 
         [Action]
-        public void WithOptionalStringArgs(string argument1 = "value1-not-passed", string argument2 = "value2-not-passed", string argument3 = "value3-not-passed")
+        public void WithOptionalStringArgs(
+            string argument1 = "value1-not-passed", 
+            string argument2 = "value2-not-passed", 
+            string argument3 = "value3-not-passed")
         {
             MethodArguments = new object[] { argument1, argument2, argument3 };
         }

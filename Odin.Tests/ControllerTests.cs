@@ -16,6 +16,7 @@ namespace Odin.Tests
             this.SubCommandController = Substitute.ForPartsOf<SubCommandController>();
             this.SubCommandController.Name = "SubCommand";
             this.Subject = Substitute.ForPartsOf<DefaultController>(this.SubCommandController, this.Logger);
+            this.Subject.Name = "Default";
         }
 
         public StringBuilderLogger Logger { get; set; }
@@ -86,37 +87,37 @@ namespace Odin.Tests
 
         #region Switches
 
-                [Test]
-                public void SwitchWithValue()
-                {
-                    var args = new[] { "WithSwitch", "--argument", "true" };
+        [Test]
+        public void SwitchWithValue()
+        {
+            var args = new[] { "WithSwitch", "--argument", "true" };
 
-                    this.Subject.Execute(args);
+            this.Subject.Execute(args);
            
-                    Assert.That(Subject.MethodArguments, Is.EquivalentTo(new [] {true}));
-                }
+            Assert.That(Subject.MethodArguments, Is.EquivalentTo(new [] {true}));
+        }
 
-                [Test]
-                public void SwitchWithoutValue()
-                {
-                    var args = new[] { "WithSwitch", "--argument"};
+        [Test]
+        public void SwitchWithoutValue()
+        {
+            var args = new[] { "WithSwitch", "--argument"};
 
-                    this.Subject.Execute(args);
+            this.Subject.Execute(args);
 
-                    Assert.That(Subject.MethodArguments, Is.EquivalentTo(new[] { true }));
-                }
+            Assert.That(Subject.MethodArguments, Is.EquivalentTo(new[] { true }));
+        }
 
-                [Test]
-                public void SwitchNotGiven()
-                {
-                    var args = new[] { "WithSwitch"};
+        [Test]
+        public void SwitchNotGiven()
+        {
+            var args = new[] { "WithSwitch"};
 
-                    this.Subject.Execute(args);
+            this.Subject.Execute(args);
 
-                    Assert.That(Subject.MethodArguments, Is.EquivalentTo(new[] { false }));
-                }
+            Assert.That(Subject.MethodArguments, Is.EquivalentTo(new[] { false }));
+        }
 
-                #endregion
+        #endregion
 
         #region Optional arguments
 
@@ -171,6 +172,16 @@ namespace Odin.Tests
         }
 
         [Test]
+        public void WithOptionalStringArgs_PassNone()
+        {
+            var args = new[] { "WithOptionalStringArgs" };
+
+            this.Subject.Execute(args);
+
+            Assert.That(this.Subject.MethodArguments, Is.EquivalentTo(new[] { "value1-not-passed", "value2-not-passed", "value3-not-passed" }));
+        }
+
+        [Test]
         public void WithOptionalStringArgs_PassTail()
         {
             var args = new[] { "WithOptionalStringArgs", "--argument3", "value3" };
@@ -209,16 +220,99 @@ namespace Odin.Tests
         }
 
         [Test]
-        public void GenerateHelp()
+        public void HelpDisplaysControllerDescription()
         {
             // When
             var result = this.Subject.GenerateHelp();
 
             // Then
-            var lines = result.Split('\n');
+            var lines = result
+                .Split('\n')
+                .Where(row => !string.IsNullOrWhiteSpace(row))
+                .Select(row => row.Replace("\r", ""))
+                .ToArray()
+                ;
+
             var i = 0;
             Assert.That(lines[i], Is.EqualTo("This is the default controller"));
         }
+
+        [Test]
+        public void HelpDisplaysSubCommands()
+        {
+            // When
+            var result = this.Subject.GenerateHelp();
+
+            // Then
+            var lines = result
+                .Split('\n')
+                .Where(row => !string.IsNullOrWhiteSpace(row))
+                .Select(row => row.Replace("\r", ""))
+                .ToArray()
+                ;
+
+            var i = 0;
+            Assert.That(lines[++i], Is.EqualTo("SUB COMMANDS"));
+            Assert.That(lines[++i], Is.EqualTo("SubCommand                         Provides a component of testability for subcommands."));
+            Assert.That(lines[++i], Is.EqualTo("To get help for subcommands"));
+            Assert.That(lines[++i], Is.EqualTo("\tDefault <subcommand> Help"));
+        }
+
+        [Test]
+        public void HelpDisplaysActions()
+        {
+            // When
+            var result = this.Subject.GenerateHelp();
+
+            // Then
+            var lines = result
+                .Split('\n')
+                .Where(row => !string.IsNullOrWhiteSpace(row))
+                .Select(row => row.Replace("\r", ""))
+                .SkipWhile(row => row != "ACTIONS")
+                .ToArray()
+                ;
+
+            var i = 0;
+            Assert.That(lines[++i].Trim(), Is.EqualTo("AlwaysReturnsMinus2"));
+            Assert.That(lines[++i].Trim(), Is.EqualTo("DoSomething (default)"));
+            Assert.That(lines[++i].Trim(), Is.EqualTo("SomeOtherControllerAction"));
+            Assert.That(lines[++i].Trim(), Is.EqualTo("WithOptionalStringArg"));
+            Assert.That(lines[++i].Trim(), Is.EqualTo("WithOptionalStringArgs"));
+            Assert.That(lines[++i].Trim(), Is.EqualTo("WithRequiredStringArg"));
+            Assert.That(lines[++i].Trim(), Is.EqualTo("WithRequiredStringArgs"));
+            Assert.That(lines[++i].Trim(), Is.EqualTo("WithSwitch"));
+            Assert.That(lines[++i].Trim(), Is.EqualTo("To get help for actions"));
+            Assert.That(lines[++i], Is.EqualTo("\tDefault <action> Help"));
+        }
+
+        //[Test]
+        //public void HelpDisplaysDefaultActionArguments()
+        //{
+        //    // When
+        //    var result = this.Subject.GenerateHelp();
+
+        //    // Then
+        //    var lines = result
+        //        .Split('\n')
+        //        .Where(row => !string.IsNullOrWhiteSpace(row))
+        //        .Select(row => row.Replace("\r", ""))
+        //        .SkipWhile(row => row != "ARGUMENTS")
+        //        .ToArray()
+        //        ;
+
+        //    var i = 0;
+        //    Assert.That(lines[++i].Trim(), Is.EqualTo("AlwaysReturnsMinus2"));
+        //    Assert.That(lines[++i].Trim(), Is.EqualTo("DoSomething (default)"));
+        //    Assert.That(lines[++i].Trim(), Is.EqualTo("SomeOtherControllerAction"));
+        //    Assert.That(lines[++i].Trim(), Is.EqualTo("WithOptionalStringArg"));
+        //    Assert.That(lines[++i].Trim(), Is.EqualTo("WithOptionalStringArgs"));
+        //    Assert.That(lines[++i].Trim(), Is.EqualTo("WithRequiredStringArg"));
+        //    Assert.That(lines[++i].Trim(), Is.EqualTo("WithRequiredStringArgs"));
+        //    Assert.That(lines[++i].Trim(), Is.EqualTo("WithSwitch"));
+        //    Assert.That(lines[++i].Trim(), Is.EqualTo("To get help for actions"));
+        //    Assert.That(lines[++i], Is.EqualTo("\tDefault <action> Help"));
+        //}
 
         #endregion
     }

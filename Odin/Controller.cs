@@ -165,11 +165,63 @@ namespace Odin
         {
             var builder = new System.Text.StringBuilder();
 
-            builder.Append(this.Description);
+            builder.AppendLine(this.Description);
+
+            if (SubCommands.Any())
+            {
+                builder
+                    .AppendLine()
+                    .AppendLine("SUB COMMANDS");
+
+                foreach (var subCommand in SubCommands.Values)
+                {
+                    builder.AppendFormat("{0,-30}", subCommand.Name)
+                        .Append("     ")
+                        .AppendLine(subCommand.Description)
+                        ;
+                }
+
+                builder.AppendLine("To get help for subcommands");
+                builder.AppendFormat("\t{0} <subcommand> Help", this.Name);
+            }
+
+            if (methods.Any())
+            {
+                builder
+                    .AppendLine()
+                    .AppendLine()
+                    .AppendLine("ACTIONS");
+
+                foreach (var method in methods.Values.OrderBy(m => m.Name))
+                {
+                    var isDefaultAction = method.Name == defaultActionAttribute?.MethodName;
+                    var name = isDefaultAction ? $"{method.Name} (default)" : method.Name;
+
+                    builder.AppendLine($"{name,-30}{GetMethodDescription(method)}");
+                }
+
+                builder.AppendLine("To get help for actions");
+                builder.AppendFormat("\t{0} <action> Help", this.Name)
+                    .AppendLine();
+            }
+
+            if (defaultActionAttribute != null)
+            {
+                builder.AppendLine("ARGUMENTS");
+            }
 
             var result = builder.ToString();
 
             return result;
+        }
+
+        private string GetMethodDescription(MethodInfo method)
+        {
+            var descriptionAttr = method.GetCustomAttribute<DescriptionAttribute>();
+            if (descriptionAttr == null)
+                return "";
+
+            return descriptionAttr.Description;
         }
 
         public void Help(string actionOrSubCommand = "")
