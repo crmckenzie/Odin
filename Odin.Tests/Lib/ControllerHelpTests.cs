@@ -12,15 +12,17 @@ namespace Odin.Tests
         public void BeforeEach()
         {
             this.Logger = new StringBuilderLogger();
-            this.SubCommandCommand = Substitute.ForPartsOf<SubCommandCommand>(this.Logger);
-            this.SubCommandCommand.Name = "SubCommand";
-            this.Subject = Substitute.ForPartsOf<DefaultCommand>(this.SubCommandCommand, this.Logger);
-            this.Subject.Name = "Default";
+
+            this.SubCommand = Substitute.ForPartsOf<SubCommand>(this.Logger);
+            this.SubCommand.Name.Returns("Sub");
+
+            this.Subject = Substitute.ForPartsOf<DefaultCommand>(this.SubCommand, this.Logger);
+            this.Subject.Name.Returns("Default");
         }
 
         public StringBuilderLogger Logger { get; set; }
 
-        public SubCommandCommand SubCommandCommand { get; set; }
+        public SubCommand SubCommand { get; set; }
 
         public DefaultCommand Subject { get; set; }
 
@@ -58,7 +60,7 @@ namespace Odin.Tests
 
             var i = 0;
             Assert.That(lines[++i], Is.EqualTo("SUB COMMANDS"));
-            Assert.That(lines[++i], Is.EqualTo("SubCommand                    Provides a component of testability for subcommands."));
+            Assert.That(lines[++i], Is.EqualTo("Sub                           Provides a component of testability for subcommands."));
             Assert.That(lines[++i], Is.EqualTo("To get help for subcommands"));
             Assert.That(lines[++i], Is.EqualTo("\tDefault <subcommand> Help"));
         }
@@ -131,11 +133,11 @@ namespace Odin.Tests
         public void HelpForSubCommands()
         {
             // When
-            var result = this.Subject.Execute(new [] { "SubCommand", "Help"});
+            var result = Subject.Execute("Sub", "Help");
 
             // Then
             Assert.That(result, Is.EqualTo(0), this.Logger.ErrorBuilder.ToString());
-            this.SubCommandCommand.Received().Help();
+            this.SubCommand.Received().Help();
 
             var lines = this.Logger.InfoBuilder.ToString()
                 .Split('\n')
@@ -153,7 +155,7 @@ namespace Odin.Tests
             Assert.That(lines[++i].Trim(), Is.EqualTo("To get help for actions"));
 
             //TODO: This line should include the root controller.
-            Assert.That(lines[++i], Is.EqualTo("\tSubCommand Help <action>"));
+            Assert.That(lines[++i], Is.EqualTo("\tSub Help <action>"));
 
         }
     }

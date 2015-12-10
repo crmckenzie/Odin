@@ -10,7 +10,7 @@ namespace Odin.Demo
     {
         static void Main(string[] args)
         {
-            var root = new RootCommand(new FizzBuzzCommand());
+            var root = new RootCommand(new KatasCommand());
             var result = root.Execute(args);
             Environment.Exit(result);
         }

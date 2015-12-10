@@ -2,8 +2,8 @@
 
 namespace Odin.Demo
 {
-    [Description("An implementation of the FizzBuzz kata.")]
-    public class FizzBuzzCommand : Command
+    [Description("Provides some katas.")]
+    public class KatasCommand : Command
     {
         [Action(IsDefault = true)]
         public void FizzBuzz(int input)

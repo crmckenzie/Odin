@@ -13,18 +13,13 @@ namespace Odin.Tests
         public void BeforeEach()
         {
             this.Logger = new StringBuilderLogger();
-            this.SubCommandCommand = new SubCommandCommand(this.Logger)
-            {
-                Name = "SubCommand"
-            };
-
-            this.Subject = new DefaultCommand(this.SubCommandCommand, this.Logger);
-            this.Subject.Name = "Default";
+            this.SubCommand = new SubCommand();
+            this.Subject = new DefaultCommand(this.SubCommand, this.Logger);
         }
 
         public StringBuilderLogger Logger { get; set; }
 
-        public SubCommandCommand SubCommandCommand { get; set; }
+        public SubCommand SubCommand { get; set; }
 
         public DefaultCommand Subject { get; set; }
 
@@ -290,12 +285,12 @@ namespace Odin.Tests
         [Test]
         public void ExecuteSubCommand()
         {
-            var args = new[] { "SubCommand" };
+            var args = new[] { "Sub" };
 
             var result = this.Subject.GenerateInvocation(args);
 
             result.ShouldNotBeNull();
-            result.Instance.ShouldBe(this.SubCommandCommand);
+            result.Instance.ShouldBe(this.SubCommand);
             result.ParameterValues.Count.ShouldBe(0);
         }
 

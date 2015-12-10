@@ -26,12 +26,25 @@ namespace Odin.Tests.Demo
         #region FizzBuzzCommandRoute.FizzBuzz
 
         [Test]
-        public void Execute_FizzBuzz_UsingExplicitNames()
+        public void Execute_FizzBuzz_UsingExplicitParameterName()
         {
             // Given
 
             // When
-            var result = this.Subject.Execute("FizzBuzzCommand", "FizzBuzz", "3");
+            var result = this.Subject.Execute("Katas", "FizzBuzz", "--input", "3");
+
+            // Then
+            result.ShouldBe(0);
+            this.Logger.InfoBuilder.ToString().Trim().ShouldBe("Fizz");
+        }
+
+        [Test]
+        public void Execute_FizzBuzz_UsingExplicitActionName()
+        {
+            // Given
+
+            // When
+            var result = this.Subject.Execute("Katas", "FizzBuzz", "3");
 
             // Then
             result.ShouldBe(0);
@@ -44,7 +57,7 @@ namespace Odin.Tests.Demo
             // Given
 
             // When
-            var result = this.Subject.Execute("FizzBuzzCommand", "3");
+            var result = this.Subject.Execute("Katas", "3");
 
             // Then
             result.ShouldBe(0, this.Logger.InfoBuilder.ToString());

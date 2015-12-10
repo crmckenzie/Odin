@@ -8,14 +8,14 @@ using System.Threading.Tasks;
 namespace Odin.Tests
 {
     [Description("Provides a component of testability for subcommands.")]
-    public class SubCommandCommand : Command
+    public class SubCommand : Command
     {
 
-        public SubCommandCommand(Logger logger) : base(logger)
+        public SubCommand(Logger logger) : base(logger)
         {
         }
 
-        public SubCommandCommand() : base()
+        public SubCommand() : base()
         {
             
         }

@@ -21,15 +21,13 @@ namespace Odin.Tests
         public void BeforeEach()
         {
             this.Logger = new StringBuilderLogger();
-            this.SubCommand = Substitute.ForPartsOf<SubCommandCommand>();
-            this.SubCommand.Name = "SubCommand";
+            this.SubCommand = Substitute.ForPartsOf<SubCommand>();
             this.Subject = Substitute.ForPartsOf<DefaultCommand>(this.SubCommand, this.Logger);
-            this.Subject.Name = "Default";
         }
 
         public StringBuilderLogger Logger { get; set; }
 
-        public SubCommandCommand SubCommand { get; set; }
+        public SubCommand SubCommand { get; set; }
 
         public DefaultCommand Subject { get; set; }
 

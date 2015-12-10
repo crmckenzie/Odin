@@ -9,13 +9,10 @@ namespace Odin
 {
     public abstract class Command
     {
-        private readonly Dictionary<string, ActionMap> _actionMaps;
+        private Dictionary<string, ActionMap> _actionMaps;
         private Dictionary<string, Command> SubCommands { get; }
         protected Command(Logger logger = null)
         {
-            this._actionMaps = GetActionMaps();
-
-            Name = GetType().Name.Replace("Controller", "");
             SubCommands = new Dictionary<string, Command>();
 
             if (logger != null)
@@ -32,6 +29,13 @@ namespace Odin
             }
 
             this.Description = GetDescription();
+        }
+
+        protected void InitializeActionMaps()
+        {
+            if (this._actionMaps != null)
+                return;
+            this._actionMaps = GetActionMaps();
         }
 
         public string Description { get; }
@@ -55,7 +59,10 @@ namespace Odin
             }
         }
 
-        public string Name { get; set; }
+        public virtual string Name
+        {
+            get { return this.GetType().Name.Replace("Command", ""); }
+        }
 
         private Dictionary<string, ActionMap> GetActionMaps()
         {
@@ -113,9 +120,16 @@ namespace Odin
 
         public ActionInvocation GenerateInvocation(string[] args)
         {
-            var actionName = GetActionName(args);
-            var subCommand = GetSubCommandByName(args.FirstOrDefault());
+            this.InitializeActionMaps();
 
+            var subCommand = GetSubCommandByName(args.FirstOrDefault());
+            if (subCommand != null)
+            {
+                var theRest = args.Skip(1).ToArray();
+                return subCommand.GenerateInvocation(theRest);
+            }
+
+            var actionName = GetActionName(args);
             if (IsValidActionName(actionName))
             {
                 var actionMap = _actionMaps[actionName];
@@ -123,15 +137,10 @@ namespace Odin
                 var invocation = actionMap.GenerateInvocation(theRest);
                 return invocation;
             }
-            else if (subCommand == null)
+            else
             {
                 var actionMap = _actionMaps.Values.FirstOrDefault(row => row.IsDefaultAction);
                 return actionMap?.GenerateInvocation(args);
-            }
-            else
-            {
-                var theRest = args.Skip(1).ToArray();
-                return subCommand.GenerateInvocation(theRest);
             }
         }
 
@@ -160,6 +169,8 @@ namespace Odin
 
         public virtual string GenerateHelp(string actionName = "")
         {
+            this.InitializeActionMaps();
+
             if (!string.IsNullOrWhiteSpace(actionName))
             {
                 var actionMap = _actionMaps[actionName];

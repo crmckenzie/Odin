@@ -3,19 +3,19 @@
     public class RootCommand : Command
     {
 
-        public RootCommand() : this(new FizzBuzzCommand())
+        public RootCommand() : this(new KatasCommand())
         {
         }
 
-        public RootCommand(Logger logger) : this(logger, new FizzBuzzCommand())
+        public RootCommand(Logger logger) : this(logger, new KatasCommand())
         {
         }
 
-        public RootCommand(FizzBuzzCommand fizzbuzz) : this(null, fizzbuzz)
+        public RootCommand(KatasCommand fizzbuzz) : this(null, fizzbuzz)
         {
         }
 
-        public RootCommand(Logger logger, FizzBuzzCommand fizzbuzz) : base(logger)
+        public RootCommand(Logger logger, KatasCommand fizzbuzz) : base(logger)
         {
             base.RegisterSubCommand(fizzbuzz);
         }
