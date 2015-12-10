@@ -12,17 +12,17 @@ namespace Odin.Tests
         public void BeforeEach()
         {
             this.Logger = new StringBuilderLogger();
-            this.SubCommandController = Substitute.ForPartsOf<SubCommandController>(this.Logger);
-            this.SubCommandController.Name = "SubCommand";
-            this.Subject = Substitute.ForPartsOf<DefaultController>(this.SubCommandController, this.Logger);
+            this.SubCommandCommandRoute = Substitute.ForPartsOf<SubCommandCommandRoute>(this.Logger);
+            this.SubCommandCommandRoute.Name = "SubCommand";
+            this.Subject = Substitute.ForPartsOf<DefaultCommandRoute>(this.SubCommandCommandRoute, this.Logger);
             this.Subject.Name = "Default";
         }
 
         public StringBuilderLogger Logger { get; set; }
 
-        public SubCommandController SubCommandController { get; set; }
+        public SubCommandCommandRoute SubCommandCommandRoute { get; set; }
 
-        public DefaultController Subject { get; set; }
+        public DefaultCommandRoute Subject { get; set; }
 
         [Test]
         public void UnmatchedArgumentsDisplaysHelp()
@@ -145,7 +145,7 @@ namespace Odin.Tests
 
             // Then
             Assert.That(result, Is.EqualTo(0), this.Logger.ErrorBuilder.ToString());
-            this.SubCommandController.Received().Help();
+            this.SubCommandCommandRoute.Received().Help();
 
             var lines = this.Logger.InfoBuilder.ToString()
                 .Split('\n')

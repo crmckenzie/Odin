@@ -9,14 +9,14 @@ namespace Odin.Tests
 {
     [Description("Provides a component of testability for subcommands.")]
     [DefaultAction("DoSomething")]
-    public class SubCommandController : Controller
+    public class SubCommandCommandRoute : CommandRoute
     {
-        public SubCommandController(Logger logger) : base()
+        public SubCommandCommandRoute(Logger logger) : base()
         {
             this.Logger = logger;
         }
 
-        public SubCommandController() : base()
+        public SubCommandCommandRoute() : base()
         {
             
         }

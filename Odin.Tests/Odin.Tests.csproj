@@ -55,12 +55,11 @@
     <Compile Include="ControllerHelpTests.cs" />
     <Compile Include="ControllerInvocationTests.cs" />
     <Compile Include="ControllerTests.cs" />
-    <Compile Include="EntryPointTests.cs" />
-    <Compile Include="NotTheDefaultController.cs" />
+    <Compile Include="NotTheDefaultCommandRoute.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="DefaultController.cs" />
+    <Compile Include="DefaultCommandRoute.cs" />
     <Compile Include="StringBuilderLogger.cs" />
-    <Compile Include="SubCommandController.cs" />
+    <Compile Include="SubCommandCommandRoute.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

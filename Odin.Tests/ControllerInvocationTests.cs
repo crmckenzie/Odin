@@ -13,20 +13,20 @@ namespace Odin.Tests
         public void BeforeEach()
         {
             this.Logger = new StringBuilderLogger();
-            this.SubCommandController = new SubCommandController(this.Logger)
+            this.SubCommandCommandRoute = new SubCommandCommandRoute(this.Logger)
             {
                 Name = "SubCommand"
             };
 
-            this.Subject = new DefaultController(this.SubCommandController, this.Logger);
+            this.Subject = new DefaultCommandRoute(this.SubCommandCommandRoute, this.Logger);
             this.Subject.Name = "Default";
         }
 
         public StringBuilderLogger Logger { get; set; }
 
-        public SubCommandController SubCommandController { get; set; }
+        public SubCommandCommandRoute SubCommandCommandRoute { get; set; }
 
-        public DefaultController Subject { get; set; }
+        public DefaultCommandRoute Subject { get; set; }
 
         #region ActionExecution
 
@@ -291,7 +291,7 @@ namespace Odin.Tests
             var result = this.Subject.GenerateInvocation(args);
 
             result.ShouldNotBeNull();
-            result.Instance.ShouldBe(this.SubCommandController);
+            result.Instance.ShouldBe(this.SubCommandCommandRoute);
             result.ParameterValues.Count.ShouldBe(0);
         }
 

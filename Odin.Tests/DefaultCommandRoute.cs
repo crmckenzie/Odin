@@ -4,18 +4,18 @@ namespace Odin.Tests
 {
     [DefaultAction("DoSomething")]
     [Description("This is the default controller")]
-    public class DefaultController : Controller
+    public class DefaultCommandRoute : CommandRoute
     {
         public object[] MethodArguments { get; set; }
 
-        public DefaultController() : this(new SubCommandController(), new Logger())
+        public DefaultCommandRoute() : this(new SubCommandCommandRoute(), new Logger())
         {
            
         }
 
-        public DefaultController(SubCommandController subcommand, Logger logger)
+        public DefaultCommandRoute(SubCommandCommandRoute subcommand, Logger logger)
         {
-            var subcommand1 = subcommand ?? new SubCommandController();
+            var subcommand1 = subcommand ?? new SubCommandCommandRoute();
 
             Logger = logger ?? new Logger();
 

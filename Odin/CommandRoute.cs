@@ -6,12 +6,12 @@ using System.Text;
 
 namespace Odin
 {
-    public abstract class Controller
+    public abstract class CommandRoute
     {
         private readonly Dictionary<string, ActionMap> _actionMaps;
         private readonly DefaultActionAttribute _defaultActionAttribute;
-        private Dictionary<string, Controller> SubCommands { get; }
-        protected Controller()
+        private Dictionary<string, CommandRoute> SubCommands { get; }
+        protected CommandRoute()
         {
             // order matters with these assignments
             this._defaultActionAttribute = GetType()
@@ -20,7 +20,7 @@ namespace Odin
             this._actionMaps = GetActionMaps();
 
             Name = GetType().Name.Replace("Controller", "");
-            SubCommands = new Dictionary<string, Controller>();
+            SubCommands = new Dictionary<string, CommandRoute>();
             Logger = new Logger();
             this.Description = GetDescription();
         }
@@ -64,9 +64,9 @@ namespace Odin
             return this.GetType().Name;
         }
 
-        protected virtual void RegisterSubCommand(Controller controller)
+        protected virtual void RegisterSubCommand(CommandRoute commandRoute)
         {
-            this.SubCommands[controller.Name] = controller;
+            this.SubCommands[commandRoute.Name] = commandRoute;
         }
 
         public virtual int Execute(string[] args)
@@ -126,7 +126,7 @@ namespace Odin
             return name;
         }
 
-        private Controller GetSubCommandByName(string name)
+        private CommandRoute GetSubCommandByName(string name)
         {
             return SubCommands.ContainsKey(name) ? SubCommands[name] : null;
         }
