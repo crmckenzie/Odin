@@ -36,24 +36,6 @@ namespace Odin
             return ParameterInfo.IsOptional;
         }
 
-        public object GetValue()
-        {
-            if (!RawValues.Any())
-            {
-                if (IsBooleanSwitch())
-                {
-                    return !string.IsNullOrWhiteSpace(Switch);
-                }
-
-                return Type.Missing;
-            }
-
-            if (RawValues.Count == 1)
-                return Coerce(RawValues.First());
-
-            return Coerce(RawValues);
-        }
-
         public bool IsBooleanSwitch()
         {
             return ParameterInfo.ParameterType == typeof (bool);
@@ -67,16 +49,6 @@ namespace Odin
             return value;
         }
 
-        private object Coerce(IEnumerable<object> value)
-        {
-            return value;
-        }
-
-        public bool IsMatch(ParameterInfo parameter)
-        {
-            return Switch == $"--{parameter.Name}";
-        }
-
         public string GetDescription()
         {
             var attr = ParameterInfo.GetCustomAttribute<DescriptionAttribute>();
@@ -85,9 +57,5 @@ namespace Odin
             return "";
         }
 
-        public bool IsSwitch(string arg)
-        {
-            return arg.StartsWith("--");
-        }
     }
 }
