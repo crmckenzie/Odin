@@ -11,13 +11,12 @@ namespace Odin
         private readonly Dictionary<string, ActionMap> _actionMaps;
         private readonly DefaultActionAttribute _defaultActionAttribute;
         private Dictionary<string, Controller> SubCommands { get; }
-
-        public Logger Logger { get; set; }
-
         protected Controller()
         {
             // order matters with these assignments
-            this._defaultActionAttribute = GetType().GetCustomAttribute(typeof(DefaultActionAttribute)) as DefaultActionAttribute;
+            this._defaultActionAttribute = GetType()
+                .GetCustomAttribute<DefaultActionAttribute>();
+
             this._actionMaps = GetActionMaps();
 
             Name = GetType().Name.Replace("Controller", "");
@@ -25,6 +24,12 @@ namespace Odin
             Logger = new Logger();
             this.Description = GetDescription();
         }
+
+        public string Description { get; }
+
+        public Logger Logger { get; set; }
+
+        public string Name { get; set; }
 
         private Dictionary<string, ActionMap> GetActionMaps()
         {
@@ -59,72 +64,49 @@ namespace Odin
             return this.GetType().Name;
         }
 
-        public string Description { get; }
-
         protected virtual void RegisterSubCommand(Controller controller)
         {
             this.SubCommands[controller.Name] = controller;
         }
 
-        public string Name { get; set; }
-
         public virtual int Execute(string[] args)
         {
+            var actionName = GetActionName(args);
+            var isValid = IsValidActionName(actionName);
+            if (isValid)
+            {
+                var result = InvokeMethod(actionName, args.Skip(1).ToArray());
+                if (result < 0) this.Help();
+                return result;
+            }
+
             if (args.Any())
             {
-                var first = args.First();
-                if (_actionMaps.ContainsKey(first))
-                {
-                    var result = InvokeMethod(first, args.Skip(1).ToArray());
-                    if (result < 0) this.Help();
-                    return result;
-                }
-
-                var subCommand = GetSubCommandByName(first);
+                var subCommand = GetSubCommandByName(args.First());
                 if (subCommand != null)
                 {
                     var theRest = args.Skip(1).ToArray();
                     return subCommand.Execute(theRest);
                 }
-
-                this.Logger.Error("Unrecognized command sequence: {0}", string.Join(" ", args));
-            }
-            else if (_defaultActionAttribute != null)
-            {
-                var result = InvokeMethod(_defaultActionAttribute.MethodName, args);
-                if (result < 0) this.Help();
-                return result;
             }
 
+            this.Logger.Error("Unrecognized command sequence: {0}", string.Join(" ", args));
             this.Help();
             return -1;
         }
 
-        public IEnumerable<ParameterMap> Map(string[] args)
+        private bool IsValidActionName(string actionName)
         {
-            ParameterMap map = null;
-            foreach (var arg in args)
-            {
-                if (arg.StartsWith("--"))
-                {
-                    if (map != null)
-                    {
-                        yield return map;
-                    }
+            if (string.IsNullOrWhiteSpace(actionName))
+                return false;
 
-                    map = new ParameterMap()
-                    {
-                        Switch = arg
-                    };
-                }
-                else
-                {
-                    map?.RawValues.Add(arg);
-                }
-            }
+            return _actionMaps.ContainsKey(actionName);
+        }
 
-            if (map != null)
-                yield return map;
+        private string GetActionName(string[] args)
+        {
+            var name = args.FirstOrDefault() ?? _defaultActionAttribute?.MethodName;
+            return name;
         }
 
         private int InvokeMethod(string name, string[] args)
@@ -140,11 +122,7 @@ namespace Odin
 
         private Controller GetSubCommandByName(string name)
         {
-            if (SubCommands.ContainsKey(name))
-            {
-                return SubCommands[name];
-            }
-            return null;
+            return SubCommands.ContainsKey(name) ? SubCommands[name] : null;
         }
 
         public virtual string GenerateHelp(string actionName = "")
@@ -155,7 +133,7 @@ namespace Odin
                 return actionMap.Help();
             }
 
-            var builder = new System.Text.StringBuilder();
+            var builder = new StringBuilder();
             builder.AppendLine(this.Description);
 
             if (SubCommands.Any())
