@@ -27,7 +27,7 @@ namespace Odin
 
         public string Description { get; }
 
-        public ReadOnlyCollection<ParameterMap> ParameterMaps { get; }
+        protected internal ReadOnlyCollection<ParameterMap> ParameterMaps { get; }
 
         private string GetDescription()
         {

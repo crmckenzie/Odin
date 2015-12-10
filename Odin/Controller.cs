@@ -71,29 +71,46 @@ namespace Odin
 
         public virtual int Execute(string[] args)
         {
+            int result = -1;
+
+            var invocation = this.GenerateInvocation(args);
+            if (invocation != null)
+            {
+                if (invocation.CanInvoke())
+                {
+                    result =  invocation.Invoke();
+                }
+            }
+
+            if (result == 0)
+                return result;
+
+            this.Logger.Error("Unrecognized command sequence: {0}", string.Join(" ", args));
+            this.Help();
+            return result;
+        }
+
+        public ActionInvocation GenerateInvocation(string[] args)
+        {
             var actionName = GetActionName(args);
             var isValid = IsValidActionName(actionName);
             if (isValid)
             {
-                var result = InvokeMethod(actionName, args.Skip(1).ToArray());
-                if (result < 0) this.Help();
-                return result;
+                var actionMap = _actionMaps[actionName];
+                var theRest = args.Skip(1).ToArray();
+                var invocation = actionMap.GenerateInvocation(theRest);
+                return invocation;
             }
-
-            if (args.Any())
+            else
             {
-                var subCommand = GetSubCommandByName(args.First());
-                if (subCommand != null)
-                {
-                    var theRest = args.Skip(1).ToArray();
-                    return subCommand.Execute(theRest);
-                }
-            }
+                var subCommand = GetSubCommandByName(args.FirstOrDefault());
+                if (subCommand == null) return null;
 
-            this.Logger.Error("Unrecognized command sequence: {0}", string.Join(" ", args));
-            this.Help();
-            return -1;
+                var theRest = args.Skip(1).ToArray();
+                return subCommand.GenerateInvocation(theRest);
+            }
         }
+
 
         private bool IsValidActionName(string actionName)
         {
@@ -107,17 +124,6 @@ namespace Odin
         {
             var name = args.FirstOrDefault() ?? _defaultActionAttribute?.MethodName;
             return name;
-        }
-
-        private int InvokeMethod(string name, string[] args)
-        {
-            var actionMap = _actionMaps[name];
-
-            var invocation = actionMap.GenerateInvocation(args);
-            if (!invocation.CanInvoke()) return -1;
-
-            var result = invocation.Invoke();
-            return result;
         }
 
         private Controller GetSubCommandByName(string name)

@@ -18,6 +18,8 @@ namespace Odin
                 _isSet = true;
             } }
 
+        public string Name => ParameterMap.ParameterInfo.Name;
+
         public ParameterValue(ParameterMap parameterMap)
         {
             ParameterMap = parameterMap;
