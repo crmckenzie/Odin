@@ -26,6 +26,7 @@ namespace Odin
          
         public string[] Args { get;  }
         public ReadOnlyCollection<ParameterValue> ParameterValues { get; }
+        public string Name => ActionMap.Name;
 
         private void Initialize()
         {

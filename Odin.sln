@@ -12,6 +12,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		README.md = README.md
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Odin.Demo", "Odin.Demo\Odin.Demo.csproj", "{F3682E22-F249-40F5-922A-9758ACF6E3FE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -26,6 +28,10 @@ Global
 		{FE28E9E3-2E45-441A-83A0-F2F8232F8300}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FE28E9E3-2E45-441A-83A0-F2F8232F8300}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FE28E9E3-2E45-441A-83A0-F2F8232F8300}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F3682E22-F249-40F5-922A-9758ACF6E3FE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F3682E22-F249-40F5-922A-9758ACF6E3FE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F3682E22-F249-40F5-922A-9758ACF6E3FE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F3682E22-F249-40F5-922A-9758ACF6E3FE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

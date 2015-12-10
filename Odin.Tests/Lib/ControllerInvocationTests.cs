@@ -13,25 +13,25 @@ namespace Odin.Tests
         public void BeforeEach()
         {
             this.Logger = new StringBuilderLogger();
-            this.SubCommandCommandRoute = new SubCommandCommandRoute(this.Logger)
+            this.SubCommandCommand = new SubCommandCommand(this.Logger)
             {
                 Name = "SubCommand"
             };
 
-            this.Subject = new DefaultCommandRoute(this.SubCommandCommandRoute, this.Logger);
+            this.Subject = new DefaultCommand(this.SubCommandCommand, this.Logger);
             this.Subject.Name = "Default";
         }
 
         public StringBuilderLogger Logger { get; set; }
 
-        public SubCommandCommandRoute SubCommandCommandRoute { get; set; }
+        public SubCommandCommand SubCommandCommand { get; set; }
 
-        public DefaultCommandRoute Subject { get; set; }
+        public DefaultCommand Subject { get; set; }
 
         #region ActionExecution
 
         [Test]
-        public void CannotExecuteAMethodThatIsNotAnAction()
+        public void OnlyActionMethodsAreInterpretedAsActions()
         {
             // Given
             var args = new[] { "NotAnAction" };
@@ -40,7 +40,11 @@ namespace Odin.Tests
             var result = this.Subject.GenerateInvocation(args);
 
             // Then
-            result.ShouldBeNull();
+            result.ShouldNotBeNull();
+            result.Name.ShouldBe("DoSomething");
+            result.ParameterValues[0].Value.ShouldBe("NotAnAction");
+            result.ParameterValues[1].Value.ShouldBe(Type.Missing);
+            result.ParameterValues[2].Value.ShouldBe(Type.Missing);
         }
 
         [Test]
@@ -291,7 +295,7 @@ namespace Odin.Tests
             var result = this.Subject.GenerateInvocation(args);
 
             result.ShouldNotBeNull();
-            result.Instance.ShouldBe(this.SubCommandCommandRoute);
+            result.Instance.ShouldBe(this.SubCommandCommand);
             result.ParameterValues.Count.ShouldBe(0);
         }
 

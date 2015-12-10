@@ -2,26 +2,20 @@
 
 namespace Odin.Tests
 {
-    [DefaultAction("DoSomething")]
     [Description("This is the default controller")]
-    public class DefaultCommandRoute : CommandRoute
+    public class DefaultCommand : Command
     {
         public object[] MethodArguments { get; set; }
 
-        public DefaultCommandRoute() : this(new SubCommandCommandRoute(), new Logger())
+        public DefaultCommand() : this(new SubCommandCommand(), new Logger())
         {
            
         }
 
-        public DefaultCommandRoute(SubCommandCommandRoute subcommand, Logger logger)
+        public DefaultCommand(SubCommandCommand subcommand, Logger logger) : base(logger)
         {
-            var subcommand1 = subcommand ?? new SubCommandCommandRoute();
-
-            Logger = logger ?? new Logger();
-
+            var subcommand1 = subcommand ?? new SubCommandCommand();
             base.RegisterSubCommand(subcommand1);
-
-            base.Logger = logger ?? base.Logger;
         }
 
         public void NotAnAction()
@@ -29,7 +23,7 @@ namespace Odin.Tests
             
         }
 
-        [Action]
+        [Action(IsDefault = true)]
         [Description("A description of the DoSomething() method.")]
         public void DoSomething(
             [Description("Lorem ipsum dolor sit amet, consectetur adipiscing elit")]

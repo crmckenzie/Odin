@@ -21,28 +21,17 @@ namespace Odin.Tests
         public void BeforeEach()
         {
             this.Logger = new StringBuilderLogger();
-            this.SubCommandCommandRoute = Substitute.ForPartsOf<SubCommandCommandRoute>(this.Logger);
-            this.SubCommandCommandRoute.Name = "SubCommand";
-            this.Subject = Substitute.ForPartsOf<DefaultCommandRoute>(this.SubCommandCommandRoute, this.Logger);
+            this.SubCommand = Substitute.ForPartsOf<SubCommandCommand>();
+            this.SubCommand.Name = "SubCommand";
+            this.Subject = Substitute.ForPartsOf<DefaultCommand>(this.SubCommand, this.Logger);
             this.Subject.Name = "Default";
         }
 
         public StringBuilderLogger Logger { get; set; }
 
-        public SubCommandCommandRoute SubCommandCommandRoute { get; set; }
+        public SubCommandCommand SubCommand { get; set; }
 
-        public DefaultCommandRoute Subject { get; set; }
-
-        [Test]
-        public void CannotExecuteAMethodThatIsNotAnAction()
-        {
-            var args = new[] { "NotAnAction" };
-
-            var result = this.Subject.Execute(args);
-
-            Assert.That(result, Is.EqualTo(-1));
-            this.Subject.Received().Help();
-        }
+        public DefaultCommand Subject { get; set; }
 
         [Test]
         public void CanExecuteAMethodThatIsAnAction()
@@ -64,6 +53,12 @@ namespace Odin.Tests
 
             Assert.That(result, Is.EqualTo(-2));
             this.Subject.Received().Help();
+        }
+
+        [Test]
+        public void SubCommandUsesParentsLogger()
+        {
+            this.SubCommand.Logger.ShouldBe(this.Subject.Logger);
         }
     }
 }

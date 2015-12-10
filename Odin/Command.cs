@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -6,43 +7,62 @@ using System.Text;
 
 namespace Odin
 {
-    public abstract class CommandRoute
+    public abstract class Command
     {
         private readonly Dictionary<string, ActionMap> _actionMaps;
-        private readonly DefaultActionAttribute _defaultActionAttribute;
-        private Dictionary<string, CommandRoute> SubCommands { get; }
-        protected CommandRoute()
+        private Dictionary<string, Command> SubCommands { get; }
+        protected Command(Logger logger = null)
         {
-            // order matters with these assignments
-            this._defaultActionAttribute = GetType()
-                .GetCustomAttribute<DefaultActionAttribute>();
-
             this._actionMaps = GetActionMaps();
 
             Name = GetType().Name.Replace("Controller", "");
-            SubCommands = new Dictionary<string, CommandRoute>();
-            Logger = new Logger();
+            SubCommands = new Dictionary<string, Command>();
+
+            if (logger != null)
+            {
+                _Logger = logger;
+            }
+            else
+            {
+                _Logger = new Logger();
+
+                Logger.OnInfo += Console.Write;
+                Logger.OnWarning += Console.Write;
+                Logger.OnError += Console.Error.Write;
+            }
+
             this.Description = GetDescription();
         }
 
         public string Description { get; }
 
-        public Logger Logger { get; set; }
+        internal void SetParent(Command parent)
+        {
+            this._parent = parent;
+        }
+
+        private Command _parent;
+        protected Command Parent => _parent;
+
+        private readonly Logger _Logger;
+        public Logger Logger
+        {
+            get
+            {
+                if (Parent != null)
+                    return Parent.Logger;
+                return _Logger;
+            }
+        }
 
         public string Name { get; set; }
 
         private Dictionary<string, ActionMap> GetActionMaps()
         {
             return GetActionMethods()
-                .Select(row => new ActionMap(this, row, IsDefaultAction(row)))
+                .Select(row => new ActionMap(this, row))
                 .ToDictionary(row => row.Name)
                 ;
-        }
-
-        private bool IsDefaultAction(MethodInfo methodInfo)
-        {
-            if (_defaultActionAttribute == null) return false;
-            return _defaultActionAttribute.MethodName == methodInfo.Name;
         }
 
         private IEnumerable<MethodInfo> GetActionMethods()
@@ -64,12 +84,13 @@ namespace Odin
             return this.GetType().Name;
         }
 
-        protected virtual void RegisterSubCommand(CommandRoute commandRoute)
+        protected virtual void RegisterSubCommand(Command command)
         {
-            this.SubCommands[commandRoute.Name] = commandRoute;
+            this.SubCommands[command.Name] = command;
+            command.SetParent(this);
         }
 
-        public virtual int Execute(string[] args)
+        public virtual int Execute(params string[] args)
         {
             int result = -1;
 
@@ -93,19 +114,22 @@ namespace Odin
         public ActionInvocation GenerateInvocation(string[] args)
         {
             var actionName = GetActionName(args);
-            var isValid = IsValidActionName(actionName);
-            if (isValid)
+            var subCommand = GetSubCommandByName(args.FirstOrDefault());
+
+            if (IsValidActionName(actionName))
             {
                 var actionMap = _actionMaps[actionName];
                 var theRest = args.Skip(1).ToArray();
                 var invocation = actionMap.GenerateInvocation(theRest);
                 return invocation;
             }
+            else if (subCommand == null)
+            {
+                var actionMap = _actionMaps.Values.FirstOrDefault(row => row.IsDefaultAction);
+                return actionMap?.GenerateInvocation(args);
+            }
             else
             {
-                var subCommand = GetSubCommandByName(args.FirstOrDefault());
-                if (subCommand == null) return null;
-
                 var theRest = args.Skip(1).ToArray();
                 return subCommand.GenerateInvocation(theRest);
             }
@@ -122,12 +146,15 @@ namespace Odin
 
         private string GetActionName(string[] args)
         {
-            var name = args.FirstOrDefault() ?? _defaultActionAttribute?.MethodName;
+            var name = args.FirstOrDefault() ?? 
+                _actionMaps.Values.FirstOrDefault(a => a.IsDefaultAction)?.Name;
             return name;
         }
 
-        private CommandRoute GetSubCommandByName(string name)
+        private Command GetSubCommandByName(string name)
         {
+            if (string.IsNullOrWhiteSpace(name))
+                return null;
             return SubCommands.ContainsKey(name) ? SubCommands[name] : null;
         }
 

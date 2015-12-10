@@ -8,20 +8,19 @@ using System.Threading.Tasks;
 namespace Odin.Tests
 {
     [Description("Provides a component of testability for subcommands.")]
-    [DefaultAction("DoSomething")]
-    public class SubCommandCommandRoute : CommandRoute
+    public class SubCommandCommand : Command
     {
-        public SubCommandCommandRoute(Logger logger) : base()
+
+        public SubCommandCommand(Logger logger) : base(logger)
         {
-            this.Logger = logger;
         }
 
-        public SubCommandCommandRoute() : base()
+        public SubCommandCommand() : base()
         {
             
         }
 
-        [Action]
+        [Action(IsDefault = true)]
         public virtual void DoSomething()
         {
             

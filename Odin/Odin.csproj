@@ -43,8 +43,7 @@
     <Compile Include="ActionAttribute.cs" />
     <Compile Include="ActionInvocation.cs" />
     <Compile Include="ActionMap.cs" />
-    <Compile Include="CommandRoute.cs" />
-    <Compile Include="DefaultActionAttribute.cs" />
+    <Compile Include="Command.cs" />
     <Compile Include="Logger.cs" />
     <Compile Include="ParameterMap.cs" />
     <Compile Include="ParameterValue.cs" />

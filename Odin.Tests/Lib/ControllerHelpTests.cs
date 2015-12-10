@@ -12,27 +12,17 @@ namespace Odin.Tests
         public void BeforeEach()
         {
             this.Logger = new StringBuilderLogger();
-            this.SubCommandCommandRoute = Substitute.ForPartsOf<SubCommandCommandRoute>(this.Logger);
-            this.SubCommandCommandRoute.Name = "SubCommand";
-            this.Subject = Substitute.ForPartsOf<DefaultCommandRoute>(this.SubCommandCommandRoute, this.Logger);
+            this.SubCommandCommand = Substitute.ForPartsOf<SubCommandCommand>(this.Logger);
+            this.SubCommandCommand.Name = "SubCommand";
+            this.Subject = Substitute.ForPartsOf<DefaultCommand>(this.SubCommandCommand, this.Logger);
             this.Subject.Name = "Default";
         }
 
         public StringBuilderLogger Logger { get; set; }
 
-        public SubCommandCommandRoute SubCommandCommandRoute { get; set; }
+        public SubCommandCommand SubCommandCommand { get; set; }
 
-        public DefaultCommandRoute Subject { get; set; }
-
-        [Test]
-        public void UnmatchedArgumentsDisplaysHelp()
-        {
-            this.Subject.GenerateHelp().Returns("this is a test");
-
-            this.Subject.Execute(new[] {"Fredbob"});
-
-            this.Subject.Received().Help();
-        }
+        public DefaultCommand Subject { get; set; }
 
         [Test]
         public void HelpDisplaysControllerDescription()
@@ -145,7 +135,7 @@ namespace Odin.Tests
 
             // Then
             Assert.That(result, Is.EqualTo(0), this.Logger.ErrorBuilder.ToString());
-            this.SubCommandCommandRoute.Received().Help();
+            this.SubCommandCommand.Received().Help();
 
             var lines = this.Logger.InfoBuilder.ToString()
                 .Split('\n')

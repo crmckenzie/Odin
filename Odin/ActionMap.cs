@@ -10,11 +10,11 @@ namespace Odin
 {
     public class ActionMap
     {
-        public ActionMap(object instance, MethodInfo method, bool isDefaultAction)
+        public ActionMap(object instance, MethodInfo method)
         {
             Instance = instance;
             MethodInfo = method;
-            IsDefaultAction = isDefaultAction;
+            IsDefaultAction = method.GetCustomAttribute<ActionAttribute>().IsDefault;
             ParameterMaps = GenerateParameterMap().ToList().AsReadOnly();
             Description = GetDescription();
         }
@@ -23,7 +23,7 @@ namespace Odin
 
         public object Instance { get; }
         public MethodInfo MethodInfo { get; }
-        public bool IsDefaultAction { get;  }
+        public bool IsDefaultAction { get; }
 
         public string Description { get; }
 

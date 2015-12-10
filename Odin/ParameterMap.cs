@@ -12,7 +12,8 @@ namespace Odin
         {
             Coercion = new Dictionary<Type, Func<object, object>>
             {
-                [typeof (bool)] = o => bool.Parse(o.ToString())
+                [typeof (bool)] = o => bool.Parse(o.ToString()),
+                [typeof(int)] = o => int.Parse(o.ToString())
             };
         }
 
