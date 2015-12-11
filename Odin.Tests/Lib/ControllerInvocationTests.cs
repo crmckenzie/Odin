@@ -36,7 +36,7 @@ namespace Odin.Tests
 
             // Then
             result.ShouldNotBeNull();
-            result.Name.ShouldBe("DoSomething");
+            result.Name.ShouldBe("do-something");
             result.ParameterValues[0].Value.ShouldBe("NotAnAction");
             result.ParameterValues[1].Value.ShouldBe(Type.Missing);
             result.ParameterValues[2].Value.ShouldBe(Type.Missing);
@@ -46,7 +46,7 @@ namespace Odin.Tests
         public void CanExecuteAMethodThatIsAnAction()
         {
             // Given
-            var args = new[] { "DoSomething" };
+            var args = new[] { "do-something" };
 
             // When
             var result = this.Subject.GenerateInvocation(args);
@@ -61,7 +61,7 @@ namespace Odin.Tests
         public void ReturnsResultFromAction()
         {
             // Given
-            var args = new[] { "AlwaysReturnsMinus2" };
+            var args = new[] { "always-returns-minus2" };
 
             // When
             var result = this.Subject.GenerateInvocation(args);
@@ -78,7 +78,7 @@ namespace Odin.Tests
         [Test]
         public void WithRequiredStringArg()
         {
-            var args = new[] { "WithRequiredStringArg", "--argument", "value" };
+            var args = new[] { "with-required-string-arg", "--argument", "value" };
 
             var result =this.Subject.GenerateInvocation(args);
 
@@ -91,7 +91,7 @@ namespace Odin.Tests
         [Test]
         public void WithMultipleRequiredStringArgs()
         {
-            var args = new[] { "WithRequiredStringArgs", "--argument1", "value1", "--argument2", "value2" };
+            var args = new[] { "with-required-string-args", "--argument1", "value1", "--argument2", "value2" };
 
             var result = this.Subject.GenerateInvocation(args);
 
@@ -106,7 +106,7 @@ namespace Odin.Tests
         [Test]
         public void CanMatchArgsByParameterOrder()
         {
-            var args = new[] { "WithRequiredStringArgs", "value1", "value2" };
+            var args = new[] { "with-required-string-args", "value1", "value2" };
 
             var result = this.Subject.GenerateInvocation(args);
 
@@ -125,7 +125,7 @@ namespace Odin.Tests
         [Test]
         public void SwitchWithValue()
         {
-            var args = new[] { "WithSwitch", "--argument", "true" };
+            var args = new[] { "with-switch", "--argument", "true" };
 
             var result = this.Subject.GenerateInvocation(args);
 
@@ -138,7 +138,7 @@ namespace Odin.Tests
         [Test]
         public void SwitchWithoutValue()
         {
-            var args = new[] { "WithSwitch", "--argument"};
+            var args = new[] { "with-switch", "--argument"};
 
             var result = this.Subject.GenerateInvocation(args);
 
@@ -151,7 +151,7 @@ namespace Odin.Tests
         [Test]
         public void SwitchNotGiven()
         {
-            var args = new[] { "WithSwitch"};
+            var args = new[] { "with-switch"};
 
             var result = this.Subject.GenerateInvocation(args);
 
@@ -168,7 +168,7 @@ namespace Odin.Tests
         [Test]
         public void WithOptionalStringArg_DoNotPassIt()
         {
-            var args = new[] { "WithOptionalStringArg" };
+            var args = new[] { "with-optional-string-arg" };
 
             var result = this.Subject.GenerateInvocation(args);
 
@@ -181,7 +181,7 @@ namespace Odin.Tests
         [Test]
         public void WithOptionalStringArg_PassIt()
         {
-            var args = new[] { "WithOptionalStringArg", "--argument", "value1" };
+            var args = new[] { "with-optional-string-arg", "--argument", "value1" };
 
             var result = this.Subject.GenerateInvocation(args);
 
@@ -194,7 +194,7 @@ namespace Odin.Tests
         [Test]
         public void WithOptionalStringArgs_PassThemAll()
         {
-            var args = new[] { "WithOptionalStringArgs", "--argument1", "value1", "--argument2", "value2", "--argument3", "value3" };
+            var args = new[] { "with-optional-string-args", "--argument1", "value1", "--argument2", "value2", "--argument3", "value3" };
 
             this.Subject.Execute(args);
 
@@ -213,7 +213,7 @@ namespace Odin.Tests
         [Test]
         public void WithOptionalStringArgs_PassHead()
         {
-            var args = new[] { "WithOptionalStringArgs", "--argument1", "value1" };
+            var args = new[] { "with-optional-string-args", "--argument1", "value1" };
 
             var result = this.Subject.GenerateInvocation(args);
 
@@ -230,7 +230,7 @@ namespace Odin.Tests
         [Test]
         public void WithOptionalStringArgs_PassBody()
         {
-            var args = new[] { "WithOptionalStringArgs", "--argument2", "value2" };
+            var args = new[] { "with-optional-string-args", "--argument2", "value2" };
 
             var result = this.Subject.GenerateInvocation(args);
 
@@ -247,7 +247,7 @@ namespace Odin.Tests
         [Test]
         public void WithOptionalStringArgs_PassNone()
         {
-            var args = new[] { "WithOptionalStringArgs" };
+            var args = new[] { "with-optional-string-args" };
 
             var result = this.Subject.GenerateInvocation(args);
 
@@ -264,7 +264,7 @@ namespace Odin.Tests
         [Test]
         public void WithOptionalStringArgs_PassTail()
         {
-            var args = new[] { "WithOptionalStringArgs", "--argument3", "value3" };
+            var args = new[] { "with-optional-string-args", "--argument3", "value3" };
 
             var result = this.Subject.GenerateInvocation(args);
 
@@ -285,7 +285,7 @@ namespace Odin.Tests
         [Test]
         public void ExecuteSubCommand()
         {
-            var args = new[] { "Sub" };
+            var args = new[] { "sub" };
 
             var result = this.Subject.GenerateInvocation(args);
 

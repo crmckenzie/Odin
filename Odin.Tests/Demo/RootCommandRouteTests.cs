@@ -31,7 +31,7 @@ namespace Odin.Tests.Demo
             // Given
 
             // When
-            var result = this.Subject.Execute("Katas", "FizzBuzz", "--input", "3");
+            var result = this.Subject.Execute("katas", "fizz-buzz", "--input", "3");
 
             // Then
             result.ShouldBe(0);
@@ -44,7 +44,7 @@ namespace Odin.Tests.Demo
             // Given
 
             // When
-            var result = this.Subject.Execute("Katas", "FizzBuzz", "3");
+            var result = this.Subject.Execute("katas", "fizz-buzz", "3");
 
             // Then
             result.ShouldBe(0);
@@ -57,7 +57,7 @@ namespace Odin.Tests.Demo
             // Given
 
             // When
-            var result = this.Subject.Execute("Katas", "3");
+            var result = this.Subject.Execute("katas", "3");
 
             // Then
             result.ShouldBe(0, this.Logger.InfoBuilder.ToString());

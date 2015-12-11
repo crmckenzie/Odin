@@ -34,7 +34,7 @@ namespace Odin.Tests
         [Test]
         public void CanExecuteAMethodThatIsAnAction()
         {
-            var args = new[] { "DoSomething" };
+            var args = new[] { "do-something" };
 
             var result = this.Subject.Execute(args);
 
@@ -45,7 +45,7 @@ namespace Odin.Tests
         [Test]
         public void ReturnsResultFromAction()
         {
-            var args = new[] { "AlwaysReturnsMinus2" };
+            var args = new[] { "always-returns-minus2" };
 
             var result = this.Subject.Execute(args);
 

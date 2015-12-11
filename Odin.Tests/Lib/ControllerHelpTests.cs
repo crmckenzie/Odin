@@ -2,6 +2,7 @@
 using System.Linq;
 using NSubstitute;
 using NUnit.Framework;
+using Shouldly;
 
 namespace Odin.Tests
 {
@@ -14,10 +15,10 @@ namespace Odin.Tests
             this.Logger = new StringBuilderLogger();
 
             this.SubCommand = Substitute.ForPartsOf<SubCommand>(this.Logger);
-            this.SubCommand.Name.Returns("Sub");
+            this.SubCommand.Name.Returns("sub");
 
             this.Subject = Substitute.ForPartsOf<DefaultCommand>(this.SubCommand, this.Logger);
-            this.Subject.Name.Returns("Default");
+            this.Subject.Name.Returns("default");
         }
 
         public StringBuilderLogger Logger { get; set; }
@@ -60,9 +61,9 @@ namespace Odin.Tests
 
             var i = 0;
             Assert.That(lines[++i], Is.EqualTo("SUB COMMANDS"));
-            Assert.That(lines[++i], Is.EqualTo("Sub                           Provides a component of testability for subcommands."));
+            Assert.That(lines[++i], Is.EqualTo("sub                           Provides a component of testability for subcommands."));
             Assert.That(lines[++i], Is.EqualTo("To get help for subcommands"));
-            Assert.That(lines[++i], Is.EqualTo("\tDefault <subcommand> Help"));
+            Assert.That(lines[++i], Is.EqualTo("\tdefault <subcommand> help"));
         }
 
         [Test]
@@ -82,36 +83,36 @@ namespace Odin.Tests
                 ;
 
             var i = 0;
-            Assert.That(lines[++i].Trim(), Is.EqualTo("AlwaysReturnsMinus2"));
-            Assert.That(lines[++i].Trim(), Is.EqualTo("DoSomething (default)         A description of the DoSomething() method."));
+            Assert.That(lines[++i].Trim(), Is.EqualTo("always-returns-minus2"));
+            Assert.That(lines[++i].Trim(), Is.EqualTo("do-something (default)        A description of the DoSomething() method."));
             Assert.That(lines[++i], Is.EqualTo("\t--argument1               Lorem ipsum dolor sit amet, consectetur adipiscing elit"));
             Assert.That(lines[++i], Is.EqualTo("\t--argument2               sed do eiusmod tempor incididunt ut labore et dolore magna aliqua"));
             Assert.That(lines[++i], Is.EqualTo("\t--argument3               Ut enim ad minim veniam"));
-            Assert.That(lines[++i].Trim(), Is.EqualTo("Help"));
-            Assert.That(lines[++i], Is.EqualTo("\t--actionName              The name of the action to provide help for."));
-            Assert.That(lines[++i].Trim(), Is.EqualTo("SomeOtherControllerAction"));
-            Assert.That(lines[++i].Trim(), Is.EqualTo("WithOptionalStringArg"));
+            Assert.That(lines[++i].Trim(), Is.EqualTo("help"));
+            lines[++i].ShouldBe("\t--action-name             The name of the action to provide help for.");
+            Assert.That(lines[++i].Trim(), Is.EqualTo("some-other-controller-action"));
+            Assert.That(lines[++i].Trim(), Is.EqualTo("with-optional-string-arg"));
             Assert.That(lines[++i].TrimEnd(), Is.EqualTo("\t--argument"));
-            Assert.That(lines[++i].Trim(), Is.EqualTo("WithOptionalStringArgs"));
+            Assert.That(lines[++i].Trim(), Is.EqualTo("with-optional-string-args"));
             Assert.That(lines[++i].TrimEnd(), Is.EqualTo("\t--argument1"));
             Assert.That(lines[++i].TrimEnd(), Is.EqualTo("\t--argument2"));
             Assert.That(lines[++i].TrimEnd(), Is.EqualTo("\t--argument3"));
-            Assert.That(lines[++i].Trim(), Is.EqualTo("WithRequiredStringArg"));
+            Assert.That(lines[++i].Trim(), Is.EqualTo("with-required-string-arg"));
             Assert.That(lines[++i].TrimEnd(), Is.EqualTo("\t--argument"));
-            Assert.That(lines[++i].Trim(), Is.EqualTo("WithRequiredStringArgs"));
+            Assert.That(lines[++i].Trim(), Is.EqualTo("with-required-string-args"));
             Assert.That(lines[++i].TrimEnd(), Is.EqualTo("\t--argument1"));
             Assert.That(lines[++i].TrimEnd(), Is.EqualTo("\t--argument2"));
-            Assert.That(lines[++i].Trim(), Is.EqualTo("WithSwitch"));
+            Assert.That(lines[++i].Trim(), Is.EqualTo("with-switch"));
             Assert.That(lines[++i].TrimEnd(), Is.EqualTo("\t--argument"));
             Assert.That(lines[++i].Trim(), Is.EqualTo("To get help for actions"));
-            Assert.That(lines[++i], Is.EqualTo("\tDefault Help <action>"));
+            Assert.That(lines[++i], Is.EqualTo("\tdefault help <action>"));
         }
 
         [Test]
         public void HelpForIndividualAction()
         {
             // When
-            var result = this.Subject.GenerateHelp("DoSomething");
+            var result = this.Subject.GenerateHelp("do-something");
             Console.WriteLine(result);
 
             // Then
@@ -123,7 +124,7 @@ namespace Odin.Tests
                 ;
 
             var i = 0;
-            Assert.That(lines[i].Trim(), Is.EqualTo("DoSomething (default)         A description of the DoSomething() method."));
+            Assert.That(lines[i].Trim(), Is.EqualTo("do-something (default)        A description of the DoSomething() method."));
             Assert.That(lines[++i], Is.EqualTo("\t--argument1               Lorem ipsum dolor sit amet, consectetur adipiscing elit"));
             Assert.That(lines[++i], Is.EqualTo("\t--argument2               sed do eiusmod tempor incididunt ut labore et dolore magna aliqua"));
             Assert.That(lines[++i], Is.EqualTo("\t--argument3               Ut enim ad minim veniam"));
@@ -133,7 +134,7 @@ namespace Odin.Tests
         public void HelpForSubCommands()
         {
             // When
-            var result = Subject.Execute("Sub", "Help");
+            var result = Subject.Execute("sub", "help");
 
             // Then
             Assert.That(result, Is.EqualTo(0), this.Logger.ErrorBuilder.ToString());
@@ -149,13 +150,13 @@ namespace Odin.Tests
             var i = 0;
             Assert.That(lines[i].Trim(), Is.EqualTo("Provides a component of testability for subcommands."));
             Assert.That(lines[++i].Trim(), Is.EqualTo("ACTIONS"));
-            Assert.That(lines[++i].Trim(), Is.EqualTo("DoSomething (default)"));
-            Assert.That(lines[++i].Trim(), Is.EqualTo("Help"));
-            Assert.That(lines[++i], Is.EqualTo("\t--actionName              The name of the action to provide help for."));
+            Assert.That(lines[++i].Trim(), Is.EqualTo("do-something (default)"));
+            Assert.That(lines[++i].Trim(), Is.EqualTo("help"));
+            Assert.That(lines[++i], Is.EqualTo("\t--action-name             The name of the action to provide help for."));
             Assert.That(lines[++i].Trim(), Is.EqualTo("To get help for actions"));
 
             //TODO: This line should include the root controller.
-            Assert.That(lines[++i], Is.EqualTo("\tSub Help <action>"));
+            Assert.That(lines[++i], Is.EqualTo("\tsub help <action>"));
 
         }
     }

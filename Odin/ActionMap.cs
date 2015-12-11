@@ -19,7 +19,7 @@ namespace Odin
             Description = GetDescription();
         }
 
-        public string Name => MethodInfo.Name;
+        public string Name => Conventions.GetActionName(MethodInfo);
         public Conventions Conventions => Instance.Conventions;
 
         public Command Instance { get; }

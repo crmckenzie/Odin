@@ -112,7 +112,6 @@ namespace Odin
         public virtual int Execute(params string[] args)
         {
             int result = -1;
-
             var invocation = this.GenerateInvocation(args);
             if (invocation != null)
             {
@@ -217,7 +216,8 @@ namespace Odin
 
             builder.AppendLine();
             builder.AppendLine("To get help for actions");
-            builder.AppendFormat("\t{0} Help <action>", this.Name)
+            var helpActionName = this.Conventions.GetActionName(this.GetType().GetMethod("Help"));
+            builder.AppendFormat("\t{0} {1} <action>", this.Name, helpActionName)
                 .AppendLine();
         }
 
@@ -238,7 +238,8 @@ namespace Odin
 
             builder.AppendLine();
             builder.AppendLine("To get help for subcommands");
-            builder.AppendFormat("\t{0} <subcommand> Help", this.Name);
+            var helpActionName = this.Conventions.GetActionName(this.GetType().GetMethod("Help"));
+            builder.AppendFormat("\t{0} <subcommand> {1}", this.Name, helpActionName);
         }
 
         [Action]
