@@ -13,12 +13,8 @@ namespace Odin.Tests
         public void BeforeEach()
         {
             this.Logger = new StringBuilderLogger();
-
-            this.SubCommand = Substitute.ForPartsOf<SubCommand>(this.Logger);
-            this.SubCommand.Name.Returns("sub");
-
-            this.Subject = Substitute.ForPartsOf<DefaultCommand>(this.SubCommand, this.Logger);
-            this.Subject.Name.Returns("default");
+            this.SubCommand = new SubCommand(); 
+            this.Subject = new DefaultCommand(this.SubCommand, this.Logger);
         }
 
         public StringBuilderLogger Logger { get; set; }
@@ -63,7 +59,7 @@ namespace Odin.Tests
             Assert.That(lines[++i], Is.EqualTo("SUB COMMANDS"));
             Assert.That(lines[++i], Is.EqualTo("sub                           Provides a component of testability for subcommands."));
             Assert.That(lines[++i], Is.EqualTo("To get help for subcommands"));
-            Assert.That(lines[++i], Is.EqualTo("\tdefault <subcommand> help"));
+            Assert.That(lines[++i], Is.EqualTo("\thelp <subcommand>"));
         }
 
         [Test]
@@ -138,7 +134,6 @@ namespace Odin.Tests
 
             // Then
             Assert.That(result, Is.EqualTo(0), this.Logger.ErrorBuilder.ToString());
-            this.SubCommand.Received().Help();
 
             var lines = this.Logger.InfoBuilder.ToString()
                 .Split('\n')
@@ -149,15 +144,60 @@ namespace Odin.Tests
 
             var i = 0;
             Assert.That(lines[i].Trim(), Is.EqualTo("Provides a component of testability for subcommands."));
+            lines[++i].Trim().ShouldBe("SUB COMMANDS");
+            lines[++i].Trim().ShouldBe("katas                         Provides some katas.");
+            lines[++i].Trim().ShouldBe("To get help for subcommands");
+            lines[++i].Trim().ShouldBe("sub help <subcommand>");
             Assert.That(lines[++i].Trim(), Is.EqualTo("ACTIONS"));
             Assert.That(lines[++i].Trim(), Is.EqualTo("do-something (default)"));
             Assert.That(lines[++i].Trim(), Is.EqualTo("help"));
             Assert.That(lines[++i], Is.EqualTo("\t--action-name             The name of the action to provide help for."));
             Assert.That(lines[++i].Trim(), Is.EqualTo("To get help for actions"));
 
-            //TODO: This line should include the root controller.
             Assert.That(lines[++i], Is.EqualTo("\tsub help <action>"));
-
         }
+
+        [Test]
+        public void AlternativeHelpForSubCommands()
+        {
+            // When
+            var result = Subject.Execute("help", "sub");
+
+            // Then
+            Assert.That(result, Is.EqualTo(0), this.Logger.ErrorBuilder.ToString());
+
+            var lines = this.Logger.InfoBuilder.ToString()
+                .Split('\n')
+                .Where(row => !string.IsNullOrWhiteSpace(row))
+                .Select(row => row.Replace("\r", ""))
+                .ToArray()
+                ;
+
+            var i = 0;
+            Assert.That(lines[i].Trim(), Is.EqualTo("Provides a component of testability for subcommands."));
+        }
+
+        [Test]
+        public void HelpForSubSubCommands()
+        {
+            // When
+            var result = Subject.Execute("sub", "katas", "help");
+
+            // Then
+            Assert.That(result, Is.EqualTo(0), this.Logger.ErrorBuilder.ToString());
+
+            var lines = this.Logger.InfoBuilder.ToString()
+                .Split('\n')
+                .Where(row => !string.IsNullOrWhiteSpace(row))
+                .Select(row => row.Replace("\r", ""))
+                .ToArray()
+                ;
+
+            Console.WriteLine(this.Logger.InfoBuilder.ToString());
+
+            var i = 0;
+            Assert.That(lines[i].Trim(), Is.EqualTo("Provides some katas."));
+        }
+
     }
 }

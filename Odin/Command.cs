@@ -14,21 +14,8 @@ namespace Odin
         protected Command(Logger logger = null, Conventions conventions = null)
         {
             SubCommands = new Dictionary<string, Command>();
-            if (logger != null)
-            {
-                _Logger = logger;
-            }
-            else
-            {
-                _Logger = new Logger();
-
-                Logger.OnInfo += Console.Write;
-                Logger.OnWarning += Console.Write;
-                Logger.OnError += Console.Error.Write;
-            }
-
+            _Logger = logger ?? new DefaultLogger();
             _conventions = conventions ?? new DefaultConventions();
-
             this.Description = GetDescription();
         }
 
@@ -72,13 +59,7 @@ namespace Odin
             }
         }
 
-        public virtual string Name
-        {
-            get
-            {
-                return Conventions.GetCommandName(this);
-            }
-        }
+        public virtual string Name => Conventions.GetCommandName(this);
 
         private Dictionary<string, ActionMap> GetActionMaps()
         {
@@ -181,10 +162,16 @@ namespace Odin
         {
             this.InitializeActionMaps();
 
-            if (!string.IsNullOrWhiteSpace(actionName))
+            if (IsValidActionName(actionName))
             {
                 var actionMap = _actionMaps[actionName];
                 return actionMap.Help();
+            }
+
+            if (this.SubCommands.ContainsKey(actionName))
+            {
+                var subCommand = this.SubCommands[actionName];
+                return subCommand.GenerateHelp();
             }
 
             var builder = new StringBuilder();
@@ -239,7 +226,38 @@ namespace Odin
             builder.AppendLine();
             builder.AppendLine("To get help for subcommands");
             var helpActionName = this.Conventions.GetActionName(this.GetType().GetMethod("Help"));
-            builder.AppendFormat("\t{0} <subcommand> {1}", this.Name, helpActionName);
+
+            if (IsRoot())
+            {
+                builder.AppendFormat("\t{0} <subcommand>", helpActionName);
+            }
+            else
+            {
+                var fullPath = GetFullCommandPath().Skip(1); // remove the root command from the path.
+                var path = string.Join(" ", fullPath);
+                builder.AppendFormat("\t{0} {1} <subcommand>", path, helpActionName);
+            }
+
+        }
+
+        private string[] GetFullCommandPath()
+        {
+            var stack = new Stack<string>();
+            stack.Push(this.Name);
+
+            var parent = this.Parent;
+            while (parent != null)
+            {
+                stack.Push(parent.Name);
+                parent = parent.Parent;
+            }
+
+            return stack.ToArray();
+        }
+
+        private bool IsRoot()
+        {
+            return this.Parent == null;
         }
 
         [Action]

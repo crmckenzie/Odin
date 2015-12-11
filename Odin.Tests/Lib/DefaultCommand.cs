@@ -7,7 +7,7 @@ namespace Odin.Tests
     {
         public object[] MethodArguments { get; set; }
 
-        public DefaultCommand() : this(new SubCommand(), new Logger())
+        public DefaultCommand() : this(new SubCommand(), new DefaultLogger())
         {
            
         }
