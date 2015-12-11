@@ -44,6 +44,8 @@
     <Compile Include="ActionInvocation.cs" />
     <Compile Include="ActionMap.cs" />
     <Compile Include="Command.cs" />
+    <Compile Include="Conventions.cs" />
+    <Compile Include="DefaultConventions.cs" />
     <Compile Include="Logger.cs" />
     <Compile Include="ParameterMap.cs" />
     <Compile Include="ParameterValue.cs" />

@@ -11,10 +11,9 @@ namespace Odin
     {
         private Dictionary<string, ActionMap> _actionMaps;
         private Dictionary<string, Command> SubCommands { get; }
-        protected Command(Logger logger = null)
+        protected Command(Logger logger = null, Conventions conventions = null)
         {
             SubCommands = new Dictionary<string, Command>();
-
             if (logger != null)
             {
                 _Logger = logger;
@@ -27,6 +26,8 @@ namespace Odin
                 Logger.OnWarning += Console.Write;
                 Logger.OnError += Console.Error.Write;
             }
+
+            _conventions = conventions ?? new DefaultConventions();
 
             this.Description = GetDescription();
         }
@@ -49,6 +50,7 @@ namespace Odin
         protected Command Parent => _parent;
 
         private readonly Logger _Logger;
+
         public Logger Logger
         {
             get
@@ -59,9 +61,23 @@ namespace Odin
             }
         }
 
+        private readonly Conventions _conventions;
+        public Conventions Conventions
+        {
+            get
+            {
+                if (Parent != null)
+                    return Parent.Conventions;
+                return _conventions;
+            }
+        }
+
         public virtual string Name
         {
-            get { return this.GetType().Name.Replace("Command", ""); }
+            get
+            {
+                return Conventions.GetCommandName(this);
+            }
         }
 
         private Dictionary<string, ActionMap> GetActionMaps()
@@ -83,18 +99,14 @@ namespace Odin
 
         private string GetDescription()
         {
-            var attribute = this.GetType().GetCustomAttribute<System.ComponentModel.DescriptionAttribute>(inherit:true);
-            if (attribute != null)
-            {
-                return attribute.Description;
-            }
-            return this.GetType().Name;
+            var attribute = this.GetType().GetCustomAttribute<DescriptionAttribute>(inherit:true);
+            return attribute != null ? attribute.Description : this.Name;
         }
 
         protected virtual void RegisterSubCommand(Command command)
         {
-            this.SubCommands[command.Name] = command;
             command.SetParent(this);
+            this.SubCommands[command.Name] = command;
         }
 
         public virtual int Execute(params string[] args)
@@ -143,7 +155,6 @@ namespace Odin
                 return actionMap?.GenerateInvocation(args);
             }
         }
-
 
         private bool IsValidActionName(string actionName)
         {

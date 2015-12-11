@@ -19,6 +19,8 @@ namespace Odin
             this.Initialize();
         }
 
+        public Conventions Conventions => ActionMap.Conventions;
+
         public object Instance => ActionMap.Instance;
         public ActionMap ActionMap { get; }
 
@@ -45,7 +47,7 @@ namespace Odin
 
             var values = this.ParameterValues.ToDictionary(row => row.ParameterMap);
             var parameterValue = values[map];
-            if (IsArgumentIdentifier(arg))
+            if (Conventions.IsArgumentIdentifier(arg))
             {
                 if (map.IsBooleanSwitch())
                 {
@@ -79,7 +81,7 @@ namespace Odin
             var j = indexOfCurrentArg + 1;
             if (j < Args.Length)
             {
-                return IsArgumentIdentifier(Args[j]);
+                return Conventions.IsArgumentIdentifier(Args[j]);
             }
             return false;
         }
@@ -92,11 +94,6 @@ namespace Odin
                 map = this.ParameterMaps[i];
             }
             return map;
-        }
-
-        private bool IsArgumentIdentifier(string value)
-        {
-            return value.StartsWith("--");
         }
 
         public bool CanInvoke()

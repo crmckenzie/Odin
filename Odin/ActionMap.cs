@@ -10,7 +10,7 @@ namespace Odin
 {
     public class ActionMap
     {
-        public ActionMap(object instance, MethodInfo method)
+        public ActionMap(Command instance, MethodInfo method)
         {
             Instance = instance;
             MethodInfo = method;
@@ -20,8 +20,9 @@ namespace Odin
         }
 
         public string Name => MethodInfo.Name;
+        public Conventions Conventions => Instance.Conventions;
 
-        public object Instance { get; }
+        public Command Instance { get; }
         public MethodInfo MethodInfo { get; }
         public bool IsDefaultAction { get; }
 
@@ -32,10 +33,7 @@ namespace Odin
         private string GetDescription()
         {
             var descriptionAttr = MethodInfo.GetCustomAttribute<DescriptionAttribute>();
-            if (descriptionAttr == null)
-                return "";
-
-            return descriptionAttr.Description;
+            return descriptionAttr == null ? "" : descriptionAttr.Description;
         }
 
         private IEnumerable<ParameterMap> GenerateParameterMap()
@@ -46,7 +44,7 @@ namespace Odin
                 .Select(row => new ParameterMap
                 {
                     ParameterInfo = row,
-                    Switch = $"--{row.Name}"
+                    Switch = Conventions.GetArgumentName(row),
                 });
         }
 
