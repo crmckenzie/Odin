@@ -80,8 +80,9 @@ namespace Odin
 
         private string GetDescription()
         {
+            var defaultDescription = IsRoot() ? "" : this.Name;
             var attribute = this.GetType().GetCustomAttribute<DescriptionAttribute>(inherit:true);
-            return attribute != null ? attribute.Description : this.Name;
+            return attribute != null ? attribute.Description : defaultDescription;
         }
 
         protected virtual void RegisterSubCommand(Command command)
@@ -94,45 +95,51 @@ namespace Odin
         {
             int result = -1;
             var invocation = this.GenerateInvocation(args);
-            if (invocation != null)
+            if (invocation?.CanInvoke() == true)
             {
-                if (invocation.CanInvoke())
-                {
-                    result =  invocation.Invoke();
-                }
+                result =  invocation.Invoke();
             }
 
             if (result == 0)
                 return result;
 
-            this.Logger.Error("Unrecognized command sequence: {0}", string.Join(" ", args));
+            this.Logger.Error("Unrecognized command sequence: {0}\n", string.Join(" ", args));
             this.Help();
             return result;
         }
 
         public ActionInvocation GenerateInvocation(string[] args)
         {
-            this.InitializeActionMaps();
+            try
+            {
+                this.InitializeActionMaps();
 
-            var subCommand = GetSubCommandByName(args.FirstOrDefault());
-            if (subCommand != null)
-            {
-                var theRest = args.Skip(1).ToArray();
-                return subCommand.GenerateInvocation(theRest);
-            }
+                var subCommand = GetSubCommandByName(args.FirstOrDefault());
+                if (subCommand != null)
+                {
+                    var theRest = args.Skip(1).ToArray();
+                    return subCommand.GenerateInvocation(theRest);
+                }
 
-            var actionName = GetActionName(args);
-            if (IsValidActionName(actionName))
-            {
-                var actionMap = _actionMaps[actionName];
-                var theRest = args.Skip(1).ToArray();
-                var invocation = actionMap.GenerateInvocation(theRest);
-                return invocation;
+                var actionName = GetActionName(args);
+                if (IsValidActionName(actionName))
+                {
+                    var actionMap = _actionMaps[actionName];
+                    var theRest = args.Skip(1).ToArray();
+                    var invocation = actionMap.GenerateInvocation(theRest);
+                    return invocation;
+                }
+                else
+                {
+                    var actionMap = _actionMaps.Values.FirstOrDefault(row => row.IsDefaultAction);
+                    return actionMap?.GenerateInvocation(args);
+                }
+
             }
-            else
+            catch (ParameterConversionException pce)
             {
-                var actionMap = _actionMaps.Values.FirstOrDefault(row => row.IsDefaultAction);
-                return actionMap?.GenerateInvocation(args);
+                this.Logger.Error(pce.Message);
+                return null;
             }
         }
 

@@ -64,6 +64,18 @@ namespace Odin.Tests.Demo
             this.Logger.InfoBuilder.ToString().Trim().ShouldBe("Fizz");
         }
 
+        [Test]
+        public void Execute_FizzBuzz_WithParsingError_FailsGracefully()
+        {
+            // Given
+
+            // When
+            var result = this.Subject.Execute("katas", "fredbob");
+
+            // Then
+            result.ShouldBe(-1, this.Logger.InfoBuilder.ToString());
+        }
+
         #endregion
 
     }

@@ -22,6 +22,8 @@ namespace Odin
         public string Name => Conventions.GetActionName(MethodInfo);
         public Conventions Conventions => Instance.Conventions;
 
+        public Logger Logger => Instance.Logger;
+
         public Command Instance { get; }
         public MethodInfo MethodInfo { get; }
         public bool IsDefaultAction { get; }
@@ -41,7 +43,7 @@ namespace Odin
             return MethodInfo
                 .GetParameters()
                 .OrderBy(row => row.Position)
-                .Select(row => new ParameterMap
+                .Select(row => new ParameterMap(this)
                 {
                     ParameterInfo = row,
                     Switch = Conventions.GetArgumentName(row),

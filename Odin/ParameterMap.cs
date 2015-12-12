@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 
 namespace Odin
 {
     public class ParameterMap
     {
+
         static ParameterMap()
         {
             Coercion = new Dictionary<Type, Func<object, object>>
@@ -19,17 +21,26 @@ namespace Odin
 
         public static Dictionary<Type, Func<object, object>> Coercion { get; set; }
 
-        public ParameterMap()
+        public ActionMap ActionMap { get; }
+
+        public Logger Logger => ActionMap.Logger;
+
+        public ParameterMap(ActionMap actionMap)
         {
+            ActionMap = actionMap;
             this.RawValues = new List<object>();
         }
 
         public string Switch { get; set; }
 
-        public List<object> RawValues { get; set; }
+        public List<object> RawValues { get; }
 
         public ParameterInfo ParameterInfo { get; set; }
         public int Position => ParameterInfo.Position;
+
+        public Type ParameterType => ParameterInfo.ParameterType;
+
+        public string Name => ParameterInfo.Name;
 
         public bool IsOptional()
         {
@@ -43,10 +54,17 @@ namespace Odin
 
         public object Coerce(object value)
         {
-            var key = this.ParameterInfo.ParameterType;
-            if (Coercion.ContainsKey(key))
-                return Coercion[key].Invoke(value);
-            return value;
+            try
+            {
+                var key = this.ParameterInfo.ParameterType;
+                if (Coercion.ContainsKey(key))
+                    return Coercion[key].Invoke(value);
+                return value;
+            }
+            catch (Exception e)
+            {
+                throw new ParameterConversionException(this, value, e);
+            }
         }
 
         public string GetDescription()
