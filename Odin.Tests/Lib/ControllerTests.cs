@@ -11,7 +11,6 @@ namespace Odin.Tests
     //TODO: Support aliases on controllers
     //TODO: Support aliases on methods
     //TODO: Support aliases on parameters
-    //TODO: Support custom conventions
     //TODO: Support custom argument parsers
 
     [TestFixture]

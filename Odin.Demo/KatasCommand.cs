@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using System.Linq;
 
 namespace Odin.Demo
 {
@@ -6,7 +7,7 @@ namespace Odin.Demo
     public class KatasCommand : Command
     {
         [Action(IsDefault = true)]
-        public void FizzBuzz(int input)
+        public int FizzBuzz(int input)
         {
             if (input%3 == 0 && input%5 == 0)
             {
@@ -25,6 +26,16 @@ namespace Odin.Demo
                 Logger.Info(input.ToString());
             }
             Logger.Info("\n");
+            return 0;
+        }
+
+        [Action]
+        public int PrimeFactors(int input)
+        {
+            var result = PrimeFactorGenerator.Generate(input);
+            var output = string.Join(" ", result.Select(row => row.ToString()));
+            this.Logger.Info($"{output}\n");
+            return 0;
         }
     }
 }
