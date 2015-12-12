@@ -1,4 +1,6 @@
 ﻿using System.ComponentModel;
+using Odin.Attributes;
+using Odin.Logging;
 
 namespace Odin.Tests
 {

@@ -1,0 +1,65 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="Odin.ActionInvocation">
+    <Position X="7" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAIAAAIAQAAAQAgAAaAAAAgAAAAQAAAAAAlAAg=</HashCode>
+      <FileName>ActionInvocation.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsCollectionAssociation>
+      <Property Name="ParameterValues" />
+    </ShowAsCollectionAssociation>
+  </Class>
+  <Class Name="Odin.ActionMap">
+    <Position X="4" Y="0.5" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAI8CAAAIAAAAAYAAAgAAAAAQAAAAAAgAAA=</HashCode>
+      <FileName>ActionMap.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="Instance" />
+    </ShowAsAssociation>
+    <ShowAsCollectionAssociation>
+      <Property Name="ParameterMaps" />
+    </ShowAsCollectionAssociation>
+  </Class>
+  <Class Name="Odin.Command">
+    <Position X="0.5" Y="0.5" Width="2.25" />
+    <Compartments>
+      <Compartment Name="Fields" Collapsed="true" />
+    </Compartments>
+    <AssociationLine Name="SubCommands" Type="Odin.Command" ManuallyRouted="true">
+      <Path>
+        <Point X="1.298" Y="6.353" />
+        <Point X="1.298" Y="7.29" />
+        <Point X="1.968" Y="7.29" />
+        <Point X="1.968" Y="6.353" />
+      </Path>
+    </AssociationLine>
+    <TypeIdentifier>
+      <HashCode>IAASAEMAAAIsQAQAoAAEYAwQIAAAAAAAAUAAAQQgIAA=</HashCode>
+      <FileName>Command.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsCollectionAssociation>
+      <Property Name="SubCommands" />
+    </ShowAsCollectionAssociation>
+  </Class>
+  <Class Name="Odin.ParameterMap">
+    <Position X="4.25" Y="5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ABAAAAAAAAJCAIAgIAABAAwAAAAEAAAAIAAAAAABAAA=</HashCode>
+      <FileName>ParameterMap.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Odin.ParameterValue">
+    <Position X="7.25" Y="5.5" Width="1.5" />
+    <Compartments>
+      <Compartment Name="Fields" Collapsed="true" />
+    </Compartments>
+    <TypeIdentifier>
+      <HashCode>ABAAAABCAAAAAAAAAAQAAAQAAAAAAAAAAAAgAAAAAAA=</HashCode>
+      <FileName>ParameterValue.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

@@ -1,6 +1,6 @@
 using System;
 
-namespace Odin
+namespace Odin.Exceptions
 {
     public class ParameterConversionException : Exception
     {

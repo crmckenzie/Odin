@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Odin
+namespace Odin.Logging
 {
     public class DefaultLogger : Logger
     {

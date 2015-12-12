@@ -1,8 +1,8 @@
 using System;
 
-namespace Odin
+namespace Odin.Attributes
 {
-    [AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
+    [AttributeUsage(AttributeTargets.Method)]
     public class ActionAttribute : System.Attribute
     {
         public bool IsDefault { get; set; }

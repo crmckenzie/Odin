@@ -2,7 +2,7 @@ using System;
 using System.Reflection;
 using System.Text.RegularExpressions;
 
-namespace Odin
+namespace Odin.Configuration
 {
     public static class StringExtensions
     {

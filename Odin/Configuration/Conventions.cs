@@ -1,6 +1,6 @@
 using System.Reflection;
 
-namespace Odin
+namespace Odin.Configuration
 {
     public abstract class Conventions
     {

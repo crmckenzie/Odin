@@ -1,4 +1,6 @@
-﻿namespace Odin.Tests
+﻿using Odin.Attributes;
+
+namespace Odin.Tests
 {
     public class NotTheDefaultCommand: Command
     {

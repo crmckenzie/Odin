@@ -4,6 +4,8 @@ using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using Odin.Exceptions;
+using Odin.Logging;
 
 namespace Odin
 {

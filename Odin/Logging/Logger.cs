@@ -1,12 +1,5 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Odin
+﻿namespace Odin.Logging
 {
-    public delegate void LoggingEvent(string text);
-
     public abstract class Logger
     {
         public abstract void Debug(string format, params object[] args);

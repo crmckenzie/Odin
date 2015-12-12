@@ -1,4 +1,5 @@
 using System.Text;
+using Odin.Logging;
 
 namespace Odin.Tests
 {
