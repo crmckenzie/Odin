@@ -1,5 +1,7 @@
 # Odin
 
+[![Build status](https://ci.appveyor.com/api/projects/status/4s75vka56cos0h87/branch/master?svg=true)](https://ci.appveyor.com/project/crmckenzie/odin/branch/master)
+
 In the .NET space there are a number of good libraries to handle run-of-the-mill command line argument parsing.
 My current favorite is a nuget package called simply [CommandLineParser].
 So why write a new one?

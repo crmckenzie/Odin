@@ -14,16 +14,6 @@ namespace Odin.Tests
     public class SubCommand : Command
     {
 
-        public SubCommand(Logger logger) : base(logger)
-        {
-            base.RegisterSubCommand(new KatasCommand());
-        }
-
-        public SubCommand() : this(new DefaultLogger())
-        {
-            
-        }
-
         [Action(IsDefault = true)]
         public virtual void DoSomething()
         {

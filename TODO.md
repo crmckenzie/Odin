@@ -18,8 +18,8 @@
 * [ ] Help should support an output file parameter
 * [ ] Help generation should be customizable
 * [ ] Support argument parsing for primitive types
-  * [ ] bool
-  * [ ] int
+  * [x] bool
+  * [x] int
   * [ ] long
   * [ ] DateTime
   * [ ] decimal

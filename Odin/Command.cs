@@ -15,12 +15,17 @@ namespace Odin
     {
         private Dictionary<string, ActionMap> _actionMaps;
         private Dictionary<string, Command> SubCommands { get; }
-        protected Command(Logger logger = null, Conventions conventions = null)
+        protected Command(Conventions conventions = null)
         {
             SubCommands = new Dictionary<string, Command>();
-            _Logger = logger ?? new DefaultLogger();
             _conventions = conventions ?? new DefaultConventions();
             this.Description = GetDescription();
+        }
+
+        public Command Use(Logger logger)
+        {
+            _logger = logger ?? new DefaultLogger();
+            return this;
         }
 
         protected void InitializeActionMaps()
@@ -40,17 +45,8 @@ namespace Odin
         private Command _parent;
         protected Command Parent => _parent;
 
-        private readonly Logger _Logger;
-
-        public Logger Logger
-        {
-            get
-            {
-                if (Parent != null)
-                    return Parent.Logger;
-                return _Logger;
-            }
-        }
+        private Logger _logger = new DefaultLogger();
+        public Logger Logger => IsRoot() ? _logger : Parent.Logger;
 
         private readonly Conventions _conventions;
         public Conventions Conventions

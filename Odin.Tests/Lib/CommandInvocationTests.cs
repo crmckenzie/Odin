@@ -14,7 +14,10 @@ namespace Odin.Tests
         {
             this.Logger = new StringBuilderLogger();
             this.SubCommand = new SubCommand();
-            this.Subject = new DefaultCommand(this.SubCommand, this.Logger);
+            this.Subject = new DefaultCommand(this.SubCommand);
+            this.Subject
+                .Use(this.Logger)
+                ;
         }
 
         public StringBuilderLogger Logger { get; set; }

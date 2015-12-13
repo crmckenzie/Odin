@@ -16,7 +16,8 @@ namespace Odin.Tests.Demo
         public void BeforeEach()
         {
             this.Logger = new StringBuilderLogger();
-            this.Subject = new RootCommand(this.Logger);
+            this.Subject = new RootCommand();
+            this.Subject.Use(this.Logger);
         }
 
         public StringBuilderLogger Logger { get; set; }

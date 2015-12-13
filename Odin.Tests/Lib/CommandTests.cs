@@ -9,19 +9,15 @@ using Shouldly;
 namespace Odin.Tests
 {
 
-
     [TestFixture]
     public class CommandTests
     {
         [SetUp]
         public void BeforeEach()
         {
-            this.Logger = new StringBuilderLogger();
             this.SubCommand = Substitute.ForPartsOf<SubCommand>();
-            this.Subject = Substitute.ForPartsOf<DefaultCommand>(this.SubCommand, this.Logger);
+            this.Subject = Substitute.ForPartsOf<DefaultCommand>(this.SubCommand);
         }
-
-        public StringBuilderLogger Logger { get; set; }
 
         public SubCommand SubCommand { get; set; }
 

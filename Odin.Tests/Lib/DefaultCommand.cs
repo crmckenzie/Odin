@@ -8,13 +8,8 @@ namespace Odin.Tests
     public class DefaultCommand : Command
     {
         public object[] MethodArguments { get; set; }
-
-        public DefaultCommand() : this(new SubCommand(), new DefaultLogger())
-        {
-           
-        }
-
-        public DefaultCommand(SubCommand subcommand, Logger logger) : base(logger)
+        
+        public DefaultCommand(SubCommand subcommand) 
         {
             var subcommand1 = subcommand ?? new SubCommand();
             base.RegisterSubCommand(subcommand1);
