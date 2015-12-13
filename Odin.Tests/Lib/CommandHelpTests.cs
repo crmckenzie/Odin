@@ -124,9 +124,12 @@ namespace Odin.Tests
 
             var i = 0;
             Assert.That(lines[i].Trim(), Is.EqualTo("do-something (default)        A description of the DoSomething() method."));
-            Assert.That(lines[++i], Is.EqualTo("\t--argument1               Lorem ipsum dolor sit amet, consectetur adipiscing elit"));
-            Assert.That(lines[++i], Is.EqualTo("\t--argument2               sed do eiusmod tempor incididunt ut labore et dolore magna aliqua"));
-            Assert.That(lines[++i], Is.EqualTo("\t--argument3               Ut enim ad minim veniam"));
+            Assert.That(lines[++i], Is.EqualTo("\t--argument1               aliases: -a, -A"));
+            Assert.That(lines[++i], Is.EqualTo("\t                          Lorem ipsum dolor sit amet, consectetur adipiscing elit"));
+            Assert.That(lines[++i], Is.EqualTo("\t--argument2               aliases: -b, -B"));
+            Assert.That(lines[++i], Is.EqualTo("\t                          sed do eiusmod tempor incididunt ut labore et dolore magna aliqua"));
+            Assert.That(lines[++i], Is.EqualTo("\t--argument3               aliases: -c, -C"));
+            Assert.That(lines[++i], Is.EqualTo("\t                          Ut enim ad minim veniam"));
         }
 
         [Test]
