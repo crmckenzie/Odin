@@ -46,29 +46,32 @@ namespace Odin
             if (map == null)
                 return 0;
 
-            var values = this.ParameterValues.ToDictionary(row => row.ParameterMap);
-            var parameterValue = values[map];
-            if (Conventions.IsArgumentIdentifier(arg))
+            var parameterValue = this.ParameterValues.FirstOrDefault(row => row.IsIdentifiedBy(arg));
+            if (parameterValue == null)
             {
-                if (map.IsBooleanSwitch())
-                {
-                    parameterValue.Value = true;
-                }
-                else if (NextArgIsIdentifier(i))
-                {
-                    return 0;
-                }
-                else if (HasNextValue(i))
-                {
-                    var value = Args[i + 1];
-                    parameterValue.Value = map.Coerce(value);
-                    return 1;
-                }
-            }
-            else
-            {
+                parameterValue = this.ParameterValues[i];
                 parameterValue.Value = map.Coerce(arg);
+                return 0;
             }
+
+            if (!parameterValue.IsIdentifiedBy(arg))
+                return 0;
+
+            if (map.IsBooleanSwitch())
+            {
+                parameterValue.Value = true;
+            }
+            else if (NextArgIsIdentifier(i))
+            {
+                return 0;
+            }
+            else if (HasNextValue(i))
+            {
+                var value = Args[i + 1];
+                parameterValue.Value = map.Coerce(value);
+                return 1;
+            }
+
             return 0;
         }
 
@@ -89,7 +92,7 @@ namespace Odin
 
         private ParameterMap FindBySwitchOrIndex(string arg, int i)
         {
-            var map = this.ParameterMaps.FirstOrDefault(p => p.Switch == arg);
+            var map = this.ParameterMaps.FirstOrDefault(p => p.Switch == arg || p.HasAlias(arg));
             if (map == null && i < this.ParameterMaps.Count)
             {
                 map = this.ParameterMaps[i];

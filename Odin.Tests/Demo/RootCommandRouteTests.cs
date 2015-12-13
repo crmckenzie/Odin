@@ -39,6 +39,20 @@ namespace Odin.Tests.Demo
         }
 
         [Test]
+        public void Execute_FizzBuzz_UsingParamterAlias()
+        {
+            // Given
+
+            // When
+            var result = this.Subject.Execute("katas", "fizz-buzz", "-i", "3");
+
+            // Then
+            result.ShouldBe(0);
+            this.Logger.InfoBuilder.ToString().Trim().ShouldBe("Fizz");
+        }
+
+
+        [Test]
         public void Execute_FizzBuzz_UsingExplicitActionName()
         {
             // Given

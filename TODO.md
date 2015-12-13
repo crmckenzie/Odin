@@ -13,7 +13,7 @@
 * [x] Provide testability of command structure separate from execution of command structure.
 * [ ] Support aliases on controllers
 * [ ] Support aliases on methods
-* [ ] Support aliases on parameters
+* [x] Support aliases on parameters
 * [ ] Aliases should be emitted by the help
 * [ ] Help should support an output file parameter
 * [ ] Help generation should be customizable
@@ -34,3 +34,6 @@
 * [ ] Support --switch and --no-switch argument styles for boolean arguments
 * [ ] Create a nuget package
 * [ ] Wire into a teamcity build for publication
+* [ ] Validation
+  * [ ] Validate no more than one action per command
+  * [ ] Validate no more than one of the same alias on a method

@@ -53,9 +53,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Demo\RootCommandRouteTests.cs" />
-    <Compile Include="Lib\ControllerHelpTests.cs" />
-    <Compile Include="Lib\ControllerInvocationTests.cs" />
-    <Compile Include="Lib\ControllerTests.cs" />
+    <Compile Include="Lib\CommandHelpTests.cs" />
+    <Compile Include="Lib\CommandInvocationTests.cs" />
+    <Compile Include="Lib\CommandTests.cs" />
     <Compile Include="Lib\NotTheDefaultCommand.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Lib\DefaultCommand.cs" />

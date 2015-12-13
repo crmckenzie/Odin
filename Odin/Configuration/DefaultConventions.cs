@@ -1,6 +1,8 @@
 using System;
+using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
+using Odin.Attributes;
 
 namespace Odin.Configuration
 {
@@ -42,6 +44,13 @@ namespace Odin.Configuration
         public override string GetActionName(MethodInfo methodInfo)
         {
             return methodInfo.Name.HyphenCase();
+        }
+
+        public override bool MatchesAlias(AliasAttribute aliasAttribute, string arg)
+        {
+            if (aliasAttribute == null)
+                return false;
+            return aliasAttribute.Aliases.Contains(arg);
         }
     }
 }

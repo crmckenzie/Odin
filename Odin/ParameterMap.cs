@@ -4,6 +4,8 @@ using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using Odin.Attributes;
+using Odin.Configuration;
 using Odin.Exceptions;
 using Odin.Logging;
 
@@ -25,6 +27,8 @@ namespace Odin
 
         public ActionMap ActionMap { get; }
 
+        public Conventions Conventions => this.ActionMap.Conventions;
+
         public Logger Logger => ActionMap.Logger;
 
         public ParameterMap(ActionMap actionMap)
@@ -44,10 +48,7 @@ namespace Odin
 
         public string Name => ParameterInfo.Name;
 
-        public bool IsOptional()
-        {
-            return ParameterInfo.IsOptional;
-        }
+        public bool IsOptional => ParameterInfo.IsOptional;
 
         public bool IsBooleanSwitch()
         {
@@ -77,5 +78,28 @@ namespace Odin
             return "";
         }
 
+        public bool HasAlias(string arg)
+        {
+            var attr = this.ParameterInfo.GetCustomAttribute<AliasAttribute>();
+            return Conventions.MatchesAlias(attr, arg);
+        }
+
+        public bool HasAliases()
+        {
+            var attr = this.ParameterInfo.GetCustomAttribute<AliasAttribute>();
+            if (attr == null)
+                return false;
+
+            return attr.Aliases.Any();
+        }
+
+        public string[] GetAliases()
+        {
+            var attr = this.ParameterInfo.GetCustomAttribute<AliasAttribute>();
+            if (attr == null)
+                return new string[] {};
+
+            return attr.Aliases.ToArray();
+        }
     }
 }

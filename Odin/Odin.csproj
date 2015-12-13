@@ -43,6 +43,7 @@
     <Compile Include="Attributes\ActionAttribute.cs" />
     <Compile Include="ActionInvocation.cs" />
     <Compile Include="ActionMap.cs" />
+    <Compile Include="Attributes\AliasAttribute.cs" />
     <Compile Include="Command.cs" />
     <Compile Include="Configuration\Conventions.cs" />
     <Compile Include="Configuration\DefaultConventions.cs" />

@@ -8,7 +8,10 @@ namespace Odin.Demo
     public class KatasCommand : Command
     {
         [Action(IsDefault = true)]
-        public int FizzBuzz(int input)
+        public int FizzBuzz(
+            [Alias("-i")]
+            int input
+            )
         {
             if (input%3 == 0 && input%5 == 0)
             {

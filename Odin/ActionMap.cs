@@ -68,7 +68,17 @@ namespace Odin
             foreach (var parameterMap in this.ParameterMaps)
             {
                 var description = parameterMap.GetDescription();
-                builder.AppendLine($"\t{parameterMap.Switch,-26}{description}");
+                builder.Append($"\t{parameterMap.Switch,-26}");
+                if (parameterMap.HasAliases())
+                {
+                    var aliases = string.Join(", ", parameterMap.GetAliases());
+                    var text = $"aliases: {aliases}";
+                    builder.AppendLine(text)
+                        .Append($"\t{new string(' ', 26)}")
+                        ;
+                }
+
+                builder.AppendLine(description);
             }
             return builder.ToString();
         }

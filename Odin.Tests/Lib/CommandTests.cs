@@ -11,7 +11,7 @@ namespace Odin.Tests
 
 
     [TestFixture]
-    public class ControllerTests
+    public class CommandTests
     {
         [SetUp]
         public void BeforeEach()

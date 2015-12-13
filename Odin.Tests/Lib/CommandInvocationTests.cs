@@ -7,7 +7,7 @@ using Shouldly;
 namespace Odin.Tests
 {
     [TestFixture]
-    public class ControllerInvocationTests
+    public class CommandInvocationTests
     {
         [SetUp]
         public void BeforeEach()
