@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>Odin</id>
+    <version>$version$</version>
+    <title>Odin</title>
+    <authors>Chris McKenzie</authors>
+    <owners>Chris McKenzie</owners>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Odin is a conventions-based library for routing command-line arguments to the appropriate code to execute.</description>
+    <releaseNotes>Initial  release</releaseNotes>
+    <copyright>Copyright 2015</copyright>
+    <tags>CommandLine</tags>
+  </metadata>
+  <files>
+    <file src="Odin\bin\Release\Odin.dll" target="lib\net451" />
+  </files>
+</package>

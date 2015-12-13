@@ -2,6 +2,7 @@
 using System.Linq;
 using NSubstitute;
 using NUnit.Framework;
+using Odin.Demo;
 using Shouldly;
 
 namespace Odin.Tests
@@ -13,7 +14,8 @@ namespace Odin.Tests
         public void BeforeEach()
         {
             this.Logger = new StringBuilderLogger();
-            this.SubCommand = new SubCommand(); 
+            this.SubCommand = new SubCommand();
+            this.SubCommand.RegisterSubCommand(new KatasCommand());
             this.Subject = new DefaultCommand(this.SubCommand);
             this.Subject.Use(this.Logger);
         }

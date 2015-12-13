@@ -85,10 +85,11 @@ namespace Odin
             return attribute != null ? attribute.Description : defaultDescription;
         }
 
-        protected virtual void RegisterSubCommand(Command command)
+        public virtual Command RegisterSubCommand(Command command)
         {
             command.SetParent(this);
             this.SubCommands[command.Name] = command;
+            return this;
         }
 
         public virtual int Execute(params string[] args)
