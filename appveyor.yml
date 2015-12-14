@@ -29,7 +29,7 @@ build:
   verbosity: minimal
 
 after_build:
-- nuget pack Odin.nuspec
+- nuget pack Odin.nuspec -version $env:nugetVersion
 
 artifacts:
 - path: '*.nupkg'
