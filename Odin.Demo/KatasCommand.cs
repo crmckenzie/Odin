@@ -9,7 +9,7 @@ namespace Odin.Demo
     {
         [Action(IsDefault = true)]
         public int FizzBuzz(
-            [Alias("-i")]
+            [Alias("i")]
             int input
             )
         {

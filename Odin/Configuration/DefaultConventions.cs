@@ -50,7 +50,14 @@ namespace Odin.Configuration
         {
             if (aliasAttribute == null)
                 return false;
-            return aliasAttribute.Aliases.Contains(arg);
+
+            var aliases = aliasAttribute.Aliases.Select(GetFormattedAlias);
+            return aliases.Contains(arg);
+        }
+
+        public override string GetFormattedAlias(string rawAlias)
+        {
+            return $"-{rawAlias}";
         }
     }
 }

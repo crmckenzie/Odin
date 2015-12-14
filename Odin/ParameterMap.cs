@@ -99,7 +99,7 @@ namespace Odin
             if (attr == null)
                 return new string[] {};
 
-            return attr.Aliases.ToArray();
+            return attr.Aliases.Select(a => Conventions.GetFormattedAlias(a)).ToArray();
         }
     }
 }

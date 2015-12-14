@@ -11,5 +11,7 @@ namespace Odin.Configuration
         public abstract string GetActionName(MethodInfo methodInfo);
 
         public abstract bool MatchesAlias(AliasAttribute aliasAttribute, string arg);
+
+        public abstract string GetFormattedAlias(string rawAlias);
     }
 }
