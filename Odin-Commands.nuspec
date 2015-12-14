@@ -6,6 +6,7 @@
     <title>Odin Commands</title>
     <authors>Chris McKenzie</authors>
     <owners>Chris McKenzie</owners>
+    <projectUrl>http://crmckenzie.github.io/Odin/</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>Odin is a conventions-based library for routing command-line arguments to the appropriate code to execute.</description>
     <releaseNotes>Initial  release</releaseNotes>
