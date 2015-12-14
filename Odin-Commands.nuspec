@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package >
   <metadata>
-    <id>Odin</id>
+    <id>Odin-Commands</id>
     <version>$version$</version>
     <title>Odin</title>
     <authors>Chris McKenzie</authors>

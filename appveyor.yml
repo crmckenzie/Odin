@@ -29,7 +29,7 @@ build:
   verbosity: minimal
 
 after_build:
-- ps: nuget pack Odin.nuspec -version "$env:nugetVersion"
+- ps: nuget pack Odin-Commands.nuspec -version "$env:nugetVersion"
 
 artifacts:
 - path: '*.nupkg'
@@ -38,6 +38,6 @@ deploy:
 - provider: NuGet
   api_key:
     secure: oZLUyd94wnic5VlRfHZnlopK4I2tNOT30JMOp0nWrH/i+ZOyVYKayPbfy407OZdL
-  artifact: '*.nupkg'
+  artifact: Odin-Commands*.nupkg
   on:
     branch: master
