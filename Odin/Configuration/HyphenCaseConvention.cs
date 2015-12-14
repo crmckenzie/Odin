@@ -15,15 +15,8 @@ namespace Odin.Configuration
         }
     }
 
-    public class DefaultConventions : Conventions
+    public class HyphenCaseConvention : Conventions
     {
-
-        private string GetTableName(Type type)
-        {
-            var name = Regex.Replace(type.Name, "Entity$", "");
-            return name.HyphenCase().ToUpper();
-        }
-
         public override string GetCommandName(Command command)
         {
             var name = command.GetType().Name;
@@ -58,6 +51,36 @@ namespace Odin.Configuration
         public override string GetFormattedAlias(string rawAlias)
         {
             return $"-{rawAlias}";
+        }
+
+        public override bool IsIdentifiedBy(ParameterMap parameterMap, string arg)
+        {
+            return parameterMap.Switch == arg;
+        }
+
+        public override int SetValue(ParameterValue parameter, int i)
+        {
+            var arg = parameter.Args[i];
+            if (parameter.IsBooleanSwitch())
+            {
+                parameter.Value = true;
+            }
+            else if (parameter.NextArgIsIdentifier(i))
+            {
+                return 1;
+            }
+            else if (parameter.IsIdentifiedBy(arg) && parameter.HasNextValue(i))
+            {
+                var value = parameter.Args[i + 1];
+                parameter.Value = parameter.Coerce(value);
+                return 2;
+            }
+            else
+            {
+                parameter.Value = parameter.Coerce(arg);
+            }
+
+            return 1;
         }
     }
 }

@@ -46,7 +46,8 @@
     <Compile Include="Attributes\AliasAttribute.cs" />
     <Compile Include="Command.cs" />
     <Compile Include="Configuration\Conventions.cs" />
-    <Compile Include="Configuration\DefaultConventions.cs" />
+    <Compile Include="Configuration\ForwardSlashColonConvention.cs" />
+    <Compile Include="Configuration\HyphenCaseConvention.cs" />
     <Compile Include="Logging\DefaultLogger.cs" />
     <Compile Include="Logging\Logger.cs" />
     <Compile Include="Exceptions\ParameterConversionException.cs" />

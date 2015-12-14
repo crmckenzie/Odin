@@ -13,5 +13,9 @@ namespace Odin.Configuration
         public abstract bool MatchesAlias(AliasAttribute aliasAttribute, string arg);
 
         public abstract string GetFormattedAlias(string rawAlias);
+
+        public abstract bool IsIdentifiedBy(ParameterMap parameterMap, string arg);
+
+        public abstract int SetValue(ParameterValue parameter, int i);
     }
 }

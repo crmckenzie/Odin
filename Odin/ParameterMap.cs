@@ -14,22 +14,9 @@ namespace Odin
     public class ParameterMap
     {
 
-        static ParameterMap()
-        {
-            Coercion = new Dictionary<Type, Func<object, object>>
-            {
-                [typeof (bool)] = o => bool.Parse(o.ToString()),
-                [typeof(int)] = o => int.Parse(o.ToString())
-            };
-        }
-
-        public static Dictionary<Type, Func<object, object>> Coercion { get; set; }
-
         public ActionMap ActionMap { get; }
 
         public Conventions Conventions => this.ActionMap.Conventions;
-
-        public Logger Logger => ActionMap.Logger;
 
         public ParameterMap(ActionMap actionMap)
         {
@@ -44,30 +31,11 @@ namespace Odin
         public ParameterInfo ParameterInfo { get; set; }
         public int Position => ParameterInfo.Position;
 
-        public Type ParameterType => ParameterInfo.ParameterType;
-
-        public string Name => ParameterInfo.Name;
-
         public bool IsOptional => ParameterInfo.IsOptional;
 
         public bool IsBooleanSwitch()
         {
             return ParameterInfo.ParameterType == typeof (bool);
-        }
-
-        public object Coerce(object value)
-        {
-            try
-            {
-                var key = this.ParameterInfo.ParameterType;
-                if (Coercion.ContainsKey(key))
-                    return Coercion[key].Invoke(value);
-                return value;
-            }
-            catch (Exception e)
-            {
-                throw new ParameterConversionException(this, value, e);
-            }
         }
 
         public string GetDescription()
@@ -101,5 +69,6 @@ namespace Odin
 
             return attr.Aliases.Select(a => Conventions.GetFormattedAlias(a)).ToArray();
         }
+
     }
 }

@@ -4,13 +4,13 @@ namespace Odin.Exceptions
 {
     public class ParameterConversionException : Exception
     {
-        public ParameterMap ParameterMap { get; }
+        public ParameterValue ParameterValue { get; }
         public object Value { get; }
 
-        public ParameterConversionException(ParameterMap parameterMap, object value, Exception exception) : 
-            base($"Argument conversion failed for parameter {parameterMap.Name}.\nCould not convert '{value}' to type {parameterMap.ParameterType.FullName}.\n", exception)
+        public ParameterConversionException(ParameterValue parameterValue, object value, Exception exception) : 
+            base($"Argument conversion failed for parameter {parameterValue.Name}.\nCould not convert '{value}' to type {parameterValue.ParameterType.FullName}.\n", exception)
         {
-            ParameterMap = parameterMap;
+            ParameterValue = parameterValue;
             Value = value;
         }
     }

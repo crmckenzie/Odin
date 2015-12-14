@@ -56,6 +56,7 @@
     <Compile Include="Lib\CommandHelpTests.cs" />
     <Compile Include="Lib\CommandInvocationTests.cs" />
     <Compile Include="Lib\CommandTests.cs" />
+    <Compile Include="Lib\ForwardSlashColonConventionTests.cs" />
     <Compile Include="Lib\NotTheDefaultCommand.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Lib\DefaultCommand.cs" />

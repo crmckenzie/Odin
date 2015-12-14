@@ -18,8 +18,14 @@ namespace Odin
         protected Command(Conventions conventions = null)
         {
             SubCommands = new Dictionary<string, Command>();
-            _conventions = conventions ?? new DefaultConventions();
+            _conventions = conventions ?? new HyphenCaseConvention();
             this.Description = GetDescription();
+        }
+
+        public Command Use(Conventions conventions)
+        {
+            _conventions = conventions;
+            return this;
         }
 
         public Command Use(Logger logger)
@@ -48,7 +54,7 @@ namespace Odin
         private Logger _logger = new DefaultLogger();
         public Logger Logger => IsRoot() ? _logger : Parent.Logger;
 
-        private readonly Conventions _conventions;
+        private  Conventions _conventions;
         public Conventions Conventions
         {
             get
@@ -109,31 +115,31 @@ namespace Odin
             return result;
         }
 
-        public ActionInvocation GenerateInvocation(string[] args)
+        public ActionInvocation GenerateInvocation(string[] tokens)
         {
             try
             {
                 this.InitializeActionMaps();
 
-                var subCommand = GetSubCommandByName(args.FirstOrDefault());
+                var subCommand = GetSubCommandByName(tokens.FirstOrDefault());
                 if (subCommand != null)
                 {
-                    var theRest = args.Skip(1).ToArray();
+                    var theRest = tokens.Skip(1).ToArray();
                     return subCommand.GenerateInvocation(theRest);
                 }
 
-                var actionName = GetActionName(args);
+                var actionName = GetActionName(tokens);
                 if (IsValidActionName(actionName))
                 {
                     var actionMap = _actionMaps[actionName];
-                    var theRest = args.Skip(1).ToArray();
+                    var theRest = tokens.Skip(1).ToArray();
                     var invocation = actionMap.GenerateInvocation(theRest);
                     return invocation;
                 }
                 else
                 {
                     var actionMap = _actionMaps.Values.FirstOrDefault(row => row.IsDefaultAction);
-                    return actionMap?.GenerateInvocation(args);
+                    return actionMap?.GenerateInvocation(tokens);
                 }
 
             }

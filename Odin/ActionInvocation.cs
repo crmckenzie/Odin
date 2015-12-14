@@ -1,18 +1,19 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Runtime.InteropServices.WindowsRuntime;
 using Odin.Configuration;
 
 namespace Odin
 {
     public class ActionInvocation
     {
-        public ActionInvocation(ActionMap actionMap, string[] args)
+        public ActionInvocation(ActionMap actionMap, string[] tokens)
         {
             ActionMap = actionMap;
-            Args = args;
+            Tokens = tokens;
             this.ParameterValues = this.ParameterMaps
-                .Select(row => new ParameterValue(row))
+                .Select(row => new ParameterValue(this, row))
                 .ToList()
                 .AsReadOnly()
                 ;
@@ -27,77 +28,36 @@ namespace Odin
 
         public ReadOnlyCollection<ParameterMap> ParameterMaps => ActionMap.ParameterMaps;
          
-        public string[] Args { get;  }
+        public string[] Tokens { get;  }
         public ReadOnlyCollection<ParameterValue> ParameterValues { get; }
         public string Name => ActionMap.Name;
 
         private void Initialize()
         {
-            for (var i = 0; i < Args.Length; i++)
+            for (var i = 0; i < Tokens.Length; i++)
             {
-                var arg = Args[i];
-                var map = FindBySwitchOrIndex(arg, i);
-                i += SetParameterValue(map, arg, i);
+                var arg = Tokens[i];
+                var parameter = FindBySwitchOrIndex(arg, i);
+                if (parameter != null)
+                {
+                    i += (Conventions.SetValue(parameter, i) -1);
+                }
             }
         }
 
-        private int SetParameterValue(ParameterMap map, string arg, int i)
+        private ParameterValue FindBySwitchOrIndex(string arg, int i)
         {
-            if (map == null)
-                return 0;
-
-            var parameterValue = this.ParameterValues.FirstOrDefault(row => row.IsIdentifiedBy(arg));
-            if (parameterValue == null)
+            var found = this.ParameterValues
+                .FirstOrDefault(p => p.IsIdentifiedBy(arg))
+                ;
+            if (found == null && i < this.ParameterMaps.Count)
             {
-                parameterValue = this.ParameterValues[i];
-                parameterValue.Value = map.Coerce(arg);
-                return 0;
+                found = this.ParameterValues
+                    .OrderBy(p => p.Position)
+                    .ToArray()[i]
+                    ;
             }
-
-            if (!parameterValue.IsIdentifiedBy(arg))
-                return 0;
-
-            if (map.IsBooleanSwitch())
-            {
-                parameterValue.Value = true;
-            }
-            else if (NextArgIsIdentifier(i))
-            {
-                return 0;
-            }
-            else if (HasNextValue(i))
-            {
-                var value = Args[i + 1];
-                parameterValue.Value = map.Coerce(value);
-                return 1;
-            }
-
-            return 0;
-        }
-
-        private bool HasNextValue(int indexOfCurrentArg)
-        {
-            return Args.Length > (indexOfCurrentArg + 1);
-        }
-
-        private bool NextArgIsIdentifier(int indexOfCurrentArg)
-        {
-            var j = indexOfCurrentArg + 1;
-            if (j < Args.Length)
-            {
-                return Conventions.IsArgumentIdentifier(Args[j]);
-            }
-            return false;
-        }
-
-        private ParameterMap FindBySwitchOrIndex(string arg, int i)
-        {
-            var map = this.ParameterMaps.FirstOrDefault(p => p.Switch == arg || p.HasAlias(arg));
-            if (map == null && i < this.ParameterMaps.Count)
-            {
-                map = this.ParameterMaps[i];
-            }
-            return map;
+            return found;
         }
 
         public bool CanInvoke()
