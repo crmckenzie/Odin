@@ -23,12 +23,14 @@
   * [ ] long
   * [ ] DateTime
   * [ ] decimal
+  * [ ] Enum
 * [ ] Support argument parsing for nullable primitive types
   * [ ] bool
   * [ ] int
   * [ ] long
   * [ ] DateTime
   * [ ] decimal
+  * [ ] Enum
 * [ ] Support custom argument parsers
 * [ ] Support array arguments
 * [ ] Support --switch and --no-switch argument styles for boolean arguments
