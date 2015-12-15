@@ -44,26 +44,103 @@ I wondered if it would be possible to use a combination of reflection and conven
 * Odin should automatically parse arguments into common framework types
   * Odin should allow overrideble parsing algorithms.
 
-## Back of the Paper Napkin Usage Design
+### Show Me The Code
+
+#### Setup Code
 
 ```csharp
-[DefaultAction("DoSomething")]
-[Description("This is the default controller")]
-public class DefaultController : Controller
+
+public class RootCommand : Command
 {
-    [Action]
-    [Description("A description of the DoSomething() method.")]
-    public void DoSomething(
-        [Description("Lorem ipsum dolor sit amet, consectetur adipiscing elit")]
-        string argument1 = "value1-not-passed", 
-        [Description("sed do eiusmod tempor incididunt ut labore et dolore magna aliqua")]
-        string argument2 = "value2-not-passed", 
-        [Description("Ut enim ad minim veniam")]
-        string argument3 = "value3-not-passed")
+    public RootCommand() : this(new KatasCommand())
     {
-        // do something here
+    }
+
+    public RootCommand(KatasCommand katas)
+    {
+        base.RegisterSubCommand(katas);
+    }
+
+    [Action]
+    [Description("The proverbial 'hello world' application.")]
+    public int Hello(
+        [Description("Override who to say hello to. Defaults to 'World'.")]
+        [Alias("w")]
+        string who = "World")
+    {
+        this.Logger.Info($"Hello {who}!\n");
+        return 0;
+    }
+
+    [Action]
+    [Description("Display the current time")]
+    public void Time(
+        [Description("The format of the time. (default) hh:mm:ss tt")]
+        [Alias("f")]
+        string format = "hh:mm:ss tt")
+    {
+        this.Logger.Info($"The time is {DateTime.Now.ToLocalTime():format}\n");
     }
 }
+
+[Description("Provides some katas.")]
+public class KatasCommand : Command
+{
+    [Action(IsDefault = true)]
+    public int FizzBuzz(
+        [Alias("i")]
+        int input
+        )
+    {
+        FizzBuzzGame.Play(this.Logger, input);
+        return 0;
+    }
+
+    [Action]
+    public int PrimeFactors(
+      [Alias("i")]
+      int input
+      )
+    {
+        var result = PrimeFactorGenerator.Generate(input);
+        var output = string.Join(" ", result.Select(row => row.ToString()));
+        this.Logger.Info($"{output}\n");
+        return 0;
+    }
+}
+
+
+```
+
+#### The Program
+
+```csharp
+class Program
+{
+    static void Main(string[] args)
+    {
+        var root = new RootCommand(new KatasCommand());
+        var result = root.Execute(args);
+        Environment.Exit(result);
+    }
+}
+```
+
+### What Do I Get For My Trouble?
+
+You get a command line executable that can be invoked like so:
+
+```
+
+exe hello --who "world"                 # explicit invocation
+exe hello -w "world"                    # argument alias
+exe hello "world"                       # implicit argument by order
+
+exe katas fizz-buzz --input 11          # explicit subcommand invocation
+exe katas --input 11                    # subcommand + default action
+exe katas -i 11                         # subcommand + default action + argument alias
+exe katas 11                            # subcommand + default action + implicit argument by order
+exe katas prime-factors --input 27      # subcommand + non-default action + explicit argument
 ```
 
 [CommandLineParser]:https://www.nuget.org/packages/CommandLineParser
