@@ -9,6 +9,8 @@
 * [x] Create a demo project to show how to use the library.
 * [x] Support an injectable Logger
 * [x] Support customizable conventions
+  * [x] provide /argment:value style convention
+  * [ ] provide /argument=value style convention
 * [x] Handle parsing errors in a friendly manner.
 * [x] Provide testability of command structure separate from execution of command structure.
 * [ ] Support aliases on controllers

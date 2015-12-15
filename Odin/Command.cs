@@ -13,7 +13,6 @@ namespace Odin
 {
     public abstract class Command
     {
-        private Dictionary<string, ActionMap> _actionMaps;
         private Dictionary<string, Command> SubCommands { get; }
         protected Command(Conventions conventions = null)
         {
@@ -32,13 +31,6 @@ namespace Odin
         {
             _logger = logger ?? new DefaultLogger();
             return this;
-        }
-
-        protected void InitializeActionMaps()
-        {
-            if (this._actionMaps != null)
-                return;
-            this._actionMaps = GetActionMaps();
         }
 
         public string Description { get; }
@@ -67,11 +59,11 @@ namespace Odin
 
         public virtual string Name => Conventions.GetCommandName(this);
 
-        private Dictionary<string, ActionMap> GetActionMaps()
+        private List<MethodInvocation> GetActions()
         {
             return GetActionMethods()
-                .Select(row => new ActionMap(this, row))
-                .ToDictionary(row => row.Name)
+                .Select(row => new MethodInvocation(this, row))
+                .ToList()
                 ;
         }
 
@@ -100,7 +92,7 @@ namespace Odin
 
         public virtual int Execute(params string[] args)
         {
-            int result = -1;
+            var result = -1;
             var invocation = this.GenerateInvocation(args);
             if (invocation?.CanInvoke() == true)
             {
@@ -115,54 +107,36 @@ namespace Odin
             return result;
         }
 
-        public ActionInvocation GenerateInvocation(string[] tokens)
+        public MethodInvocation GenerateInvocation(string[] tokens)
         {
             try
             {
-                this.InitializeActionMaps();
-
-                var subCommand = GetSubCommandByName(tokens.FirstOrDefault());
+                var commandOrActionName = tokens.FirstOrDefault();
+                var subCommand = GetSubCommandByName(commandOrActionName);
                 if (subCommand != null)
                 {
                     var theRest = tokens.Skip(1).ToArray();
                     return subCommand.GenerateInvocation(theRest);
                 }
 
-                var actionName = GetActionName(tokens);
-                if (IsValidActionName(actionName))
+                var actions = this.GetActions();
+                var action = actions.FirstOrDefault(row => row.Name == commandOrActionName);
+                var toSkip = 1;
+                if (action == null)
                 {
-                    var actionMap = _actionMaps[actionName];
-                    var theRest = tokens.Skip(1).ToArray();
-                    var invocation = actionMap.GenerateInvocation(theRest);
-                    return invocation;
+                    toSkip = 0;
+                    action = actions.FirstOrDefault(row => row.IsDefault);
                 }
-                else
-                {
-                    var actionMap = _actionMaps.Values.FirstOrDefault(row => row.IsDefaultAction);
-                    return actionMap?.GenerateInvocation(tokens);
-                }
-
+ 
+                var args = tokens.Skip(toSkip).ToArray();
+                action?.SetParameterValues(args);
+                return action;
             }
             catch (ParameterConversionException pce)
             {
                 this.Logger.Error(pce.Message);
                 return null;
             }
-        }
-
-        private bool IsValidActionName(string actionName)
-        {
-            if (string.IsNullOrWhiteSpace(actionName))
-                return false;
-
-            return _actionMaps.ContainsKey(actionName);
-        }
-
-        private string GetActionName(string[] args)
-        {
-            var name = args.FirstOrDefault() ?? 
-                _actionMaps.Values.FirstOrDefault(a => a.IsDefaultAction)?.Name;
-            return name;
         }
 
         private Command GetSubCommandByName(string name)
@@ -174,12 +148,12 @@ namespace Odin
 
         public virtual string GenerateHelp(string actionName = "")
         {
-            this.InitializeActionMaps();
-
-            if (IsValidActionName(actionName))
+            var actions = this.GetActions();
+            var names = actions.Select(row => row.Name);
+            if (names.Contains(actionName))
             {
-                var actionMap = _actionMaps[actionName];
-                return actionMap.Help();
+                var action = actions.First(row => row.Name == actionName);
+                return action.Help();
             }
 
             if (this.SubCommands.ContainsKey(actionName))
@@ -194,22 +168,22 @@ namespace Odin
             if (SubCommands.Any())
                 GetSubCommandsHelp(builder);
 
-            if (_actionMaps.Any())
-                GetMethodsHelp(builder);
+            if (actions.Any())
+                GetMethodsHelp(builder, actions);
 
             var result = builder.ToString();
 
             return result;
         }
 
-        private void GetMethodsHelp(StringBuilder builder)
+        private void GetMethodsHelp(StringBuilder builder, IEnumerable<MethodInvocation>  actions)
         {
             builder
                 .AppendLine()
                 .AppendLine()
                 .AppendLine("ACTIONS");
 
-            foreach (var method in _actionMaps.Values.OrderBy(m => m.Name))
+            foreach (var method in actions.OrderBy(m => m.Name))
             {
                 var methodHelp = method.Help();;
                 builder.AppendLine(methodHelp);

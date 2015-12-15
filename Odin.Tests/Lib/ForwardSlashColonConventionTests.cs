@@ -294,7 +294,7 @@ namespace Odin.Tests
             var result = this.Subject.GenerateInvocation(args);
 
             result.ShouldNotBeNull();
-            result.Instance.ShouldBe(this.SubCommand);
+            result.Command.ShouldBe(this.SubCommand);
             result.ParameterValues.Count.ShouldBe(0);
         }
 

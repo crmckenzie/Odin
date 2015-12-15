@@ -53,7 +53,7 @@ namespace Odin.Configuration
             return $"-{rawAlias}";
         }
 
-        public override bool IsIdentifiedBy(ParameterMap parameterMap, string arg)
+        public override bool IsIdentifiedBy(ParameterValue parameterMap, string arg)
         {
             return parameterMap.Switch == arg;
         }
