@@ -19,8 +19,6 @@ namespace Odin
 
             IsDefault = methodInfo.GetCustomAttribute<ActionAttribute>().IsDefault;
             ParameterValues = GenerateParameteValues().ToList().AsReadOnly();
-            Description = GetDescription();
-
 
             this.ParameterValues = this.MethodInfo.GetParameters()
                 .Select(row => new ParameterValue(this, row))
@@ -29,11 +27,9 @@ namespace Odin
                 ;
         }
 
-        public string Description { get; }
-
         public bool IsDefault { get; }
 
-        public MethodInfo MethodInfo { get; }
+        private MethodInfo MethodInfo { get; }
 
         public Command Command { get; }
 
@@ -49,7 +45,7 @@ namespace Odin
         public Conventions Conventions => Command.Conventions;
 
         
-        public string[] Tokens { get; internal set; }
+        public string[] Tokens { get; private set; }
         public ReadOnlyCollection<ParameterValue> ParameterValues { get; }
         public string Name => Conventions.GetActionName(MethodInfo);
 
@@ -57,19 +53,6 @@ namespace Odin
         {
             var descriptionAttr = MethodInfo.GetCustomAttribute<DescriptionAttribute>();
             return descriptionAttr == null ? "" : descriptionAttr.Description;
-        }
-
-        private void Initialize()
-        {
-            for (var i = 0; i < Tokens.Length; i++)
-            {
-                var arg = Tokens[i];
-                var parameter = FindBySwitch(arg) ?? FindByIndex(i);
-                if (parameter != null)
-                {
-                    i += (Conventions.SetValue(parameter, i) -1);
-                }
-            }
         }
 
         private ParameterValue FindBySwitch(string arg)
@@ -115,7 +98,7 @@ namespace Odin
             var builder = new StringBuilder();
             var name = IsDefault ? $"{Name} (default)" : Name;
 
-            builder.AppendLine($"{name,-30}{Description}");
+            builder.AppendLine($"{name,-30}{GetDescription()}");
 
             foreach (var parameter in this.ParameterValues)
             {
