@@ -16,6 +16,7 @@
 * [ ] Support aliases on controllers
 * [ ] Support aliases on methods
 * [x] Support aliases on parameters
+* [x] Support boolean actions and report proper exit code.
 * [ ] Aliases should be emitted by the help
 * [ ] Help should support an output file parameter
 * [ ] Help generation should be customizable

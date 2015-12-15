@@ -37,25 +37,16 @@ namespace Odin
 
         internal void SetParent(Command parent)
         {
-            this._parent = parent;
+            this.Parent = parent;
         }
 
-        private Command _parent;
-        protected Command Parent => _parent;
+        protected Command Parent { get; private set; }
 
         private Logger _logger = new DefaultLogger();
         public Logger Logger => IsRoot() ? _logger : Parent.Logger;
 
         private  Conventions _conventions;
-        public Conventions Conventions
-        {
-            get
-            {
-                if (Parent != null)
-                    return Parent.Conventions;
-                return _conventions;
-            }
-        }
+        public Conventions Conventions => IsRoot() ? _conventions : Parent.Conventions ;
 
         public virtual string Name => Conventions.GetCommandName(this);
 
@@ -83,14 +74,14 @@ namespace Odin
             return attribute != null ? attribute.Description : defaultDescription;
         }
 
-        public virtual Command RegisterSubCommand(Command command)
+        public Command RegisterSubCommand(Command command)
         {
             command.SetParent(this);
             this.SubCommands[command.Name] = command;
             return this;
         }
 
-        public virtual int Execute(params string[] args)
+        public int Execute(params string[] args)
         {
             var result = -1;
             var invocation = this.GenerateInvocation(args);
@@ -146,7 +137,7 @@ namespace Odin
             return SubCommands.ContainsKey(name) ? SubCommands[name] : null;
         }
 
-        public virtual string GenerateHelp(string actionName = "")
+        public string GenerateHelp(string actionName = "")
         {
             var actions = this.GetActions();
             var names = actions.Select(row => row.Name);
