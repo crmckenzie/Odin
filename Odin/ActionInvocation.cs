@@ -37,7 +37,7 @@ namespace Odin
             for (var i = 0; i < Tokens.Length; i++)
             {
                 var arg = Tokens[i];
-                var parameter = FindBySwitchOrIndex(arg, i);
+                var parameter = FindBySwitch(arg) ?? FindByIndex(i);
                 if (parameter != null)
                 {
                     i += (Conventions.SetValue(parameter, i) -1);
@@ -45,19 +45,22 @@ namespace Odin
             }
         }
 
-        private ParameterValue FindBySwitchOrIndex(string arg, int i)
+        private ParameterValue FindBySwitch(string arg)
         {
-            var found = this.ParameterValues
+            return this.ParameterValues
                 .FirstOrDefault(p => p.IsIdentifiedBy(arg))
                 ;
-            if (found == null && i < this.ParameterMaps.Count)
-            {
-                found = this.ParameterValues
-                    .OrderBy(p => p.Position)
-                    .ToArray()[i]
-                    ;
-            }
-            return found;
+        }
+
+
+        private ParameterValue FindByIndex(int i)
+        {
+            if (i >= this.ParameterMaps.Count)
+                return null;
+            return  this.ParameterValues
+                .OrderBy(p => p.Position)
+                .ToArray()[i]
+                ;
         }
 
         public bool CanInvoke()

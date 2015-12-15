@@ -1,5 +1,6 @@
 using System.Linq;
 using System.Reflection;
+using System.Text.RegularExpressions;
 using Odin.Attributes;
 
 namespace Odin.Configuration
@@ -14,7 +15,7 @@ namespace Odin.Configuration
 
         public override string GetArgumentName(ParameterInfo row)
         {
-            return $"/{row.Name.HyphenCase()}";
+            return $"/{row.Name}";
         }
 
         public override bool IsArgumentIdentifier(string value)
@@ -48,27 +49,26 @@ namespace Odin.Configuration
 
         public override int SetValue(ParameterValue parameter, int i)
         {
-            var arg = parameter.Args[i];
-            if (parameter.IsBooleanSwitch())
+            var token = parameter.Tokens[i];
+            if (Regex.IsMatch(token, @"/\w+:\w+"))
             {
-                parameter.Value = true;
-            }
-            else if (parameter.NextArgIsIdentifier(i))
-            {
-                return 1;
-            }
-            else if (parameter.IsIdentifiedBy(arg) && parameter.HasNextValue(i))
-            {
-                var value = parameter.Args[i + 1];
+                var value = token.Split(':').Skip(1).First();
                 parameter.Value = parameter.Coerce(value);
-                return 2;
+            }
+            else if (Regex.IsMatch(token, @"/\w+"))
+            {
+                if (parameter.IsBooleanSwitch())
+                {
+                    parameter.Value = true;
+                }
             }
             else
             {
-                parameter.Value = parameter.Coerce(arg);
+                parameter.Value = parameter.Coerce(token);
             }
 
             return 1;
+
         }
     }
 }

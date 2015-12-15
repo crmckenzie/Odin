@@ -60,7 +60,7 @@ namespace Odin.Configuration
 
         public override int SetValue(ParameterValue parameter, int i)
         {
-            var arg = parameter.Args[i];
+            var arg = parameter.Tokens[i];
             if (parameter.IsBooleanSwitch())
             {
                 parameter.Value = true;
@@ -71,7 +71,7 @@ namespace Odin.Configuration
             }
             else if (parameter.IsIdentifiedBy(arg) && parameter.HasNextValue(i))
             {
-                var value = parameter.Args[i + 1];
+                var value = parameter.Tokens[i + 1];
                 parameter.Value = parameter.Coerce(value);
                 return 2;
             }

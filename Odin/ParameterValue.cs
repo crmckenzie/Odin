@@ -61,7 +61,7 @@ namespace Odin
 
         public string Name => ParameterMap.ParameterInfo.Name;
 
-        public string[] Args => ActionInvocation.Tokens;
+        public string[] Tokens => ActionInvocation.Tokens;
         
         public bool IsValueSet()
         {
@@ -74,7 +74,7 @@ namespace Odin
 
         public bool IsIdentifiedBy(string arg)
         {
-            if (arg == Conventions.GetArgumentName(this.ParameterInfo))
+            if (Conventions.IsIdentifiedBy(this.ParameterMap, arg))
                 return true;
             return HasAlias(arg);
         }
@@ -111,7 +111,7 @@ namespace Odin
             }
             else if (IsIdentifiedBy(arg) && HasNextValue(i))
             {
-                var value = Args[i + 1];
+                var value = Tokens[i + 1];
                 Value = Coerce(value);
                 return 2;
             }
@@ -125,15 +125,15 @@ namespace Odin
 
         public bool HasNextValue(int indexOfCurrentArg)
         {
-            return Args.Length > (indexOfCurrentArg + 1);
+            return Tokens.Length > (indexOfCurrentArg + 1);
         }
 
         public bool NextArgIsIdentifier(int indexOfCurrentArg)
         {
             var j = indexOfCurrentArg + 1;
-            if (j < Args.Length)
+            if (j < Tokens.Length)
             {
-                return Conventions.IsArgumentIdentifier(Args[j]);
+                return Conventions.IsArgumentIdentifier(Tokens[j]);
             }
             return false;
         }
