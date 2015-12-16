@@ -41,7 +41,7 @@ namespace Odin.Tests
                 ;
 
             var i = 0;
-            Assert.That(lines[i], Is.EqualTo("This is the default controller"));
+            Assert.That(lines[i], Is.EqualTo("This is the default command"));
         }
 
         [Test]
@@ -93,6 +93,9 @@ namespace Odin.Tests
             Assert.That(lines[++i].Trim(), Is.EqualTo("help"));
             lines[++i].ShouldBe("\t--action-name             The name of the action to provide help for.");
             Assert.That(lines[++i].Trim(), Is.EqualTo("some-other-controller-action"));
+            Assert.That(lines[++i].Trim(), Is.EqualTo("with-arguments-of-various-types"));
+            Assert.That(lines[++i].Trim(), Is.EqualTo("--i"));
+            Assert.That(lines[++i].Trim(), Is.EqualTo("--j"));
             Assert.That(lines[++i].Trim(), Is.EqualTo("with-optional-string-arg"));
             Assert.That(lines[++i].TrimEnd(), Is.EqualTo("\t--argument"));
             Assert.That(lines[++i].Trim(), Is.EqualTo("with-optional-string-args"));

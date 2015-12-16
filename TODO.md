@@ -17,23 +17,26 @@
 * [ ] Support aliases on methods
 * [x] Support aliases on parameters
 * [x] Support boolean actions and report proper exit code.
-* [ ] Aliases should be emitted by the help
+* [x] Aliases should be emitted by the help
 * [ ] Help should support an output file parameter
 * [ ] Help generation should be customizable
 * [ ] Support argument parsing for primitive types
   * [x] bool
   * [x] int
-  * [ ] long
-  * [ ] DateTime
-  * [ ] decimal
-  * [ ] Enum
+  * [x] long
+  * [x] DateTime
+  * [x] decimal
+  * [x] double
+  * [x] Enum
 * [ ] Support argument parsing for nullable primitive types
   * [ ] bool
   * [ ] int
   * [ ] long
   * [ ] DateTime
   * [ ] decimal
+  * [ ] double
   * [ ] Enum
+* [ ] boolean methods should convert to a sensical exit code.
 * [ ] Support custom argument parsers
 * [ ] Support array arguments
 * [ ] Support --switch and --no-switch argument styles for boolean arguments

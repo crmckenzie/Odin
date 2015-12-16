@@ -53,11 +53,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Demo\RootCommandRouteTests.cs" />
+    <Compile Include="Lib\ArgumentTypesCommand.cs" />
     <Compile Include="Lib\CommandHelpTests.cs" />
     <Compile Include="Lib\CommandInvocationTests.cs" />
     <Compile Include="Lib\CommandTests.cs" />
     <Compile Include="Lib\ForwardSlashColonConventionTests.cs" />
     <Compile Include="Lib\NotTheDefaultCommand.cs" />
+    <Compile Include="Lib\ParseArgumentTypesTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Lib\DefaultCommand.cs" />
     <Compile Include="Lib\StringBuilderLogger.cs" />

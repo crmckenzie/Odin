@@ -98,7 +98,7 @@ namespace Odin
             return result;
         }
 
-        public MethodInvocation GenerateInvocation(string[] tokens)
+        public MethodInvocation GenerateInvocation(params string[] tokens)
         {
             try
             {

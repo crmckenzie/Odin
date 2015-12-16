@@ -17,7 +17,11 @@ namespace Odin
             Coercion = new Dictionary<Type, Func<object, object>>
             {
                 [typeof(bool)] = o => bool.Parse(o.ToString()),
-                [typeof(int)] = o => int.Parse(o.ToString())
+                [typeof(int)] = o => int.Parse(o.ToString()),
+                [typeof(long)] = o => long.Parse(o.ToString()),
+                [typeof(double)] = o => double.Parse(o.ToString()),
+                [typeof(decimal)] = o => decimal.Parse(o.ToString()),
+                [typeof(DateTime)] = o => DateTime.Parse(o.ToString()),
             };
         }
 
@@ -92,7 +96,7 @@ namespace Odin
             return HasAlias(arg);
         }
 
-        public bool HasAlias(string arg)
+        private bool HasAlias(string arg)
         {
             var attr = this.ParameterInfo.GetCustomAttribute<AliasAttribute>();
             return Conventions.MatchesAlias(attr, arg);
@@ -105,6 +109,10 @@ namespace Odin
                 var key = this.ParameterInfo.ParameterType;
                 if (Coercion.ContainsKey(key))
                     return Coercion[key].Invoke(value);
+
+                if (key.IsEnum)
+                    return Enum.Parse(key, value.ToString());
+
                 return value;
             }
             catch (Exception e)

@@ -4,11 +4,16 @@ using Odin.Logging;
 
 namespace Odin.Tests
 {
-    [Description("This is the default controller")]
+    [Description("This is the default command")]
     public class DefaultCommand : Command
     {
         public object[] MethodArguments { get; set; }
-        
+
+        public DefaultCommand() : this(new SubCommand())
+        {
+            
+        }
+
         public DefaultCommand(SubCommand subcommand) 
         {
             var subcommand1 = subcommand ?? new SubCommand();
@@ -79,6 +84,12 @@ namespace Odin.Tests
         public void WithSwitch(bool argument)
         {
             MethodArguments = new object[] { argument };
+        }
+
+        [Action]
+        public void WithArgumentsOfVariousTypes(int i, long j)
+        {
+            
         }
     }
 }
