@@ -28,7 +28,7 @@
   * [x] decimal
   * [x] double
   * [x] Enum
-* [ ] Support argument parsing for nullable primitive types
+* [x] Support argument parsing for nullable primitive types
   * [x] bool
   * [x] int
   * [x] long
@@ -41,7 +41,6 @@
 * [ ] Support array arguments
 * [ ] Support --switch and --no-switch argument styles for boolean arguments
 * [ ] Create a nuget package
-* [ ] Wire into a teamcity build for publication
 * [ ] Validation
   * [ ] Validate no more than one action per command
   * [ ] Validate no more than one of the same alias on a method
