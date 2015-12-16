@@ -1,6 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Linq;
 using System.Reflection;
+using Odin.Attributes;
 using Odin.Configuration;
 using Odin.Exceptions;
 
@@ -8,7 +11,7 @@ namespace Odin
 {
     public class ParameterValue
     {
-        public static Dictionary<Type, Func<object, object>> Coercion { get; set; }
+        public static Dictionary<Type, Func<object, object>> Coercion { get;  }
         static ParameterValue()
         {
             Coercion = new Dictionary<Type, Func<object, object>>
@@ -23,25 +26,25 @@ namespace Odin
 
         private object _value;
 
-        public ParameterValue(ActionInvocation actionInvocation, ParameterMap parameterMap)
+        public ParameterValue(MethodInvocation methodInvocation, ParameterInfo parameterInfo)
         {
-            ActionInvocation = actionInvocation;
-            ParameterMap = parameterMap;
+            MethodInvocation = methodInvocation;
+            ParameterInfo = parameterInfo;
 
-            if (parameterMap.IsBooleanSwitch())
+            if (IsBooleanSwitch())
                 Value = false;
 
-            if (parameterMap.IsOptional)
+            if (ParameterInfo.IsOptional)
                 Value = Type.Missing;
         }
 
-        public ActionInvocation ActionInvocation { get; }
 
-        public ParameterMap ParameterMap { get; }
 
-        public Conventions Conventions => ParameterMap.Conventions;
+        public MethodInvocation MethodInvocation { get; }
 
-        public ParameterInfo ParameterInfo => ParameterMap.ParameterInfo;
+        public Conventions Conventions => MethodInvocation.Conventions;
+
+        public ParameterInfo ParameterInfo { get;  }
         public Type ParameterType => ParameterInfo.ParameterType;
 
         public int Position => ParameterInfo.Position;
@@ -59,10 +62,20 @@ namespace Odin
             }
         }
 
-        public string Name => ParameterMap.ParameterInfo.Name;
+        public string Name => ParameterInfo.Name;
 
-        public string[] Args => ActionInvocation.Tokens;
-        
+        public string Switch => Conventions.GetArgumentName(this.ParameterInfo);
+
+        public string[] Tokens => MethodInvocation.Tokens;
+
+        public string GetDescription()
+        {
+            var attr = ParameterInfo.GetCustomAttribute<DescriptionAttribute>();
+            if (attr != null)
+                return attr.Description;
+            return "";
+        }
+
         public bool IsValueSet()
         {
             return _isSet;
@@ -74,14 +87,15 @@ namespace Odin
 
         public bool IsIdentifiedBy(string arg)
         {
-            if (arg == Conventions.GetArgumentName(this.ParameterInfo))
+            if (Conventions.IsIdentifiedBy(this, arg))
                 return true;
             return HasAlias(arg);
         }
 
         public bool HasAlias(string arg)
         {
-            return ParameterMap.HasAlias(arg);
+            var attr = this.ParameterInfo.GetCustomAttribute<AliasAttribute>();
+            return Conventions.MatchesAlias(attr, arg);
         }
 
         public object Coerce(object value)
@@ -99,44 +113,39 @@ namespace Odin
             }
         }
 
-        public int SetValue(string arg, int i)
-        {
-            if (IsBooleanSwitch())
-            {
-                Value = true;
-            }
-            else if (NextArgIsIdentifier(i))
-            {
-                return 1;
-            }
-            else if (IsIdentifiedBy(arg) && HasNextValue(i))
-            {
-                var value = Args[i + 1];
-                Value = Coerce(value);
-                return 2;
-            }
-            else
-            {
-                Value = Coerce(arg);
-            }
-
-            return 1;
-        }
-
         public bool HasNextValue(int indexOfCurrentArg)
         {
-            return Args.Length > (indexOfCurrentArg + 1);
+            return Tokens.Length > (indexOfCurrentArg + 1);
         }
 
         public bool NextArgIsIdentifier(int indexOfCurrentArg)
         {
             var j = indexOfCurrentArg + 1;
-            if (j < Args.Length)
+            if (j < Tokens.Length)
             {
-                return Conventions.IsArgumentIdentifier(Args[j]);
+                return Conventions.IsArgumentIdentifier(Tokens[j]);
             }
             return false;
         }
+
+        public bool HasAliases()
+        {
+            var attr = this.ParameterInfo.GetCustomAttribute<AliasAttribute>();
+            if (attr == null)
+                return false;
+
+            return attr.Aliases.Any();
+        }
+
+        public string[] GetAliases()
+        {
+            var attr = this.ParameterInfo.GetCustomAttribute<AliasAttribute>();
+            if (attr == null)
+                return new string[] { };
+
+            return attr.Aliases.Select(a => Conventions.GetFormattedAlias(a)).ToArray();
+        }
+
 
     }
 }

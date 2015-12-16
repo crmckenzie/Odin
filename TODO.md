@@ -9,11 +9,14 @@
 * [x] Create a demo project to show how to use the library.
 * [x] Support an injectable Logger
 * [x] Support customizable conventions
+  * [x] provide /argment:value style convention
+  * [ ] provide /argument=value style convention
 * [x] Handle parsing errors in a friendly manner.
 * [x] Provide testability of command structure separate from execution of command structure.
 * [ ] Support aliases on controllers
 * [ ] Support aliases on methods
 * [x] Support aliases on parameters
+* [x] Support boolean actions and report proper exit code.
 * [ ] Aliases should be emitted by the help
 * [ ] Help should support an output file parameter
 * [ ] Help generation should be customizable
@@ -23,12 +26,14 @@
   * [ ] long
   * [ ] DateTime
   * [ ] decimal
+  * [ ] Enum
 * [ ] Support argument parsing for nullable primitive types
   * [ ] bool
   * [ ] int
   * [ ] long
   * [ ] DateTime
   * [ ] decimal
+  * [ ] Enum
 * [ ] Support custom argument parsers
 * [ ] Support array arguments
 * [ ] Support --switch and --no-switch argument styles for boolean arguments

@@ -9,13 +9,9 @@ namespace Odin.Configuration
         public abstract string GetArgumentName(ParameterInfo row);
         public abstract bool IsArgumentIdentifier(string value);
         public abstract string GetActionName(MethodInfo methodInfo);
-
         public abstract bool MatchesAlias(AliasAttribute aliasAttribute, string arg);
-
         public abstract string GetFormattedAlias(string rawAlias);
-
-        public abstract bool IsIdentifiedBy(ParameterMap parameterMap, string arg);
-
+        public abstract bool IsIdentifiedBy(ParameterValue parameterMap, string arg);
         public abstract int SetValue(ParameterValue parameter, int i);
     }
 }

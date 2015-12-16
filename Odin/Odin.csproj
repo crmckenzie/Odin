@@ -41,8 +41,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Attributes\ActionAttribute.cs" />
-    <Compile Include="ActionInvocation.cs" />
-    <Compile Include="ActionMap.cs" />
+    <Compile Include="MethodInvocation.cs" />
     <Compile Include="Attributes\AliasAttribute.cs" />
     <Compile Include="Command.cs" />
     <Compile Include="Configuration\Conventions.cs" />
@@ -51,7 +50,6 @@
     <Compile Include="Logging\DefaultLogger.cs" />
     <Compile Include="Logging\Logger.cs" />
     <Compile Include="Exceptions\ParameterConversionException.cs" />
-    <Compile Include="ParameterMap.cs" />
     <Compile Include="ParameterValue.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
