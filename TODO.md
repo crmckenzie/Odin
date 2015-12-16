@@ -20,7 +20,7 @@
 * [x] Aliases should be emitted by the help
 * [ ] Help should support an output file parameter
 * [ ] Help generation should be customizable
-* [ ] Support argument parsing for primitive types
+* [x] Support argument parsing for primitive types
   * [x] bool
   * [x] int
   * [x] long
@@ -29,13 +29,13 @@
   * [x] double
   * [x] Enum
 * [ ] Support argument parsing for nullable primitive types
-  * [ ] bool
-  * [ ] int
-  * [ ] long
-  * [ ] DateTime
-  * [ ] decimal
-  * [ ] double
-  * [ ] Enum
+  * [x] bool
+  * [x] int
+  * [x] long
+  * [x] DateTime
+  * [x] decimal
+  * [x] double
+  * [x] Enum
 * [ ] boolean methods should convert to a sensical exit code.
 * [ ] Support custom argument parsers
 * [ ] Support array arguments

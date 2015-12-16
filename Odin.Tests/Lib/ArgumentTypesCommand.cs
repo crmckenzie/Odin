@@ -17,7 +17,24 @@ namespace Odin.Tests.Lib
     public class ArgumentTypesCommand : Command
     {
         [Action]
+        public void WithBoolean(bool input)
+        {
+            
+        }
+
+        [Action]
+        public void WithNullableBoolean(bool? input)
+        {
+
+        }
+
+        [Action]
         public void WithInt32(int input)
+        {
+        }
+
+        [Action]
+        public void WithNullableInt32(int? input)
         {
         }
 
@@ -27,7 +44,16 @@ namespace Odin.Tests.Lib
         }
 
         [Action]
+        public void WithNullableInt64(long? input)
+        {
+        }
+
+        [Action]
         public void WithDouble(double input)
+        {
+        }
+        [Action]
+        public void WithNullableDouble(double? input)
         {
         }
 
@@ -35,16 +61,27 @@ namespace Odin.Tests.Lib
         public void WithDecimal(double input)
         {
         }
-
+        [Action]
+        public void WithNullableDecimal(decimal? input)
+        {
+        }
         [Action]
         public void WithEnum(Numbers input)
-        {
-            
+        {   
         }
+        [Action]
+        public void WithNullableEnum(Numbers? input)
+        {
+        }
+
         [Action]
         public void WithDateTime(DateTime input)
         {
+        }
 
+        [Action]
+        public void WithNullableDateTime(DateTime? input)
+        {
         }
     }
 }

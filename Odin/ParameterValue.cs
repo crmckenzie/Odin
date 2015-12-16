@@ -22,6 +22,14 @@ namespace Odin
                 [typeof(double)] = o => double.Parse(o.ToString()),
                 [typeof(decimal)] = o => decimal.Parse(o.ToString()),
                 [typeof(DateTime)] = o => DateTime.Parse(o.ToString()),
+
+                [typeof(bool?)] = o => bool.Parse(o.ToString()),
+                [typeof(int?)] = o => int.Parse(o.ToString()),
+                [typeof(long?)] = o => long.Parse(o.ToString()),
+                [typeof(double?)] = o => double.Parse(o.ToString()),
+                [typeof(decimal?)] = o => decimal.Parse(o.ToString()),
+                [typeof(DateTime?)] = o => DateTime.Parse(o.ToString()),
+
             };
         }
 
@@ -35,13 +43,20 @@ namespace Odin
             MethodInvocation = methodInvocation;
             ParameterInfo = parameterInfo;
 
-            if (IsBooleanSwitch())
+            if (ParameterType == typeof(bool))
                 Value = false;
+
+            if (IsNullableType())
+                Value = null;
 
             if (ParameterInfo.IsOptional)
                 Value = Type.Missing;
         }
 
+        private bool IsNullableType()
+        {
+            return ParameterType.IsGenericType && ParameterType.GetGenericTypeDefinition() == typeof(Nullable<>);
+        }
 
 
         public MethodInvocation MethodInvocation { get; }
@@ -86,7 +101,9 @@ namespace Odin
         }
         public bool IsBooleanSwitch()
         {
-            return ParameterInfo.ParameterType == typeof(bool);
+            return ParameterType == typeof(bool)
+                || ParameterType == typeof(bool?)
+                ;
         }
 
         public bool IsIdentifiedBy(string arg)
@@ -106,12 +123,21 @@ namespace Odin
         {
             try
             {
-                var key = this.ParameterInfo.ParameterType;
+                var key = this.ParameterType;
                 if (Coercion.ContainsKey(key))
                     return Coercion[key].Invoke(value);
 
                 if (key.IsEnum)
                     return Enum.Parse(key, value.ToString());
+
+                if (IsNullableType())
+                {
+                    var genericType = key.GetGenericArguments()[0];
+                    if (genericType.IsEnum)
+                    {
+                        return Enum.Parse(genericType, value.ToString());
+                    }
+                }
 
                 return value;
             }
