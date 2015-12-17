@@ -6,6 +6,7 @@
 * [x] Support the concept of a default action
 * [x] Support sub-comamnds
 * [x] Generate help using reflection
+  * [ ] Help should display available enum options
 * [x] Create a demo project to show how to use the library.
 * [x] Support an injectable Logger
 * [x] Support customizable conventions
