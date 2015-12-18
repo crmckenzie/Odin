@@ -54,7 +54,8 @@
   <ItemGroup>
     <Compile Include="Demo\RootCommandRouteTests.cs" />
     <Compile Include="Lib\ArgumentTypesCommand.cs" />
-    <Compile Include="Lib\Configuration\ForwardSlashColonConventionTests.cs" />
+    <Compile Include="Lib\Configuration\SlashColonConventionTests.cs" />
+    <Compile Include="Lib\Configuration\SlashEqualsConventionTests.cs" />
     <Compile Include="Lib\HelpTests.cs" />
     <Compile Include="Lib\CommandInvocationTests.cs" />
     <Compile Include="Lib\CommandTests.cs" />

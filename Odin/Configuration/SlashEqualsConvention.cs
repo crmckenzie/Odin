@@ -1,11 +1,8 @@
-using System.Linq;
 using System.Reflection;
-using System.Threading;
-using Odin.Attributes;
 
 namespace Odin.Configuration
 {
-    public class ForwardSlashColonConvention : Conventions
+    public class SlashEqualsConvention : Conventions
     {
         public override string GetCommandName(Command command)
         {
@@ -35,7 +32,7 @@ namespace Odin.Configuration
 
         public override IValueParser GetParser(ParameterValue parameter)
         {
-            return new ForwardSlashColonValueParser(this, parameter);
+            return new SlashEqualsValueParser(parameter);
         }
     }
 }

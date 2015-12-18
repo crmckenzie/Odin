@@ -39,7 +39,7 @@
 * [x] Support an injectable Logger
 * [x] Support customizable conventions
   * [x] provide /argment:value style convention
-  * [ ] provide /argument=value style convention
+  * [x] provide /argument=value style convention
 
 ## Help
 
@@ -48,6 +48,7 @@
   * [ ] Help should display available enum options
   * [ ] Help should support an output file parameter
   * [ ] Help generation should be customizable
+  * [ ] Display default values using reflection
 
 ## Testability
 * [x] Provide testability of command structure separate from execution of command structure.

@@ -6,7 +6,7 @@ using Shouldly;
 namespace Odin.Tests.Lib.Configuration
 {
     [TestFixture]
-    public class ForwardSlashColonConventionTests
+    public class SlashColonConventionTests
     {
         [SetUp]
         public void BeforeEach()
@@ -16,7 +16,7 @@ namespace Odin.Tests.Lib.Configuration
             this.Subject = new DefaultCommand(this.SubCommand);
             this.Subject
                 .Use(this.Logger)
-                .Use(new ForwardSlashColonConvention())
+                .Use(new SlashColonConvention())
                 ;
         }
 

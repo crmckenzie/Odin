@@ -3,14 +3,12 @@ using System.Text.RegularExpressions;
 
 namespace Odin.Configuration
 {
-    internal class ForwardSlashColonValueParser : IValueParser
+    internal class SlashEqualsValueParser : IValueParser
     {
-        private readonly Conventions _conventions;
         private readonly ParameterValue _parameterValue;
 
-        public ForwardSlashColonValueParser(Conventions conventions, ParameterValue parameterValue)
+        public SlashEqualsValueParser(ParameterValue parameterValue)
         {
-            _conventions = conventions;
             _parameterValue = parameterValue;
         }
 
@@ -19,7 +17,7 @@ namespace Odin.Configuration
             var token = tokens[i];
             if (IsNameValuePair(token))
             {
-                var value = token.Split(':').Skip(1).First();
+                var value = token.Split('=').Skip(1).First();
                 return new ParseResult()
                 {
                     Value = _parameterValue.Coerce(value),
@@ -56,7 +54,7 @@ namespace Odin.Configuration
 
         private static bool IsNameValuePair(string token)
         {
-            return Regex.IsMatch(token, @"/\w+:\w+");
+            return Regex.IsMatch(token, @"/\w+=\w+");
         }
     }
 }
