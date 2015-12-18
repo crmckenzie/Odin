@@ -6,6 +6,12 @@ In the .NET space there are a number of good libraries to handle run-of-the-mill
 My current favorite is a nuget package called simply [CommandLineParser].
 So why write a new one?
 
+## Try it out!
+
+```powershell
+Install-Package Odin-Commands -Pre
+```
+
 ## Inspired By Thor
 
 I've done some work with Ruby over the last couple of years and I was really impressed with the feature set offered by a ruby project called [thor]
