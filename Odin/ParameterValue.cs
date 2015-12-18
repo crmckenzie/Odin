@@ -11,7 +11,7 @@ namespace Odin
 {
     public class ParameterValue
     {
-        public static Dictionary<Type, Func<object, object>> Coercion { get;  }
+        private static Dictionary<Type, Func<object, object>> Coercion { get;  }
         static ParameterValue()
         {
             Coercion = new Dictionary<Type, Func<object, object>>
@@ -59,9 +59,9 @@ namespace Odin
         }
 
 
-        public MethodInvocation MethodInvocation { get; }
+        private MethodInvocation MethodInvocation { get; }
 
-        public Conventions Conventions => MethodInvocation.Conventions;
+        private Conventions Conventions => MethodInvocation.Conventions;
 
         public ParameterInfo ParameterInfo { get;  }
         public Type ParameterType => ParameterInfo.ParameterType;
@@ -83,9 +83,7 @@ namespace Odin
 
         public string Name => ParameterInfo.Name;
 
-        public string Switch => Conventions.GetArgumentName(this.ParameterInfo);
-
-        public string[] Tokens => MethodInvocation.Tokens;
+        public string LongOptionName => Conventions.GetLongOptionName(this.ParameterInfo);
 
         public string GetDescription()
         {
@@ -99,24 +97,34 @@ namespace Odin
         {
             return _isSet;
         }
-        public bool IsBooleanSwitch()
+
+        internal bool IsBoolean()
         {
             return ParameterType == typeof(bool)
                 || ParameterType == typeof(bool?)
                 ;
         }
 
-        public bool IsIdentifiedBy(string arg)
+        internal bool IsIdentifiedBy(string arg)
         {
             if (Conventions.IsIdentifiedBy(this, arg))
                 return true;
             return HasAlias(arg);
         }
 
+        private bool MatchesAlias(AliasAttribute aliasAttribute, string arg)
+        {
+            if (aliasAttribute == null)
+                return false;
+
+            var aliases = aliasAttribute.Aliases.Select(Conventions.GetShortOptionName);
+            return aliases.Contains(arg);
+        }
+
         private bool HasAlias(string arg)
         {
             var attr = this.ParameterInfo.GetCustomAttribute<AliasAttribute>();
-            return Conventions.MatchesAlias(attr, arg);
+            return MatchesAlias(attr, arg);
         }
 
         public object Coerce(object value)
@@ -130,13 +138,12 @@ namespace Odin
                 if (key.IsEnum)
                     return Enum.Parse(key, value.ToString());
 
-                if (IsNullableType())
+                if (!IsNullableType()) return value;
+
+                var genericType = key.GetGenericArguments()[0];
+                if (genericType.IsEnum)
                 {
-                    var genericType = key.GetGenericArguments()[0];
-                    if (genericType.IsEnum)
-                    {
-                        return Enum.Parse(genericType, value.ToString());
-                    }
+                    return Enum.Parse(genericType, value.ToString());
                 }
 
                 return value;
@@ -147,20 +154,7 @@ namespace Odin
             }
         }
 
-        public bool HasNextValue(int indexOfCurrentArg)
-        {
-            return Tokens.Length > (indexOfCurrentArg + 1);
-        }
 
-        public bool NextArgIsIdentifier(int indexOfCurrentArg)
-        {
-            var j = indexOfCurrentArg + 1;
-            if (j < Tokens.Length)
-            {
-                return Conventions.IsArgumentIdentifier(Tokens[j]);
-            }
-            return false;
-        }
 
         public bool HasAliases()
         {
@@ -177,7 +171,7 @@ namespace Odin
             if (attr == null)
                 return new string[] { };
 
-            return attr.Aliases.Select(a => Conventions.GetFormattedAlias(a)).ToArray();
+            return attr.Aliases.Select(a => Conventions.GetShortOptionName(a)).ToArray();
         }
 
 

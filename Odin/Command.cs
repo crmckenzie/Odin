@@ -33,14 +33,14 @@ namespace Odin
             return this;
         }
 
-        public string Description { get; }
+        private string Description { get; }
 
-        internal void SetParent(Command parent)
+        private void SetParent(Command parent)
         {
             this.Parent = parent;
         }
 
-        protected Command Parent { get; private set; }
+        private Command Parent { get; set; }
 
         private Logger _logger = new DefaultLogger();
         public Logger Logger => IsRoot() ? _logger : Parent.Logger;
@@ -48,7 +48,7 @@ namespace Odin
         private  Conventions _conventions;
         public Conventions Conventions => IsRoot() ? _conventions : Parent.Conventions ;
 
-        public virtual string Name => Conventions.GetCommandName(this);
+        private string Name => Conventions.GetCommandName(this);
 
         private List<MethodInvocation> GetActions()
         {

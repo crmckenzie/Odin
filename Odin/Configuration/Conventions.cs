@@ -6,12 +6,10 @@ namespace Odin.Configuration
     public abstract class Conventions
     {
         public abstract string GetCommandName(Command command);
-        public abstract string GetArgumentName(ParameterInfo row);
-        public abstract bool IsArgumentIdentifier(string value);
+        public abstract string GetLongOptionName(ParameterInfo row);
         public abstract string GetActionName(MethodInfo methodInfo);
-        public abstract bool MatchesAlias(AliasAttribute aliasAttribute, string arg);
-        public abstract string GetFormattedAlias(string rawAlias);
+        public abstract string GetShortOptionName(string rawAlias);
         public abstract bool IsIdentifiedBy(ParameterValue parameterMap, string arg);
-        public abstract int SetValue(ParameterValue parameter, int i);
+        public abstract IValueParser GetParser(ParameterValue parameter);
     }
 }

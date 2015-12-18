@@ -3,7 +3,6 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.InteropServices.WindowsRuntime;
 using System.Text;
 using Odin.Attributes;
 using Odin.Configuration;
@@ -32,6 +31,9 @@ namespace Odin
         private MethodInfo MethodInfo { get; }
 
         public Command Command { get; }
+        public Conventions Conventions => Command.Conventions;
+        public string Name => Conventions.GetActionName(MethodInfo);
+        public ReadOnlyCollection<ParameterValue> ParameterValues { get; }
 
         private IEnumerable<ParameterValue> GenerateParameteValues()
         {
@@ -41,14 +43,7 @@ namespace Odin
                 .Select(row => new ParameterValue(this, row))
                 ;
         }
-
-        public Conventions Conventions => Command.Conventions;
-
-        
-        public string[] Tokens { get; private set; }
-        public ReadOnlyCollection<ParameterValue> ParameterValues { get; }
-        public string Name => Conventions.GetActionName(MethodInfo);
-
+ 
         private string GetDescription()
         {
             var descriptionAttr = MethodInfo.GetCustomAttribute<DescriptionAttribute>();
@@ -93,6 +88,34 @@ namespace Odin
             return 0;
         }
 
+        internal void SetParameterValues(string[] tokens)
+        {
+            var i = 0;
+            while (i < tokens.Length)
+            {
+                var arg = tokens[i];
+                var parameter = FindBySwitch(arg) ?? FindByIndex(i);
+                if (parameter == null)
+                {
+                    i++;
+                    continue;
+                };
+
+                var parser = Conventions.GetParser(parameter);
+                var result = parser.Parse(tokens, i);
+                if (result.TokensProcessed <= 0)
+                {
+                    i++;
+                    continue;
+                };
+
+                parameter.Value = result.Value;
+                i += result.TokensProcessed;
+
+            }
+
+        }
+
         public string Help()
         {
             var builder = new StringBuilder();
@@ -103,7 +126,7 @@ namespace Odin
             foreach (var parameter in this.ParameterValues)
             {
                 var description = parameter.GetDescription();
-                builder.Append($"\t{parameter.Switch,-26}");
+                builder.Append($"\t{parameter.LongOptionName,-26}");
                 if (parameter.HasAliases())
                 {
                     var aliases = string.Join(", ", parameter.GetAliases());
@@ -118,18 +141,5 @@ namespace Odin
             return builder.ToString();
         }
 
-        internal void SetParameterValues(string[] tokens)
-        {
-            this.Tokens = tokens;
-            for (var i = 0; i < Tokens.Length; i++)
-            {
-                var arg = Tokens[i];
-                var parameter = FindBySwitch(arg) ?? FindByIndex(i);
-                if (parameter != null)
-                {
-                    i += (Conventions.SetValue(parameter, i) - 1);
-                }
-            }
-        }
     }
 }

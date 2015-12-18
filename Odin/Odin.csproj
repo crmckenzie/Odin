@@ -41,6 +41,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Attributes\ActionAttribute.cs" />
+    <Compile Include="Configuration\ForwardSlashColonValueParser.cs" />
+    <Compile Include="Configuration\HyphenCaseValueParser.cs" />
+    <Compile Include="Configuration\IValueParser.cs" />
+    <Compile Include="Configuration\ParseResult.cs" />
     <Compile Include="MethodInvocation.cs" />
     <Compile Include="Attributes\AliasAttribute.cs" />
     <Compile Include="Command.cs" />

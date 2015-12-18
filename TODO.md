@@ -41,7 +41,7 @@
 * [ ] Support custom argument parsers
 * [ ] Support array arguments
 * [ ] Support --switch and --no-switch argument styles for boolean arguments
-* [ ] Create a nuget package
+* [x] Create a nuget package
 * [ ] Validation
   * [ ] Validate no more than one action per command
   * [ ] Validate no more than one of the same alias on a method

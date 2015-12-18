@@ -24,14 +24,9 @@ namespace Odin.Configuration
             return hyphenCased;
         }
 
-        public override string GetArgumentName(ParameterInfo row)
+        public override string GetLongOptionName(ParameterInfo row)
         {
             return $"--{row.Name.HyphenCase()}";
-        }
-
-        public override bool IsArgumentIdentifier(string value)
-        {
-            return value.StartsWith("--");
         }
 
         public override string GetActionName(MethodInfo methodInfo)
@@ -39,49 +34,19 @@ namespace Odin.Configuration
             return methodInfo.Name.HyphenCase();
         }
 
-        public override bool MatchesAlias(AliasAttribute aliasAttribute, string arg)
-        {
-            if (aliasAttribute == null)
-                return false;
-
-            var aliases = aliasAttribute.Aliases.Select(GetFormattedAlias);
-            return aliases.Contains(arg);
-        }
-
-        public override string GetFormattedAlias(string rawAlias)
+        public override string GetShortOptionName(string rawAlias)
         {
             return $"-{rawAlias}";
         }
 
         public override bool IsIdentifiedBy(ParameterValue parameterMap, string arg)
         {
-            return parameterMap.Switch == arg;
+            return parameterMap.LongOptionName == arg;
         }
 
-        public override int SetValue(ParameterValue parameter, int i)
+        public override IValueParser GetParser(ParameterValue parameter)
         {
-            var arg = parameter.Tokens[i];
-            if (parameter.IsIdentifiedBy(arg) && parameter.HasNextValue(i))
-            {
-                var value = parameter.Tokens[i + 1];
-                parameter.Value = parameter.Coerce(value);
-                return 2;
-            }
-
-            if (parameter.IsBooleanSwitch())
-            {
-                parameter.Value = true;
-            }
-            else if (parameter.NextArgIsIdentifier(i))
-            {
-                return 1;
-            }
-            else
-            {
-                parameter.Value = parameter.Coerce(arg);
-            }
-
-            return 1;
+            return new HyphenCaseValueParser(this, parameter);
         }
     }
 }

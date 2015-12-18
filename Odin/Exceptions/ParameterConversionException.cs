@@ -2,6 +2,7 @@ using System;
 
 namespace Odin.Exceptions
 {
+    [Serializable]
     public class ParameterConversionException : Exception
     {
         public ParameterValue ParameterValue { get; }
