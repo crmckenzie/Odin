@@ -48,6 +48,19 @@ namespace Odin.Tests
         }
 
         [Action]
+        public virtual bool AlwaysReturnsTrue()
+        {
+            return true;
+        }
+
+        [Action]
+        public virtual bool AlwaysReturnsFalse()
+        {
+            return false;
+        }
+
+
+        [Action]
         public virtual void SomeOtherControllerAction()
         {
             

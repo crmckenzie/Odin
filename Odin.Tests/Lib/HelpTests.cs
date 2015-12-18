@@ -8,7 +8,7 @@ using Shouldly;
 namespace Odin.Tests
 {
     [TestFixture]
-    public class CommandHelpTests
+    public class HelpTests
     {
         [SetUp]
         public void BeforeEach()
@@ -82,7 +82,9 @@ namespace Odin.Tests
                 ;
 
             var i = 0;
+            Assert.That(lines[++i].Trim(), Is.EqualTo("always-returns-false"));
             Assert.That(lines[++i].Trim(), Is.EqualTo("always-returns-minus2"));
+            Assert.That(lines[++i].Trim(), Is.EqualTo("always-returns-true"));
             Assert.That(lines[++i].Trim(), Is.EqualTo("do-something (default)        A description of the DoSomething() method."));
             Assert.That(lines[++i], Is.EqualTo("\t--argument1               aliases: -a, -A"));
             Assert.That(lines[++i], Is.EqualTo("\t                          Lorem ipsum dolor sit amet, consectetur adipiscing elit"));

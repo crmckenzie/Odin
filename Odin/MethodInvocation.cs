@@ -85,6 +85,12 @@ namespace Odin
             {
                 return (int)result;
             }
+
+            if (result is bool)
+            {
+                return ((bool) result) ? 0 : -1;
+            }
+
             return 0;
         }
 

@@ -1,9 +1,9 @@
-﻿using System;
+using System;
 using NUnit.Framework;
 using Odin.Configuration;
 using Shouldly;
 
-namespace Odin.Tests
+namespace Odin.Tests.Lib.Configuration
 {
     [TestFixture]
     public class ForwardSlashColonConventionTests
@@ -20,9 +20,9 @@ namespace Odin.Tests
                 ;
         }
 
-        public StringBuilderLogger Logger { get; set; }
+        private StringBuilderLogger Logger { get; set; }
 
-        public SubCommand SubCommand { get; set; }
+        private SubCommand SubCommand { get; set; }
 
         public DefaultCommand Subject { get; set; }
 

@@ -46,6 +46,27 @@ namespace Odin.Tests
         }
 
         [Test]
+        public void BooleanActions_ReturningFalse()
+        {
+            var args = new[] { "always-returns-false" };
+
+            var result = this.Subject.Execute(args);
+
+            result.ShouldBe(-1);
+        }
+
+        [Test]
+        public void BooleanActions_ReturningTrue()
+        {
+            var args = new[] { "always-returns-true" };
+
+            var result = this.Subject.Execute(args);
+
+            result.ShouldBe(0);
+        }
+
+
+        [Test]
         public void SubCommandUsesParentsLogger()
         {
             this.SubCommand.Logger.ShouldBe(this.Subject.Logger);
