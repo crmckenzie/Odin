@@ -10,7 +10,6 @@ namespace Odin.Configuration
         public abstract string GetActionName(MethodInfo methodInfo);
         public abstract string GetShortOptionName(string rawAlias);
         public abstract bool IsIdentifiedBy(ParameterValue parameterMap, string arg);
-
-        public abstract ParseResult Parse(ParameterValue parameter, string[] tokens, int i)
+        public abstract ParseResult Parse(ParameterValue parameter, string[] tokens, int i);
     }
 }
