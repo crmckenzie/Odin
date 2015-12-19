@@ -44,9 +44,54 @@ namespace Odin.Configuration
             return parameterMap.LongOptionName == arg;
         }
 
-        public override IValueParser GetParser(ParameterValue parameter)
+        private bool IsOptionIdentifier(string value)
         {
-            return new HyphenCaseValueParser(this, parameter);
+            return value.StartsWith("--");
         }
+
+        private bool ArgIsIdentifier(string[] tokens, int indexOfCurrentArg)
+        {
+            return indexOfCurrentArg < tokens.Length && IsOptionIdentifier(tokens[indexOfCurrentArg]);
+        }
+
+        public override ParseResult Parse(ParameterValue parameter, string[] tokens, int i)
+        {
+            var token = tokens[i];
+
+            var hasNextArg = tokens.Length > (i + 1);
+            if (parameter.IsIdentifiedBy(token) && hasNextArg)
+            {
+                var value = tokens[i + 1];
+                return new ParseResult()
+                {
+                    Value = parameter.Coerce(value),
+                    TokensProcessed = 2,
+                };
+            }
+
+            if (parameter.IsBoolean())
+            {
+                return new ParseResult()
+                {
+                    Value = true,
+                    TokensProcessed = 1,
+                };
+            }
+
+            if (ArgIsIdentifier(tokens, i + 1))
+            {
+                return new ParseResult()
+                {
+                    TokensProcessed = 0
+                };
+            }
+
+            return new ParseResult()
+            {
+                Value = parameter.Coerce(token),
+                TokensProcessed = 1,
+            };
+        }
+
     }
 }

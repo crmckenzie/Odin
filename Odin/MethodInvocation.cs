@@ -107,8 +107,7 @@ namespace Odin
                     continue;
                 };
 
-                var parser = Conventions.GetParser(parameter);
-                var result = parser.Parse(tokens, i);
+                var result = Conventions.Parse(parameter, tokens,i);
                 if (result.TokensProcessed <= 0)
                 {
                     i++;

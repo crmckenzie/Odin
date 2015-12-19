@@ -41,12 +41,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Attributes\ActionAttribute.cs" />
-    <Compile Include="Configuration\SlashColonValueParser.cs" />
-    <Compile Include="Configuration\HyphenCaseValueParser.cs" />
-    <Compile Include="Configuration\IValueParser.cs" />
     <Compile Include="Configuration\ParseResult.cs" />
     <Compile Include="Configuration\SlashEqualsConvention.cs" />
-    <Compile Include="Configuration\SlashEqualsValueParser.cs" />
     <Compile Include="MethodInvocation.cs" />
     <Compile Include="Attributes\AliasAttribute.cs" />
     <Compile Include="Command.cs" />
