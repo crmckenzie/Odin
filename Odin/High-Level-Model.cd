@@ -1,10 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ClassDiagram MajorVersion="1" MinorVersion="1">
-  <Class Name="Odin.ActionInvocation">
-    <Position X="3.75" Y="0.75" Width="1.5" />
+  <Class Name="Odin.MethodInvocation">
+    <Position X="3.75" Y="0.75" Width="2.25" />
     <TypeIdentifier>
-      <HashCode>BAAAAQAAAAAoCQAAIAAgBASQAAAIAAAAAAAAAAAhAAg=</HashCode>
-      <FileName>ActionInvocation.cs</FileName>
+      <HashCode>BAAAAQAAAAAICAAAIAAgBASQAAAIAAAAAAAAAAAgAAg=</HashCode>
+      <FileName>MethodInvocation.cs</FileName>
     </TypeIdentifier>
     <ShowAsCollectionAssociation>
       <Property Name="ParameterValues" />
@@ -16,7 +16,7 @@
       <Compartment Name="Fields" Collapsed="true" />
     </Compartments>
     <TypeIdentifier>
-      <HashCode>AAAQAEMAIAIsQAQAoAAEYAwQIAAEAAAAAUAAAQAgAAA=</HashCode>
+      <HashCode>AAAAAEMAIAIsQAQAoAAEYAwAIAAEAAAAAUAAAQAgAAA=</HashCode>
       <FileName>Command.cs</FileName>
     </TypeIdentifier>
     <ShowAsCollectionAssociation>
@@ -24,12 +24,12 @@
     </ShowAsCollectionAssociation>
   </Class>
   <Class Name="Odin.ParameterValue">
-    <Position X="6.75" Y="0.75" Width="1.5" />
+    <Position X="6.75" Y="0.75" Width="2.25" />
     <Compartments>
       <Compartment Name="Fields" Collapsed="true" />
     </Compartments>
     <TypeIdentifier>
-      <HashCode>ABAAAAACAABCAqAgIQQFAAwAAAAkAAAAAAAgAAAxAAA=</HashCode>
+      <HashCode>ADAAAAACCBBCACBgIAQBAAQAAAQkAAAAAAAgAAAwAAA=</HashCode>
       <FileName>ParameterValue.cs</FileName>
     </TypeIdentifier>
   </Class>

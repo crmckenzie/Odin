@@ -106,8 +106,16 @@ namespace Odin
                     i++;
                     continue;
                 };
+                ParseResult result;
+                if (parameter.HasCustomParser())
+                {
+                    result = parameter.CustomParser.Parse(tokens, i);
+                }
+                else
+                {
+                    result = Conventions.Parse(parameter, tokens, i);
+                }
 
-                var result = Conventions.Parse(parameter, tokens,i);
                 if (result.TokensProcessed <= 0)
                 {
                     i++;

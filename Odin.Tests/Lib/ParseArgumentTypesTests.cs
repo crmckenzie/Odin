@@ -33,6 +33,16 @@ namespace Odin.Tests.Lib
         }
 
         [Test]
+        public void WithBoolean_False()
+        {
+            // When
+            var result = this.Subject.GenerateInvocation("with-boolean", "--input", "false");
+
+            // Then
+            result.ParameterValues[0].Value.ShouldBe(false);
+        }
+
+        [Test]
         public void WithBoolean_ArgumentIdentifierOnly()
         {
             // When
@@ -42,15 +52,6 @@ namespace Odin.Tests.Lib
             result.ParameterValues[0].Value.ShouldBe(true);
         }
 
-        [Test]
-        public void WithBoolean_False()
-        {
-            // When
-            var result = this.Subject.GenerateInvocation("with-boolean", "--input", "false");
-
-            // Then
-            result.ParameterValues[0].Value.ShouldBe(false);
-        }
 
         [Test]
         public void WithBoolean_NoArgumentIdentifier()
@@ -286,6 +287,28 @@ namespace Odin.Tests.Lib
             result.ParameterValues[0].Value.ShouldBe(null);
         }
 
+        [Test]
+        public void WithBooleanCustomParser()
+        {
+            // When
+            var result = this.Subject.GenerateInvocation("with-boolean-yes-no-parser", "--input", "yes", "--input2", "42", "--input3", "fredbob");
 
+            // Then
+            result.ParameterValues[0].Value.ShouldBe(true);
+            result.ParameterValues[1].Value.ShouldBe(42);
+            result.ParameterValues[2].Value.ShouldBe("fredbob");
+        }
+
+        [Test]
+        public void WithBoolean_FalseCustomParser()
+        {
+            // When
+            var result = this.Subject.GenerateInvocation("with-boolean-yes-no-parser", "--input", "no", "--input2", "42", "--input3", "fredbob");
+
+            // Then
+            result.ParameterValues[0].Value.ShouldBe(false);
+            result.ParameterValues[1].Value.ShouldBe(42);
+            result.ParameterValues[2].Value.ShouldBe("fredbob");
+        }
     }
 }

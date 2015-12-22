@@ -31,7 +31,7 @@
   * [x] decimal
   * [x] double
   * [x] Enum
-* [ ] Support custom argument parsers
+* [x] Support custom argument parsers
 * [ ] Support array arguments
 
 ## Extensibility
@@ -53,7 +53,7 @@
 ## Testability
 * [x] Provide testability of command structure separate from execution of command structure.
 * [ ] Validation
-  * [ ] Validate no more than one action per command
+  * [ ] Validate no more than one default action per command
   * [ ] Validate no more than one of the same alias on a method
 
 ## Deployment

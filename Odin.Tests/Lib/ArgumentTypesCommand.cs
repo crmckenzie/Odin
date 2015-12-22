@@ -83,5 +83,14 @@ namespace Odin.Tests.Lib
         public void WithNullableDateTime(DateTime? input)
         {
         }
+
+        [Action]
+        public void WithBooleanYesNoParser(
+            [Parser(typeof(YesNoParser))] bool input, int input2, string input3)
+        { 
+        
+
+        }
+
     }
 }

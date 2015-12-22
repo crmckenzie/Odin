@@ -61,7 +61,7 @@ namespace Odin
 
         private MethodInvocation MethodInvocation { get; }
 
-        private Conventions Conventions => MethodInvocation.Conventions;
+        public Conventions Conventions => MethodInvocation.Conventions;
 
         public ParameterInfo ParameterInfo { get;  }
         public Type ParameterType => ParameterInfo.ParameterType;
@@ -84,6 +84,38 @@ namespace Odin
         public string Name => ParameterInfo.Name;
 
         public string LongOptionName => Conventions.GetLongOptionName(this.ParameterInfo);
+
+        private CustomParser _customParser;
+        public CustomParser CustomParser
+        {
+            get
+            {
+                if (!HasCustomParser())
+                    return null;
+
+                if (_customParser == null)
+                {
+                    _customParser = CreateCustomParser();
+                }
+                return _customParser;
+            }
+        }
+
+        private CustomParser CreateCustomParser()
+        {
+            var parserAttribute = this.ParameterInfo.GetCustomAttribute<ParserAttribute>();
+            var types = new[] {typeof (ParameterValue)};
+            var constructor = parserAttribute.ParserType.GetConstructor(types);
+            if (constructor == null)
+            {
+                throw new TypeInitializationException("Could not find a constructor with the signature (ParameterValue).", null);
+            }
+
+            var parameters = new[] {this};
+            var instance = constructor.Invoke(parameters);
+            var typedInstance = (CustomParser) instance;
+            return typedInstance;
+        }
 
         public string GetDescription()
         {
@@ -175,5 +207,9 @@ namespace Odin
         }
 
 
+        public bool HasCustomParser()
+        {
+            return this.ParameterInfo.GetCustomAttribute<ParserAttribute>() != null;
+        }
     }
 }
