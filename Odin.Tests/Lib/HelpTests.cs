@@ -2,6 +2,7 @@
 using System.Linq;
 using NSubstitute;
 using NUnit.Framework;
+using Odin.Configuration;
 using Odin.Demo;
 using Shouldly;
 
@@ -16,21 +17,24 @@ namespace Odin.Tests
             this.Logger = new StringBuilderLogger();
             this.SubCommand = new SubCommand();
             this.SubCommand.RegisterSubCommand(new KatasCommand());
-            this.Subject = new DefaultCommand(this.SubCommand);
-            this.Subject.Use(this.Logger);
+            this.DefaultCommand = new DefaultCommand(this.SubCommand);
+            this.DefaultCommand.Use(this.Logger);
+            this.Subject = this.DefaultCommand.HelpGenerator;
         }
+
+        public DefaultCommand DefaultCommand { get; set; }
 
         public StringBuilderLogger Logger { get; set; }
 
         public SubCommand SubCommand { get; set; }
 
-        public DefaultCommand Subject { get; set; }
+        public HelpGenerator Subject { get; set; }
 
         [Test]
         public void HelpDisplaysControllerDescription()
         {
             // When
-            var result = this.Subject.GenerateHelp();
+            var result = this.Subject.GenerateHelp(this.DefaultCommand);
 
             // Then
             var lines = result
@@ -48,7 +52,7 @@ namespace Odin.Tests
         public void HelpDisplaysSubCommands()
         {
             // When
-            var result = this.Subject.GenerateHelp();
+            var result = this.Subject.GenerateHelp(this.DefaultCommand);
 
             // Then
             var lines = result
@@ -69,7 +73,7 @@ namespace Odin.Tests
         public void HelpDisplaysActions()
         {
             // When
-            var result = this.Subject.GenerateHelp();
+            var result = this.Subject.GenerateHelp(this.DefaultCommand);
             Console.WriteLine(result);
 
             // Then
@@ -119,7 +123,7 @@ namespace Odin.Tests
         public void HelpForIndividualAction()
         {
             // When
-            var result = this.Subject.GenerateHelp("do-something");
+            var result = this.Subject.GenerateHelp(this.DefaultCommand, "do-something");
             Console.WriteLine(result);
 
             // Then
@@ -144,7 +148,7 @@ namespace Odin.Tests
         public void HelpForSubCommands()
         {
             // When
-            var result = Subject.Execute("sub", "help");
+            var result = this.DefaultCommand.Execute("sub", "help");
 
             // Then
             Assert.That(result, Is.EqualTo(0), this.Logger.ErrorBuilder.ToString());
@@ -175,7 +179,7 @@ namespace Odin.Tests
         public void AlternativeHelpForSubCommands()
         {
             // When
-            var result = Subject.Execute("help", "sub");
+            var result = this.DefaultCommand.Execute("help", "sub");
 
             // Then
             Assert.That(result, Is.EqualTo(0), this.Logger.ErrorBuilder.ToString());
@@ -195,7 +199,7 @@ namespace Odin.Tests
         public void HelpForSubSubCommands()
         {
             // When
-            var result = Subject.Execute("sub", "katas", "help");
+            var result = this.DefaultCommand.Execute("sub", "katas", "help");
 
             // Then
             Assert.That(result, Is.EqualTo(0), this.Logger.ErrorBuilder.ToString());

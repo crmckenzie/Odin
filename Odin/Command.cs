@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
@@ -13,11 +14,18 @@ namespace Odin
 {
     public abstract class Command
     {
-        private Dictionary<string, Command> SubCommands { get; }
-        protected Command(Conventions conventions = null)
+        private Dictionary<string, Command> _subCommands; 
+        public IReadOnlyDictionary<string, Command> SubCommands { get; }
+
+
+
+        protected Command()
         {
-            SubCommands = new Dictionary<string, Command>();
-            _conventions = conventions ?? new HyphenCaseConvention();
+            _subCommands = new Dictionary<string, Command>();
+            SubCommands =new ReadOnlyDictionary<string, Command>(_subCommands);
+
+            _conventions = new HyphenCaseConvention();
+            _helpGenerator = new HelpGenerator();
             this.Description = GetDescription();
         }
 
@@ -33,7 +41,7 @@ namespace Odin
             return this;
         }
 
-        private string Description { get; }
+        public string Description { get; }
 
         private void SetParent(Command parent)
         {
@@ -46,11 +54,15 @@ namespace Odin
         public Logger Logger => IsRoot() ? _logger : Parent.Logger;
 
         private  Conventions _conventions;
+        private readonly HelpGenerator _helpGenerator;
+
+        public HelpGenerator HelpGenerator => IsRoot() ? _helpGenerator : Parent.HelpGenerator;
+
         public Conventions Conventions => IsRoot() ? _conventions : Parent.Conventions ;
 
-        private string Name => Conventions.GetCommandName(this);
+        public string Name => Conventions.GetCommandName(this);
 
-        private List<MethodInvocation> GetActions()
+        public List<MethodInvocation> GetActions()
         {
             return GetActionMethods()
                 .Select(row => new MethodInvocation(this, row))
@@ -77,7 +89,7 @@ namespace Odin
         public Command RegisterSubCommand(Command command)
         {
             command.SetParent(this);
-            this.SubCommands[command.Name] = command;
+            this._subCommands[command.Name] = command;
             return this;
         }
 
@@ -137,89 +149,7 @@ namespace Odin
             return SubCommands.ContainsKey(name) ? SubCommands[name] : null;
         }
 
-        public string GenerateHelp(string actionName = "")
-        {
-            var actions = this.GetActions();
-            var names = actions.Select(row => row.Name);
-            if (names.Contains(actionName))
-            {
-                var action = actions.First(row => row.Name == actionName);
-                return action.Help();
-            }
-
-            if (this.SubCommands.ContainsKey(actionName))
-            {
-                var subCommand = this.SubCommands[actionName];
-                return subCommand.GenerateHelp();
-            }
-
-            var builder = new StringBuilder();
-            builder.AppendLine(this.Description);
-
-            if (SubCommands.Any())
-                GetSubCommandsHelp(builder);
-
-            if (actions.Any())
-                GetMethodsHelp(builder, actions);
-
-            var result = builder.ToString();
-
-            return result;
-        }
-
-        private void GetMethodsHelp(StringBuilder builder, IEnumerable<MethodInvocation>  actions)
-        {
-            builder
-                .AppendLine()
-                .AppendLine()
-                .AppendLine("ACTIONS");
-
-            foreach (var method in actions.OrderBy(m => m.Name))
-            {
-                var methodHelp = method.Help();;
-                builder.AppendLine(methodHelp);
-            }
-
-            builder.AppendLine();
-            builder.AppendLine("To get help for actions");
-            var helpActionName = this.Conventions.GetActionName(this.GetType().GetMethod("Help"));
-            builder.AppendFormat("\t{0} {1} <action>", this.Name, helpActionName)
-                .AppendLine();
-        }
-
-        private void GetSubCommandsHelp(StringBuilder builder)
-        {
-            builder
-                .AppendLine()
-                .AppendLine()
-                .AppendLine("SUB COMMANDS");
-
-            foreach (var subCommand in SubCommands.Values)
-            {
-                builder
-                    .AppendFormat("{0,-30}", subCommand.Name)
-                    .AppendLine(subCommand.Description)
-                    ;
-            }
-
-            builder.AppendLine();
-            builder.AppendLine("To get help for subcommands");
-            var helpActionName = this.Conventions.GetActionName(this.GetType().GetMethod("Help"));
-
-            if (IsRoot())
-            {
-                builder.AppendFormat("\t{0} <subcommand>", helpActionName);
-            }
-            else
-            {
-                var fullPath = GetFullCommandPath().Skip(1); // remove the root command from the path.
-                var path = string.Join(" ", fullPath);
-                builder.AppendFormat("\t{0} {1} <subcommand>", path, helpActionName);
-            }
-
-        }
-
-        private string[] GetFullCommandPath()
+        public string[] GetFullCommandPath()
         {
             var stack = new Stack<string>();
             stack.Push(this.Name);
@@ -234,7 +164,7 @@ namespace Odin
             return stack.ToArray();
         }
 
-        private bool IsRoot()
+        public bool IsRoot()
         {
             return this.Parent == null;
         }
@@ -244,7 +174,7 @@ namespace Odin
             [Description("The name of the action to provide help for.")]
             string actionName = "")
         {
-            var help = this.GenerateHelp(actionName);
+            var help = this.HelpGenerator.GenerateHelp(this, actionName);
             this.Logger.Info(help);
         }
     }

@@ -43,8 +43,8 @@ namespace Odin
                 .Select(row => new ParameterValue(this, row))
                 ;
         }
- 
-        private string GetDescription()
+
+        public string GetDescription()
         {
             var descriptionAttr = MethodInfo.GetCustomAttribute<DescriptionAttribute>();
             return descriptionAttr == null ? "" : descriptionAttr.Description;
@@ -128,31 +128,5 @@ namespace Odin
             }
 
         }
-
-        public string Help()
-        {
-            var builder = new StringBuilder();
-            var name = IsDefault ? $"{Name} (default)" : Name;
-
-            builder.AppendLine($"{name,-30}{GetDescription()}");
-
-            foreach (var parameter in this.ParameterValues)
-            {
-                var description = parameter.GetDescription();
-                builder.Append($"\t{parameter.LongOptionName,-26}");
-                if (parameter.HasAliases())
-                {
-                    var aliases = string.Join(", ", parameter.GetAliases());
-                    var text = $"aliases: {aliases}";
-                    builder.AppendLine(text)
-                        .Append($"\t{new string(' ', 26)}")
-                        ;
-                }
-
-                builder.AppendLine(description);
-            }
-            return builder.ToString();
-        }
-
     }
 }

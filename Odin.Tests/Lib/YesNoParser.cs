@@ -6,8 +6,6 @@ namespace Odin.Tests.Lib
     {
         private readonly ParameterValue _parameterValue;
 
-        private Conventions Conventions => _parameterValue.Conventions;
-
         public override ParseResult Parse(string[] tokens, int i)
         {
             var token = tokens[i];

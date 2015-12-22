@@ -43,6 +43,7 @@
     <Compile Include="Attributes\ActionAttribute.cs" />
     <Compile Include="Attributes\ParserAttribute.cs" />
     <Compile Include="Configuration\CustomParser.cs" />
+    <Compile Include="Configuration\HelpGenerator.cs" />
     <Compile Include="Configuration\ParseResult.cs" />
     <Compile Include="Configuration\SlashEqualsConvention.cs" />
     <Compile Include="MethodInvocation.cs" />
