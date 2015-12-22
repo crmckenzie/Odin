@@ -137,11 +137,11 @@ namespace Odin
                 ;
         }
 
-        internal bool IsIdentifiedBy(string arg)
+        public bool IsIdentifiedBy(string token)
         {
-            if (Conventions.IsIdentifiedBy(this, arg))
+            if (Conventions.IsMatchingParameter(this, token))
                 return true;
-            return HasAlias(arg);
+            return HasAlias(token);
         }
 
         private bool MatchesAlias(AliasAttribute aliasAttribute, string arg)

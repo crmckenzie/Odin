@@ -32,6 +32,7 @@
   * [x] double
   * [x] Enum
 * [x] Support custom argument parsers
+    * [x] Support custom argument parsers with aliases
 * [ ] Support array arguments
 
 ## Extensibility

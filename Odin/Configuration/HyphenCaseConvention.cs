@@ -39,7 +39,7 @@ namespace Odin.Configuration
             return $"-{rawAlias}";
         }
 
-        public override bool IsIdentifiedBy(ParameterValue parameterMap, string arg)
+        public override bool IsMatchingParameter(ParameterValue parameterMap, string arg)
         {
             return parameterMap.LongOptionName == arg;
         }

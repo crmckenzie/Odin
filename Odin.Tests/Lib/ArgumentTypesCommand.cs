@@ -86,7 +86,9 @@ namespace Odin.Tests.Lib
 
         [Action]
         public void WithBooleanYesNoParser(
-            [Parser(typeof(YesNoParser))] bool input, int input2, string input3)
+            [Alias("i")]
+            [Parser(typeof(YesNoParser))] bool input, 
+            int input2, string input3)
         { 
         
 

@@ -310,5 +310,30 @@ namespace Odin.Tests.Lib
             result.ParameterValues[1].Value.ShouldBe(42);
             result.ParameterValues[2].Value.ShouldBe("fredbob");
         }
+
+        [Test]
+        public void WithAliasedBooleanCustomParser()
+        {
+            // When
+            var result = this.Subject.GenerateInvocation("with-boolean-yes-no-parser", "-i", "yes", "--input2", "42", "--input3", "fredbob");
+
+            // Then
+            result.ParameterValues[0].Value.ShouldBe(true);
+            result.ParameterValues[1].Value.ShouldBe(42);
+            result.ParameterValues[2].Value.ShouldBe("fredbob");
+        }
+
+        [Test]
+        public void WithAliasedBoolean_FalseCustomParser()
+        {
+            // When
+            var result = this.Subject.GenerateInvocation("with-boolean-yes-no-parser", "-i", "no", "--input2", "42", "--input3", "fredbob");
+
+            // Then
+            result.ParameterValues[0].Value.ShouldBe(false);
+            result.ParameterValues[1].Value.ShouldBe(42);
+            result.ParameterValues[2].Value.ShouldBe("fredbob");
+        }
+
     }
 }

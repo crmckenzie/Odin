@@ -16,7 +16,7 @@ namespace Odin.Tests.Lib
                 TokensProcessed = 1
             };
 
-            if (Conventions.IsIdentifiedBy(this._parameterValue, token))
+            if (this._parameterValue.IsIdentifiedBy(token))
             {
                 token = tokens[i + 1];
                 result.TokensProcessed++;
