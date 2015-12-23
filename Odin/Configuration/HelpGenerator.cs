@@ -16,11 +16,9 @@ namespace Odin.Configuration
 
         private string GenerateHelp(Command command, StringBuilder builder, string actionName = "")
         {
-            var actions = command.GetActions();
-            var names = actions.Select(row => row.Name);
-            if (names.Contains(actionName))
+            if (command.Actions.ContainsKey(actionName))
             {
-                var action = actions.First(row => row.Name == actionName);
+                var action = command.Actions[actionName];
                 return Help(action);
             }
 
@@ -35,8 +33,8 @@ namespace Odin.Configuration
             if (command.SubCommands.Any())
                 GetSubCommandsHelp(command, builder);
 
-            if (actions.Any())
-                GetMethodsHelp(command, builder, actions);
+            if (command.Actions.Any())
+                GetMethodsHelp(command, builder);
 
             var result = builder.ToString();
 
@@ -69,14 +67,14 @@ namespace Odin.Configuration
             return builder.ToString();
         }
 
-        private void GetMethodsHelp(Command command, StringBuilder builder, IEnumerable<MethodInvocation> actions)
+        private void GetMethodsHelp(Command command, StringBuilder builder)
         {
             builder
                 .AppendLine()
                 .AppendLine()
                 .AppendLine("ACTIONS");
 
-            foreach (var method in actions.OrderBy(m => m.Name))
+            foreach (var method in command.Actions.Values.OrderBy(m => m.Name))
             {
                 var methodHelp = Help(method); ;
                 builder.AppendLine(methodHelp);

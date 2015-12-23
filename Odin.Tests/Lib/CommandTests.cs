@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
 using NSubstitute;
 using NUnit.Framework;
+using Odin.Configuration;
 using Shouldly;
 
 namespace Odin.Tests
@@ -65,11 +67,19 @@ namespace Odin.Tests
             result.ShouldBe(0);
         }
 
-
         [Test]
         public void SubCommandUsesParentsLogger()
         {
             this.SubCommand.Logger.ShouldBe(this.Subject.Logger);
+        }
+
+        [Test]
+        public void ChangingConventionsRecalculatesSubCommandDictionary()
+        {
+            this.Subject.Use(new SlashColonConvention());
+            this.Subject.Name.ShouldBe("DefaultProxy");
+            this.SubCommand.Name.ShouldBe("SubProxy");
+            this.Subject.SubCommands["SubProxy"].ShouldBe(this.SubCommand);
         }
     }
 }

@@ -289,7 +289,7 @@ namespace Odin.Tests.Lib.Configuration
         [Test]
         public void ExecuteSubCommand()
         {
-            var args = new[] { "sub" };
+            var args = new[] { "Sub" };
 
             var result = this.Subject.GenerateInvocation(args);
 

@@ -14,25 +14,43 @@ namespace Odin
 {
     public abstract class Command
     {
-        private Dictionary<string, Command> _subCommands; 
-        public IReadOnlyDictionary<string, Command> SubCommands { get; }
-
-
-
         protected Command()
         {
+            _conventions = new HyphenCaseConvention();
+            _helpGenerator = new HelpGenerator();
+
             _subCommands = new Dictionary<string, Command>();
             SubCommands =new ReadOnlyDictionary<string, Command>(_subCommands);
 
-            _conventions = new HyphenCaseConvention();
-            _helpGenerator = new HelpGenerator();
+            ReKeyActions();
+
             this.Description = GetDescription();
         }
 
         public Command Use(Conventions conventions)
         {
             _conventions = conventions;
+            ReKeySubCommands();
+            ReKeyActions();
             return this;
+        }
+
+        private void ReKeyActions()
+        {
+            this._actions = this
+                .GetType()
+                .GetMethods()
+                .Where(m => m.GetCustomAttribute<ActionAttribute>() != null)
+                .Select(row => new MethodInvocation(this, row))
+                .ToList().ToDictionary(action => action.Name)
+                ;
+            this.Actions = new ReadOnlyDictionary<string, MethodInvocation>(this._actions);
+        }
+
+        private void ReKeySubCommands()
+        {
+            this._subCommands = this._subCommands.Values.ToDictionary(row => row.Name);
+            SubCommands = new ReadOnlyDictionary<string, Command>(_subCommands);
         }
 
         public Command Use(Logger logger)
@@ -62,22 +80,12 @@ namespace Odin
 
         public string Name => Conventions.GetCommandName(this);
 
-        public List<MethodInvocation> GetActions()
-        {
-            return GetActionMethods()
-                .Select(row => new MethodInvocation(this, row))
-                .ToList()
-                ;
-        }
+        private Dictionary<string, Command> _subCommands;
+        public IReadOnlyDictionary<string, Command> SubCommands { get; private set; }
 
-        private IEnumerable<MethodInfo> GetActionMethods()
-        {
-            return this
-                .GetType()
-                .GetMethods()
-                .Where(m => m.GetCustomAttribute<ActionAttribute>() != null)
-                ;
-        }
+        private Dictionary<string, MethodInvocation> _actions;
+
+        public IReadOnlyDictionary<string, MethodInvocation> Actions { get; private set; }
 
         private string GetDescription()
         {
@@ -98,9 +106,7 @@ namespace Odin
             var result = -1;
             var invocation = this.GenerateInvocation(args);
             if (invocation?.CanInvoke() == true)
-            {
                 result =  invocation.Invoke();
-            }
 
             if (result == 0)
                 return result;
@@ -114,23 +120,26 @@ namespace Odin
         {
             try
             {
-                var commandOrActionName = tokens.FirstOrDefault();
-                var subCommand = GetSubCommandByName(commandOrActionName);
+                var token = tokens.FirstOrDefault();
+                var subCommand = GetSubCommandByName(token);
                 if (subCommand != null)
                 {
                     var theRest = tokens.Skip(1).ToArray();
                     return subCommand.GenerateInvocation(theRest);
                 }
 
-                var actions = this.GetActions();
-                var action = actions.FirstOrDefault(row => row.Name == commandOrActionName);
-                var toSkip = 1;
-                if (action == null)
+                MethodInvocation action = null;
+                var toSkip = 0;
+                if (UseDefaultAction(token))
                 {
-                    toSkip = 0;
-                    action = actions.FirstOrDefault(row => row.IsDefault);
+                    action = GetDefaultAction();
                 }
- 
+                else 
+                {
+                    action = this.Actions[token];
+                    toSkip = 1;
+                }
+
                 var args = tokens.Skip(toSkip).ToArray();
                 action?.SetParameterValues(args);
                 return action;
@@ -140,6 +149,16 @@ namespace Odin
                 this.Logger.Error(pce.Message);
                 return null;
             }
+        }
+
+        private bool UseDefaultAction(string token)
+        {
+            return string.IsNullOrWhiteSpace(token) || !this.Actions.ContainsKey(token);
+        }
+
+        private MethodInvocation GetDefaultAction()
+        {
+            return this.Actions.Values.FirstOrDefault(row => row.IsDefault);
         }
 
         private Command GetSubCommandByName(string name)
