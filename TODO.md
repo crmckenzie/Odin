@@ -34,6 +34,20 @@
 * [x] Support custom argument parsers
     * [x] Support custom argument parsers with aliases
 * [ ] Support array arguments
+  * [ ] bool
+  * [ ] bool?
+  * [ ] int
+  * [ ] int?
+  * [ ] long
+  * [ ] long?
+  * [ ] DateTime
+  * [ ] DateTime?
+  * [ ] decimal
+  * [ ] decimal?
+  * [ ] double
+  * [ ] double?
+  * [ ] Enum
+  * [ ] Enum?
 
 ## Extensibility
 
@@ -56,6 +70,7 @@
 * [ ] Validation
   * [ ] Validate no more than one default action per command
   * [ ] Validate no more than one of the same alias on a method
+  * [ ] Detect conflicts between subcommands and action names
 
 ## Deployment
 * [x] Create a nuget package
