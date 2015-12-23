@@ -17,7 +17,7 @@ namespace Odin
         protected Command()
         {
             _conventions = new HyphenCaseConvention();
-            _helpGenerator = new HelpGenerator();
+            _helpGenerator = new DefaultHelpGenerator();
 
             _subCommands = new Dictionary<string, Command>();
             SubCommands =new ReadOnlyDictionary<string, Command>(_subCommands);
@@ -59,6 +59,12 @@ namespace Odin
             return this;
         }
 
+        public Command Use(HelpGenerator helpGenerator)
+        {
+            _helpGenerator = helpGenerator;
+            return this;
+        }
+
         public string Description { get; }
 
         private void SetParent(Command parent)
@@ -72,7 +78,7 @@ namespace Odin
         public Logger Logger => IsRoot() ? _logger : Parent.Logger;
 
         private  Conventions _conventions;
-        private readonly HelpGenerator _helpGenerator;
+        private HelpGenerator _helpGenerator;
 
         public HelpGenerator HelpGenerator => IsRoot() ? _helpGenerator : Parent.HelpGenerator;
 

@@ -17,7 +17,6 @@ namespace Odin
             this.MethodInfo = methodInfo;
 
             IsDefault = methodInfo.GetCustomAttribute<ActionAttribute>().IsDefault;
-            ParameterValues = GenerateParameteValues().ToList().AsReadOnly();
 
             this.ParameterValues = this.MethodInfo.GetParameters()
                 .Select(row => new ParameterValue(this, row))
@@ -34,15 +33,6 @@ namespace Odin
         public Conventions Conventions => Command.Conventions;
         public string Name => Conventions.GetActionName(MethodInfo);
         public ReadOnlyCollection<ParameterValue> ParameterValues { get; }
-
-        private IEnumerable<ParameterValue> GenerateParameteValues()
-        {
-            return MethodInfo
-                .GetParameters()
-                .OrderBy(row => row.Position)
-                .Select(row => new ParameterValue(this, row))
-                ;
-        }
 
         public string GetDescription()
         {

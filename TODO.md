@@ -62,7 +62,7 @@
   * [x] Aliases should be emitted by the help
   * [ ] Help should display available enum options
   * [ ] Help should support an output file parameter
-  * [ ] Help generation should be customizable
+  * [x] Help generation should be customizable
   * [ ] Display default values using reflection
 
 ## Testability
