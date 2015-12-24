@@ -1,6 +1,7 @@
 using System.Linq;
 using System.Reflection;
 using Odin.Attributes;
+using Odin.Parsing;
 
 namespace Odin.Configuration
 {
@@ -33,67 +34,14 @@ namespace Odin.Configuration
             return parameterMap.LongOptionName == arg;
         }
 
-        private bool IsOptionIdentifier(string value)
+        public override IParser CreateParser(ParameterValue parameter)
         {
-            return value.StartsWith("--");
+            return new DefaultHyphenCaseParser(parameter);
         }
 
-        private bool ArgIsIdentifier(string[] tokens, int indexOfCurrentArg)
+        public static bool IsOptionIdentifier(string value)
         {
-            return indexOfCurrentArg < tokens.Length && IsOptionIdentifier(tokens[indexOfCurrentArg]);
+            return value.StartsWith("--") ||value.StartsWith("-");
         }
-
-        public override ParseResult Parse(ParameterValue parameter, string[] tokens, int i)
-        {
-            var token = tokens[i];
-
-            if (parameter.IsIdentifiedBy(token) && parameter.IsArray())
-            {
-                var tokensToParse = tokens.Skip(1).TakeUntil(t => IsOptionIdentifier(t) || IsOptionIdentifier(t));
-
-                var range = tokensToParse.Select(parameter.Coerce).ToArray();
-                return new ParseResult()
-                {
-                    Value = range,
-                    TokensProcessed = range.Length,
-                };
-            }
-
-
-            var hasNextArg = tokens.Length > (i + 1);
-            if (parameter.IsIdentifiedBy(token) && hasNextArg)
-            {
-                var value = tokens[i + 1];
-                return new ParseResult()
-                {
-                    Value = parameter.Coerce(value),
-                    TokensProcessed = 2,
-                };
-            }
-
-            if (parameter.IsBoolean())
-            {
-                return new ParseResult()
-                {
-                    Value = true,
-                    TokensProcessed = 1,
-                };
-            }
-
-            if (ArgIsIdentifier(tokens, i + 1))
-            {
-                return new ParseResult()
-                {
-                    TokensProcessed = 0
-                };
-            }
-
-            return new ParseResult()
-            {
-                Value = parameter.Coerce(token),
-                TokensProcessed = 1,
-            };
-        }
-
     }
 }

@@ -1,12 +1,13 @@
 ﻿using Odin.Configuration;
+using Odin.Parsing;
 
 namespace Odin.Tests.Parsing
 {
-    public class YesNoParser : CustomParser
+    public class YesNoParser : IParser
     {
         private readonly ParameterValue _parameterValue;
 
-        public override ParseResult Parse(string[] tokens, int i)
+        public ParseResult Parse(string[] tokens, int i)
         {
             var token = tokens[i];
             var result = new ParseResult()

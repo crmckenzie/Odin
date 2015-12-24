@@ -42,11 +42,14 @@
   <ItemGroup>
     <Compile Include="Attributes\ActionAttribute.cs" />
     <Compile Include="Attributes\ParserAttribute.cs" />
-    <Compile Include="Configuration\CustomParser.cs" />
+    <Compile Include="Configuration\DefaultHyphenCaseParser.cs" />
+    <Compile Include="Configuration\SlashColonParser.cs" />
+    <Compile Include="Configuration\SlashEqualsParser.cs" />
+    <Compile Include="Parsing\IParser.cs" />
     <Compile Include="Configuration\DefaultHelpGenerator.cs" />
     <Compile Include="Configuration\EnumerableExtensions.cs" />
     <Compile Include="Configuration\HelpGenerator.cs" />
-    <Compile Include="Configuration\ParseResult.cs" />
+    <Compile Include="Parsing\ParseResult.cs" />
     <Compile Include="Configuration\SlashEqualsConvention.cs" />
     <Compile Include="Configuration\StringExtensions.cs" />
     <Compile Include="MethodInvocation.cs" />
@@ -59,6 +62,7 @@
     <Compile Include="Logging\Logger.cs" />
     <Compile Include="Exceptions\ParameterConversionException.cs" />
     <Compile Include="ParameterValue.cs" />
+    <Compile Include="Parsing\ReflectionExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

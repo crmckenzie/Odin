@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.Serialization;
 
 namespace Odin.Exceptions
 {
@@ -6,13 +7,14 @@ namespace Odin.Exceptions
     public class ParameterConversionException : Exception
     {
         public ParameterValue ParameterValue { get; }
-        public object Value { get; }
 
-        public ParameterConversionException(ParameterValue parameterValue, object value, Exception exception) : 
-            base($"Argument conversion failed for parameter {parameterValue.Name}.\nCould not convert '{value}' to type {parameterValue.ParameterType.FullName}.\n", exception)
+        public string Token { get; }
+        
+        public ParameterConversionException(ParameterValue parameterValue, string token, Exception exception) : 
+            base($"Argument conversion failed for parameter {parameterValue.Name}.\nCould not convert '{token}' to type {parameterValue.ParameterType.FullName}.\n", exception)
         {
             ParameterValue = parameterValue;
-            Value = value;
+            Token = token;
         }
     }
 }

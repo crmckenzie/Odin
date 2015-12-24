@@ -34,6 +34,7 @@
 * [x] Support custom argument parsers
     * [x] Support custom argument parsers with aliases
 * [ ] Support array arguments
+  * [x] string
   * [ ] bool
   * [ ] bool?
   * [ ] int

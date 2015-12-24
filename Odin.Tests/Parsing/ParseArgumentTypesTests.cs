@@ -10,7 +10,10 @@ namespace Odin.Tests.Parsing
         [SetUp]
         public void BeforeEach()
         {
-            this.Subject = new ArgumentTypesCommand();
+            this.Logger = new StringBuilderLogger();
+            this.Subject = new ArgumentTypesCommand()
+                .Use(this.Logger)
+                ;
         }
 
         public Command Subject { get; set; }
@@ -325,6 +328,7 @@ namespace Odin.Tests.Parsing
             var result = this.Subject.GenerateInvocation("with-boolean-yes-no-parser", "-i", "no", "--input2", "42", "--input3", "fredbob");
 
             // Then
+            result.ShouldNotBeNull(this.Logger.ErrorBuilder.ToString);
             result.ParameterValues[0].Value.ShouldBe(false);
             result.ParameterValues[1].Value.ShouldBe(42);
             result.ParameterValues[2].Value.ShouldBe("fredbob");

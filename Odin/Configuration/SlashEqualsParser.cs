@@ -1,0 +1,61 @@
+using System.Linq;
+using System.Text.RegularExpressions;
+using Odin.Parsing;
+
+namespace Odin.Configuration
+{
+    public class SlashEqualsParser : IParser
+    {
+        private readonly ParameterValue _parameter;
+
+        public SlashEqualsParser(ParameterValue parameter)
+        {
+            _parameter = parameter;
+        }
+
+        public ParseResult Parse(string[] tokens, int i)
+        {
+            var token = tokens[i];
+            if (IsNameValuePair(token))
+            {
+                var value = token.Split('=').Skip(1).First();
+                return new ParseResult()
+                {
+                    Value = _parameter.ParameterType.Coerce(value),
+                    TokensProcessed = 1,
+                };
+            }
+
+            if (!IsArgumentName(token))
+                return new ParseResult()
+                {
+                    Value = _parameter.ParameterType.Coerce(token),
+                    TokensProcessed = 1,
+                };
+
+            if (_parameter.IsBoolean())
+            {
+                return new ParseResult()
+                {
+                    Value = true,
+                    TokensProcessed = 1,
+                };
+            }
+            return new ParseResult()
+            {
+                Value = _parameter.ParameterType.Coerce(token),
+                TokensProcessed = 1,
+            };
+        }
+        private static bool IsArgumentName(string token)
+        {
+            return Regex.IsMatch(token, @"/\w+");
+        }
+
+        private static bool IsNameValuePair(string token)
+        {
+            return Regex.IsMatch(token, @"/\w+=\w+");
+        }
+
+    }
+}

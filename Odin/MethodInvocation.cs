@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -6,6 +7,8 @@ using System.Reflection;
 using System.Text;
 using Odin.Attributes;
 using Odin.Configuration;
+using Odin.Exceptions;
+using Odin.Parsing;
 
 namespace Odin
 {
@@ -97,26 +100,54 @@ namespace Odin
                     continue;
                 };
                 ParseResult result;
-                if (parameter.HasCustomParser())
-                {
-                    result = parameter.CustomParser.Parse(tokens, i);
-                }
-                else
-                {
-                    result = Conventions.Parse(parameter, tokens, i);
-                }
 
-                if (result.TokensProcessed <= 0)
+                try
                 {
-                    i++;
-                    continue;
-                };
+                    var parser = CreateParser(parameter);
+                    result = parser.Parse(tokens, i);
+                    if (result.TokensProcessed <= 0)
+                    {
+                        i++;
+                        continue;
+                    };
 
-                parameter.Value = result.Value;
+                    parameter.Value = result.Value;
+                }
+                catch (Exception e)
+                {
+                    throw new ParameterConversionException(parameter, tokens[i], e);
+                }
                 i += result.TokensProcessed;
 
             }
 
         }
+
+        private IParser CreateParser(ParameterValue parameter)
+        {
+            return parameter.HasCustomParser() ? CreateCustomParser(parameter) : Conventions.CreateParser(parameter);
+        }
+
+        private IParser CreateCustomParser(ParameterValue parameter)
+        {
+            var parserAttribute = parameter.ParameterInfo.GetCustomAttribute<ParserAttribute>();
+            if (!parserAttribute.ParserType.Implements<IParser>())
+                throw new ArgumentOutOfRangeException($"'{parserAttribute.ParserType.FullName}' is not an implementation of '{typeof(IParser).FullName}.'");
+
+            var types = new[] { typeof(ParameterValue) };
+            var constructor = parserAttribute.ParserType.GetConstructor(types);
+            if (constructor == null)
+            {
+                throw new TypeInitializationException(
+                    "Could not find a constructor with the signature (ParameterValue).", null);
+            }
+
+            var parameters = new[] { parameter };
+            var instance = constructor.Invoke(parameters);
+            var typedInstance = (IParser)instance;
+            return typedInstance;
+        }
+
+
     }
 }

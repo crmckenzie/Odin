@@ -1,4 +1,4 @@
-namespace Odin.Configuration
+namespace Odin.Parsing
 {
     public class ParseResult
     {

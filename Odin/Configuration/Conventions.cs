@@ -1,5 +1,6 @@
 using System.Reflection;
 using Odin.Attributes;
+using Odin.Parsing;
 
 namespace Odin.Configuration
 {
@@ -10,6 +11,6 @@ namespace Odin.Configuration
         public abstract string GetActionName(MethodInfo methodInfo);
         public abstract string GetShortOptionName(string rawAlias);
         public abstract bool IsMatchingParameter(ParameterValue parameterMap, string arg);
-        public abstract ParseResult Parse(ParameterValue parameter, string[] tokens, int i);
+        public abstract IParser CreateParser(ParameterValue parameter);
     }
 }
