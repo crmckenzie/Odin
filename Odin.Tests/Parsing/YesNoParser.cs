@@ -1,6 +1,6 @@
 ﻿using Odin.Configuration;
 
-namespace Odin.Tests.Lib
+namespace Odin.Tests.Parsing
 {
     public class YesNoParser : CustomParser
     {

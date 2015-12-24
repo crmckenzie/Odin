@@ -1,20 +1,9 @@
-using System;
 using System.Linq;
 using System.Reflection;
-using System.Text.RegularExpressions;
 using Odin.Attributes;
 
 namespace Odin.Configuration
 {
-    public static class StringExtensions
-    {
-        public static string HyphenCase(this string input)
-        {
-            var result = Regex.Replace(input, ".[A-Z]", m => m.Value[0] + "-" + m.Value[1]).ToLower();
-            return result;
-        }
-    }
-
     public class HyphenCaseConvention : Conventions
     {
         public override string GetCommandName(Command command)
@@ -57,6 +46,19 @@ namespace Odin.Configuration
         public override ParseResult Parse(ParameterValue parameter, string[] tokens, int i)
         {
             var token = tokens[i];
+
+            if (parameter.IsIdentifiedBy(token) && parameter.IsArray())
+            {
+                var tokensToParse = tokens.Skip(1).TakeUntil(t => IsOptionIdentifier(t) || IsOptionIdentifier(t));
+
+                var range = tokensToParse.Select(parameter.Coerce).ToArray();
+                return new ParseResult()
+                {
+                    Value = range,
+                    TokensProcessed = range.Length,
+                };
+            }
+
 
             var hasNextArg = tokens.Length > (i + 1);
             if (parameter.IsIdentifiedBy(token) && hasNextArg)

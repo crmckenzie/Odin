@@ -1,13 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using NUnit.Framework;
-using Odin.Demo;
 using Shouldly;
 
-namespace Odin.Tests.Lib
+namespace Odin.Tests.Parsing
 {
     [TestFixture]
     public class ParseArgumentTypesTests
@@ -334,6 +329,18 @@ namespace Odin.Tests.Lib
             result.ParameterValues[1].Value.ShouldBe(42);
             result.ParameterValues[2].Value.ShouldBe("fredbob");
         }
+
+        [Test]
+        public void WithStringArray()
+        {
+            // When
+            var result = this.Subject.GenerateInvocation("with-string-array", "--file-names", "file1", "file2", "file3", "--some-other-input", "42");
+
+            // Then
+            result.ParameterValues[0].Value.ShouldBe(new[] {"file1", "file2", "file3"});
+            result.ParameterValues[1].Value.ShouldBe(42);
+        }
+
 
     }
 }

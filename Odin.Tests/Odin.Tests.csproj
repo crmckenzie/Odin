@@ -53,15 +53,15 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Demo\RootCommandRouteTests.cs" />
-    <Compile Include="Lib\ArgumentTypesCommand.cs" />
+    <Compile Include="Parsing\ArgumentTypesCommand.cs" />
     <Compile Include="Lib\Configuration\SlashColonConventionTests.cs" />
     <Compile Include="Lib\Configuration\SlashEqualsConventionTests.cs" />
     <Compile Include="Lib\HelpTests.cs" />
     <Compile Include="Lib\CommandInvocationTests.cs" />
     <Compile Include="Lib\CommandTests.cs" />
     <Compile Include="Lib\NotTheDefaultCommand.cs" />
-    <Compile Include="Lib\ParseArgumentTypesTests.cs" />
-    <Compile Include="Lib\YesNoParser.cs" />
+    <Compile Include="Parsing\ParseArgumentTypesTests.cs" />
+    <Compile Include="Parsing\YesNoParser.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Lib\DefaultCommand.cs" />
     <Compile Include="Lib\StringBuilderLogger.cs" />

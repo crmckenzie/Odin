@@ -44,9 +44,11 @@
     <Compile Include="Attributes\ParserAttribute.cs" />
     <Compile Include="Configuration\CustomParser.cs" />
     <Compile Include="Configuration\DefaultHelpGenerator.cs" />
+    <Compile Include="Configuration\EnumerableExtensions.cs" />
     <Compile Include="Configuration\HelpGenerator.cs" />
     <Compile Include="Configuration\ParseResult.cs" />
     <Compile Include="Configuration\SlashEqualsConvention.cs" />
+    <Compile Include="Configuration\StringExtensions.cs" />
     <Compile Include="MethodInvocation.cs" />
     <Compile Include="Attributes\AliasAttribute.cs" />
     <Compile Include="Command.cs" />

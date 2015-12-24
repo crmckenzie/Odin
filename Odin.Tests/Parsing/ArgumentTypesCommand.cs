@@ -1,11 +1,8 @@
-﻿using Odin.Attributes;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System;
+using Odin.Attributes;
+using Odin.Tests.Lib;
 
-namespace Odin.Tests.Lib
+namespace Odin.Tests.Parsing
 {
     public enum Numbers
     {
@@ -92,6 +89,12 @@ namespace Odin.Tests.Lib
         { 
         
 
+        }
+
+        [Action]
+        public void WithStringArray(string[] fileNames, int someOtherInput)
+        {
+            
         }
 
     }

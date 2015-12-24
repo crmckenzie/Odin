@@ -11,39 +11,38 @@ namespace Odin
 {
     public class ParameterValue
     {
-        private static Dictionary<Type, Func<object, object>> Coercion { get;  }
-        static ParameterValue()
-        {
-            Coercion = new Dictionary<Type, Func<object, object>>
-            {
-                [typeof(bool)] = o => bool.Parse(o.ToString()),
-                [typeof(int)] = o => int.Parse(o.ToString()),
-                [typeof(long)] = o => long.Parse(o.ToString()),
-                [typeof(double)] = o => double.Parse(o.ToString()),
-                [typeof(decimal)] = o => decimal.Parse(o.ToString()),
-                [typeof(DateTime)] = o => DateTime.Parse(o.ToString()),
-
-                [typeof(bool?)] = o => bool.Parse(o.ToString()),
-                [typeof(int?)] = o => int.Parse(o.ToString()),
-                [typeof(long?)] = o => long.Parse(o.ToString()),
-                [typeof(double?)] = o => double.Parse(o.ToString()),
-                [typeof(decimal?)] = o => decimal.Parse(o.ToString()),
-                [typeof(DateTime?)] = o => DateTime.Parse(o.ToString()),
-
-            };
-        }
+        private CustomParser _customParser;
 
 
         private bool _isSet;
 
         private object _value;
 
+        static ParameterValue()
+        {
+            Coercion = new Dictionary<Type, Func<object, object>>
+            {
+                [typeof (bool)] = o => bool.Parse(o.ToString()),
+                [typeof (int)] = o => int.Parse(o.ToString()),
+                [typeof (long)] = o => long.Parse(o.ToString()),
+                [typeof (double)] = o => double.Parse(o.ToString()),
+                [typeof (decimal)] = o => decimal.Parse(o.ToString()),
+                [typeof (DateTime)] = o => DateTime.Parse(o.ToString()),
+                [typeof (bool?)] = o => bool.Parse(o.ToString()),
+                [typeof (int?)] = o => int.Parse(o.ToString()),
+                [typeof (long?)] = o => long.Parse(o.ToString()),
+                [typeof (double?)] = o => double.Parse(o.ToString()),
+                [typeof (decimal?)] = o => decimal.Parse(o.ToString()),
+                [typeof (DateTime?)] = o => DateTime.Parse(o.ToString())
+            };
+        }
+
         public ParameterValue(MethodInvocation methodInvocation, ParameterInfo parameterInfo)
         {
             MethodInvocation = methodInvocation;
             ParameterInfo = parameterInfo;
 
-            if (ParameterType == typeof(bool))
+            if (ParameterType == typeof (bool))
                 Value = false;
 
             if (IsNullableType())
@@ -53,27 +52,21 @@ namespace Odin
                 Value = Type.Missing;
         }
 
-        private bool IsNullableType()
-        {
-            return ParameterType.IsGenericType && ParameterType.GetGenericTypeDefinition() == typeof(Nullable<>);
-        }
+        private static Dictionary<Type, Func<object, object>> Coercion { get; }
 
 
         private MethodInvocation MethodInvocation { get; }
 
         public Conventions Conventions => MethodInvocation.Conventions;
 
-        public ParameterInfo ParameterInfo { get;  }
+        public ParameterInfo ParameterInfo { get; }
         public Type ParameterType => ParameterInfo.ParameterType;
 
         public int Position => ParameterInfo.Position;
 
         public object Value
         {
-            get
-            {
-                return _value;
-            }
+            get { return _value; }
             set
             {
                 _value = value;
@@ -83,9 +76,8 @@ namespace Odin
 
         public string Name => ParameterInfo.Name;
 
-        public string LongOptionName => Conventions.GetLongOptionName(this.ParameterInfo);
+        public string LongOptionName => Conventions.GetLongOptionName(ParameterInfo);
 
-        private CustomParser _customParser;
         public CustomParser CustomParser
         {
             get
@@ -101,14 +93,20 @@ namespace Odin
             }
         }
 
+        private bool IsNullableType()
+        {
+            return ParameterType.IsGenericType && ParameterType.GetGenericTypeDefinition() == typeof (Nullable<>);
+        }
+
         private CustomParser CreateCustomParser()
         {
-            var parserAttribute = this.ParameterInfo.GetCustomAttribute<ParserAttribute>();
+            var parserAttribute = ParameterInfo.GetCustomAttribute<ParserAttribute>();
             var types = new[] {typeof (ParameterValue)};
             var constructor = parserAttribute.ParserType.GetConstructor(types);
             if (constructor == null)
             {
-                throw new TypeInitializationException("Could not find a constructor with the signature (ParameterValue).", null);
+                throw new TypeInitializationException(
+                    "Could not find a constructor with the signature (ParameterValue).", null);
             }
 
             var parameters = new[] {this};
@@ -132,8 +130,8 @@ namespace Odin
 
         internal bool IsBoolean()
         {
-            return ParameterType == typeof(bool)
-                || ParameterType == typeof(bool?)
+            return ParameterType == typeof (bool)
+                   || ParameterType == typeof (bool?)
                 ;
         }
 
@@ -155,7 +153,7 @@ namespace Odin
 
         private bool HasAlias(string arg)
         {
-            var attr = this.ParameterInfo.GetCustomAttribute<AliasAttribute>();
+            var attr = ParameterInfo.GetCustomAttribute<AliasAttribute>();
             return MatchesAlias(attr, arg);
         }
 
@@ -163,7 +161,7 @@ namespace Odin
         {
             try
             {
-                var key = this.ParameterType;
+                var key = ParameterType;
                 if (Coercion.ContainsKey(key))
                     return Coercion[key].Invoke(value);
 
@@ -174,9 +172,7 @@ namespace Odin
 
                 var genericType = key.GetGenericArguments()[0];
                 if (genericType.IsEnum)
-                {
                     return Enum.Parse(genericType, value.ToString());
-                }
 
                 return value;
             }
@@ -187,10 +183,9 @@ namespace Odin
         }
 
 
-
         public bool HasAliases()
         {
-            var attr = this.ParameterInfo.GetCustomAttribute<AliasAttribute>();
+            var attr = ParameterInfo.GetCustomAttribute<AliasAttribute>();
             if (attr == null)
                 return false;
 
@@ -199,9 +194,9 @@ namespace Odin
 
         public string[] GetAliases()
         {
-            var attr = this.ParameterInfo.GetCustomAttribute<AliasAttribute>();
+            var attr = ParameterInfo.GetCustomAttribute<AliasAttribute>();
             if (attr == null)
-                return new string[] { };
+                return new string[] {};
 
             return attr.Aliases.Select(a => Conventions.GetShortOptionName(a)).ToArray();
         }
@@ -209,7 +204,12 @@ namespace Odin
 
         public bool HasCustomParser()
         {
-            return this.ParameterInfo.GetCustomAttribute<ParserAttribute>() != null;
+            return ParameterInfo.GetCustomAttribute<ParserAttribute>() != null;
+        }
+
+        public bool IsArray()
+        {
+            return ParameterType.IsSubclassOf(typeof (Array));
         }
     }
 }
