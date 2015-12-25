@@ -127,23 +127,19 @@ namespace Odin
             try
             {
                 var token = tokens.FirstOrDefault();
-                var subCommand = GetSubCommandByName(token);
+                var subCommand = GetSubCommandByName(token) ?? GetSubCommandByAlias(token);
                 if (subCommand != null)
                 {
                     var theRest = tokens.Skip(1).ToArray();
                     return subCommand.GenerateInvocation(theRest);
                 }
 
-                MethodInvocation action = null;
-                var toSkip = 0;
-                if (UseDefaultAction(token))
+                var action = GetActionByName(token) ?? GetActionByAlias(token);
+                var toSkip = 1;
+                if (action == null)
                 {
+                    toSkip = 0;
                     action = GetDefaultAction();
-                }
-                else 
-                {
-                    action = this.Actions[token];
-                    toSkip = 1;
                 }
 
                 var args = tokens.Skip(toSkip).ToArray();
@@ -155,6 +151,32 @@ namespace Odin
                 this.Logger.Error(pce.Message);
                 return null;
             }
+        }
+
+        private MethodInvocation GetActionByAlias(string token)
+        {
+            return _actions.Values.FirstOrDefault(action => action.Aliases.Contains(token));
+        }
+
+        private MethodInvocation GetActionByName(string token)
+        {
+            if (string.IsNullOrWhiteSpace(token))
+                return null;
+
+            if (!_actions.ContainsKey(token))
+                return null;
+
+            return _actions[token];
+        }
+
+        private Command GetSubCommandByAlias(string token)
+        {
+            return this.SubCommands.Values.FirstOrDefault(cmd => cmd.Aliases.Contains(token));
+        }
+
+        public string[] Aliases
+        {
+            get { return this.GetType().GetCustomAttribute<AliasAttribute>()?.Aliases.ToArray() ?? new string[] {}; }
         }
 
         private bool UseDefaultAction(string token)

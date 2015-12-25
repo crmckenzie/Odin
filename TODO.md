@@ -12,8 +12,8 @@
 * [x] Support implicit ordered parameters
 * [x] Support the concept of a default action
 * [x] Support sub-comamnds
-* [ ] Support aliases on controllers
-* [ ] Support aliases on methods
+* [x] Support aliases on controllers
+* [x] Support aliases on methods
 * [x] Support aliases on parameters
 * [x] Support argument parsing for primitive types
   * [x] bool

@@ -37,6 +37,11 @@ namespace Odin
         public string Name => Conventions.GetActionName(MethodInfo);
         public ReadOnlyCollection<ParameterValue> ParameterValues { get; }
 
+        public string[] Aliases
+        {
+            get { return this.MethodInfo.GetCustomAttribute<AliasAttribute>()?.Aliases.ToArray() ?? new string[] { }; }
+        }
+
         public string GetDescription()
         {
             var descriptionAttr = MethodInfo.GetCustomAttribute<DescriptionAttribute>();

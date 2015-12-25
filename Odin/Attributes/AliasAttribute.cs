@@ -6,7 +6,11 @@ using System.Threading.Tasks;
 
 namespace Odin.Attributes
 {
-    [AttributeUsage(AttributeTargets.Parameter | AttributeTargets.GenericParameter)]
+    [AttributeUsage(
+        AttributeTargets.Parameter | 
+        AttributeTargets.GenericParameter | 
+        AttributeTargets.Class | 
+        AttributeTargets.Method, AllowMultiple = false)]
     public class AliasAttribute : Attribute
     {
         public IReadOnlyCollection<string> Aliases { get; }
