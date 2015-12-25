@@ -31,6 +31,17 @@ namespace Odin.Tests.Parsing
         }
 
         [Test]
+        public void WithNegatedBoolean()
+        {
+            // When
+            var result = this.Subject.GenerateInvocation("with-boolean", "--no-input");
+
+            // Then
+            result.ParameterValues[0].Value.ShouldBe(false);
+        }
+
+
+        [Test]
         public void WithBoolean_False()
         {
             // When

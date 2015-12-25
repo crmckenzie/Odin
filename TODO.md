@@ -4,11 +4,12 @@
 * [x] Map command line arguments to a method to execute.
 * [x] Handle parsing errors in a friendly manner.
 * [x] Support boolean actions and report proper exit code.
+* [ ] Seek consistent interfaces between commands, actions, and parameterValues, especially with respect to names and aliases.
 
 ## Command Line Options
 
 * [x] Support boolean switches
-  * [ ] Support --switch and --no-switch argument styles for boolean arguments
+  * [x] Support --switch and --no-switch argument styles for boolean arguments
 * [x] Support implicit ordered parameters
 * [x] Support the concept of a default action
 * [x] Support sub-comamnds
@@ -55,7 +56,9 @@
 * [x] Support an injectable Logger
 * [x] Support customizable conventions
   * [x] provide /argment:value style convention
+    * [ ]  negative arguments should be in the form /no-argument
   * [x] provide /argument=value style convention
+    * [ ]  negative arguments should be in the form /no-argument
 
 ## Help
 

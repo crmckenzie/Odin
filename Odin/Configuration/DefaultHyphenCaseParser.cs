@@ -30,7 +30,7 @@ namespace Odin.Configuration
             {
                 return new ParseResult()
                 {
-                    Value = true,
+                    Value = !_parameter.IsNegatedBy(token),
                     TokensProcessed = 1,
                 };
             }

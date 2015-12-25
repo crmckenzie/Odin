@@ -13,24 +13,29 @@ namespace Odin.Configuration
             return name.Replace("Command", "");
         }
 
-        public override string GetLongOptionName(ParameterInfo row)
+        public override string GetLongOptionName(string parameterName)
         {
-            return $"/{row.Name}";
+            return $"/{parameterName}";
         }
 
-        public override string GetActionName(MethodInfo methodInfo)
+        public override string GetNegatedLongOptionName(string parameterName)
         {
-            return methodInfo.Name;
+            return $"/No{parameterName}";
         }
 
-        public override string GetShortOptionName(string rawAlias)
+        public override string GetActionName(string methodName)
         {
-            return $"/{rawAlias}";
+            return methodName;
         }
 
-        public override bool IsMatchingParameter(ParameterValue parameterMap, string arg)
+        public override string GetShortOptionName(string alias)
         {
-            return arg.StartsWith(parameterMap.LongOptionName);
+            return $"/{alias}";
+        }
+
+        public override bool IsMatchingParameterName(string parameterName, string token)
+        {
+            return token.StartsWith(GetLongOptionName(parameterName));
         }
 
         public override IParser CreateParser(ParameterValue parameter)

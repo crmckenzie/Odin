@@ -52,7 +52,7 @@ namespace Odin
 
         public string Name => ParameterInfo.Name;
 
-        public string LongOptionName => Conventions.GetLongOptionName(ParameterInfo);
+        public string LongOptionName => Conventions.GetLongOptionName(Name);
 
         public string GetDescription()
         {
@@ -116,6 +116,14 @@ namespace Odin
         public bool HasCustomParser()
         {
             return ParameterInfo.GetCustomAttribute<ParserAttribute>() != null;
+        }
+
+        public bool IsNegatedBy(string token)
+        {
+            if (!IsBoolean())
+                return false;
+
+            return Conventions.IsNegatedLongOptionName(this.Name, token);
         }
     }
 }

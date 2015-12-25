@@ -14,24 +14,29 @@ namespace Odin.Configuration
             return hyphenCased;
         }
 
-        public override string GetLongOptionName(ParameterInfo row)
+        public override string GetLongOptionName(string parameterName)
         {
-            return $"--{row.Name.HyphenCase()}";
+            return $"--{parameterName.HyphenCase()}";
         }
 
-        public override string GetActionName(MethodInfo methodInfo)
+        public override string GetActionName(string methodName)
         {
-            return methodInfo.Name.HyphenCase();
+            return methodName.HyphenCase();
         }
 
-        public override string GetShortOptionName(string rawAlias)
+        public override string GetShortOptionName(string alias)
         {
-            return $"-{rawAlias}";
+            return $"-{alias}";
         }
 
-        public override bool IsMatchingParameter(ParameterValue parameterMap, string arg)
+        public override bool IsMatchingParameterName(string parameterName, string token)
         {
-            return parameterMap.LongOptionName == arg;
+            return GetLongOptionName(parameterName) == token;
+        }
+
+        public override string GetNegatedLongOptionName(string parameterName)
+        {
+            return $"--no-{parameterName}".HyphenCase();
         }
 
         public override IParser CreateParser(ParameterValue parameter)
