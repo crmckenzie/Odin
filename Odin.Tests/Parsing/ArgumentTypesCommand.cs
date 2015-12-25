@@ -97,5 +97,84 @@ namespace Odin.Tests.Parsing
             
         }
 
+        [Action]
+        public void WithBoolArray(bool[] values, int someOtherInput)
+        {
+
+        }
+
+        [Action]
+        public void WithNullableBoolArray(bool?[] values, int someOtherInput)
+        {
+
+        }
+
+        [Action]
+        public void WithInt32Array(int[] numbers, int someOtherInput)
+        {
+            
+        }
+
+        [Action]
+        public void WithNullableInt32Array(int?[] numbers, int someOtherInput)
+        {
+
+        }
+
+        [Action]
+        public void WithInt64Array(long[] numbers, int someOtherInput)
+        {
+
+        }
+
+        [Action]
+        public void WithNullableInt64Array(long?[] numbers, int someOtherInput)
+        {
+
+        }
+
+        [Action]
+        public void WithDateTimeArray(DateTime[] values, int someOtherInput)
+        {
+
+        }
+
+        [Action]
+        public void WithNullableDateTimeArray(DateTime?[] values, int someOtherInput)
+        {
+
+        }
+
+        [Action]
+        public void WithDecimalArray(decimal[] values, int someOtherInput)
+        {
+
+        }
+
+        [Action]
+        public void WithNullableDecimalArray(decimal?[] values, int someOtherInput)
+        {
+
+        }
+
+        [Action]
+        public void WithDoubleArray(double[] values, int someOtherInput)
+        {
+
+        }
+
+        [Action]
+        public void WithNullableDoubleArray(double?[] values, int someOtherInput)
+        {
+
+        }
+
+        [Action]
+        public void WithEnumArray(Numbers[] values, int someOtherInput)
+        {
+
+        }
+
+
     }
 }

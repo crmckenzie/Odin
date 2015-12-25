@@ -76,7 +76,9 @@ namespace Odin.Configuration
         {
             var tokensToParse = tokens.Skip(1).TakeUntil(HyphenCaseConvention.IsOptionIdentifier);
 
-            var range = tokensToParse.Select(parameter.ParameterType.Coerce).ToArray();
+            var elementType = parameter.ParameterType.GetElementType();
+
+            var range = tokensToParse.Select(elementType.Coerce).ToArray();
             return new ParseResult()
             {
                 Value = range,

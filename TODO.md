@@ -33,22 +33,22 @@
   * [x] Enum
 * [x] Support custom argument parsers
     * [x] Support custom argument parsers with aliases
-* [ ] Support array arguments
+* [x] Support array arguments
   * [x] string
-  * [ ] bool
-  * [ ] bool?
-  * [ ] int
-  * [ ] int?
-  * [ ] long
-  * [ ] long?
-  * [ ] DateTime
-  * [ ] DateTime?
-  * [ ] decimal
-  * [ ] decimal?
-  * [ ] double
-  * [ ] double?
-  * [ ] Enum
-  * [ ] Enum?
+  * [x] bool
+  * [x] bool?
+  * [x] int
+  * [x] int?
+  * [x] long
+  * [x] long?
+  * [x] DateTime
+  * [x] DateTime?
+  * [x] decimal
+  * [x] decimal?
+  * [x] double
+  * [x] double?
+  * [x] Enum
+  * [x] Enum?
 
 ## Extensibility
 

@@ -345,6 +345,149 @@ namespace Odin.Tests.Parsing
             result.ParameterValues[1].Value.ShouldBe(42);
         }
 
+        [Test]
+        public void WithBoolArray()
+        {
+            // When
+            var result = this.Subject.GenerateInvocation("with-bool-array", "--values", "true", "false", "true", "--some-other-input", "42");
 
+            // Then
+            result.ParameterValues[0].Value.ShouldBe(new[] { true, false, true});
+            result.ParameterValues[1].Value.ShouldBe(42);
+        }
+
+        [Test]
+        public void WithNullableBoolArray()
+        {
+            // When
+            var result = this.Subject.GenerateInvocation("with-nullable-bool-array", "--values", "true", "", "false", "--some-other-input", "42");
+
+            // Then
+            result.ShouldNotBeNull();
+            result.ParameterValues[0].Value.ShouldBe(new[] { true, (bool?)null, false });
+            result.ParameterValues[1].Value.ShouldBe(42);
+        }
+
+        [Test]
+        public void WithInt32Array()
+        {
+            // When
+            var result = this.Subject.GenerateInvocation("with-int32-array", "--numbers", "4", "8", "15", "16","28","42", "--some-other-input", "42");
+
+            // Then
+            result.ParameterValues[0].Value.ShouldBe(new[] { 4, 8, 15, 16, 28, 42 });
+            result.ParameterValues[1].Value.ShouldBe(42);
+        }
+
+        [Test]
+        public void WithNullableInt32Array()
+        {
+            // When
+            var result = this.Subject.GenerateInvocation("with-nullable-int32-array", "--numbers", "4", "", "15", "--some-other-input", "42");
+
+            // Then
+            result.ParameterValues[0].Value.ShouldBe(new[] { 4, (int?)null, 15});
+            result.ParameterValues[1].Value.ShouldBe(42);
+        }
+
+        [Test]
+        public void WithInt64Array()
+        {
+            // When
+            var result = this.Subject.GenerateInvocation("with-int64-array", "--numbers", "4", "8", "15", "16", "28", "42", "--some-other-input", "42");
+
+            // Then
+            result.ParameterValues[0].Value.ShouldBe(new[] { 4, 8, 15, 16, 28, 42 });
+            result.ParameterValues[1].Value.ShouldBe(42);
+        }
+
+        [Test]
+        public void WithNullableInt64Array()
+        {
+            // When
+            var result = this.Subject.GenerateInvocation("with-nullable-int64-array", "--numbers", "4", "", "15", "--some-other-input", "42");
+
+            // Then
+            result.ParameterValues[0].Value.ShouldBe(new[] { 4, (int?)null, 15 });
+            result.ParameterValues[1].Value.ShouldBe(42);
+        }
+
+        [Test]
+        public void WithDateTimeArray()
+        {
+            // When
+            var result = this.Subject.GenerateInvocation("with-date-time-array", "--values", "01/01/2015", "12/25/2015", "--some-other-input", "42");
+
+            // Then
+            result.ParameterValues[0].Value.ShouldBe(new[] { new DateTime(2015,1,1), new DateTime(2015,12,25),  });
+            result.ParameterValues[1].Value.ShouldBe(42);
+        }
+
+        [Test]
+        public void WithNullableDateTimeArray()
+        {
+            // When
+            var result = this.Subject.GenerateInvocation("with-nullable-date-time-array", "--values", "01/01/2016", "", "12/25/2016", "--some-other-input", "42");
+
+            // Then
+            result.ParameterValues[0].Value.ShouldBe(new[] { new DateTime(2016, 01, 01), (DateTime?)null, new DateTime(2016, 12, 25) });
+            result.ParameterValues[1].Value.ShouldBe(42);
+        }
+
+
+        [Test]
+        public void WithDecimalArray()
+        {
+            // When
+            var result = this.Subject.GenerateInvocation("with-decimal-array", "--values", "4", "8", "15", "16", "28", "42", "--some-other-input", "42");
+
+            // Then
+            result.ParameterValues[0].Value.ShouldBe(new[] { 4, 8, 15, 16, 28, 42 });
+            result.ParameterValues[1].Value.ShouldBe(42);
+        }
+
+        [Test]
+        public void WithNullableDecimalArray()
+        {
+            // When
+            var result = this.Subject.GenerateInvocation("with-nullable-decimal-array", "--values", "4", "", "15", "--some-other-input", "42");
+
+            // Then
+            result.ParameterValues[0].Value.ShouldBe(new[] { 4, (decimal?)null, 15 });
+            result.ParameterValues[1].Value.ShouldBe(42);
+        }
+
+        [Test]
+        public void WithDoubleArray()
+        {
+            // When
+            var result = this.Subject.GenerateInvocation("with-double-array", "--values", "4", "8", "15", "16", "28", "42", "--some-other-input", "42");
+
+            // Then
+            result.ParameterValues[0].Value.ShouldBe(new[] { 4, 8, 15, 16, 28, 42 });
+            result.ParameterValues[1].Value.ShouldBe(42);
+        }
+
+        [Test]
+        public void WithNullableDoubleArray()
+        {
+            // When
+            var result = this.Subject.GenerateInvocation("with-nullable-double-array", "--values", "4", "", "15", "--some-other-input", "42");
+
+            // Then
+            result.ParameterValues[0].Value.ShouldBe(new[] { 4, (double?)null, 15 });
+            result.ParameterValues[1].Value.ShouldBe(42);
+        }
+
+        [Test]
+        public void WithEnumArray()
+        {
+            // When
+            var result = this.Subject.GenerateInvocation("with-enum-array", "--values", "One", "Three", "Two", "--some-other-input", "42");
+
+            // Then
+            result.ParameterValues[0].Value.ShouldBe(new[] { Numbers.One, Numbers.Three, Numbers.Two});
+            result.ParameterValues[1].Value.ShouldBe(42);
+        }
     }
 }
