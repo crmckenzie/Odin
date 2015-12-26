@@ -72,7 +72,7 @@ namespace Odin
             this.Parent = parent;
         }
 
-        private Command Parent { get; set; }
+        public Command Parent { get; set; }
 
         private Logger _logger = new DefaultLogger();
         public Logger Logger => IsRoot() ? _logger : Parent.Logger;
@@ -85,6 +85,16 @@ namespace Odin
         public Conventions Conventions => IsRoot() ? _conventions : Parent.Conventions ;
 
         public string Name => Conventions.GetCommandName(this);
+
+        public string[] Aliases
+        {
+            get { return this.GetType().GetCustomAttribute<AliasAttribute>()?.Aliases.ToArray() ?? new string[] { }; }
+        }
+
+        public bool IsIdentifiedBy(string token)
+        {
+            return token == Name || Aliases.Contains(token);
+        }
 
         private Dictionary<string, Command> _subCommands;
         public IReadOnlyDictionary<string, Command> SubCommands { get; private set; }
@@ -127,14 +137,14 @@ namespace Odin
             try
             {
                 var token = tokens.FirstOrDefault();
-                var subCommand = GetSubCommandByName(token) ?? GetSubCommandByAlias(token);
+                var subCommand = GetSubCommandByToken(token);
                 if (subCommand != null)
                 {
                     var theRest = tokens.Skip(1).ToArray();
                     return subCommand.GenerateInvocation(theRest);
                 }
 
-                var action = GetActionByName(token) ?? GetActionByAlias(token);
+                var action = GetActionByToken(token);
                 var toSkip = 1;
                 if (action == null)
                 {
@@ -153,62 +163,19 @@ namespace Odin
             }
         }
 
-        private MethodInvocation GetActionByAlias(string token)
+        private MethodInvocation GetActionByToken(string token)
         {
-            return _actions.Values.FirstOrDefault(action => action.Aliases.Contains(token));
+            return _actions.Values.FirstOrDefault(action => action.IsIdentifiedBy(token));
         }
 
-        private MethodInvocation GetActionByName(string token)
+        private Command GetSubCommandByToken(string token)
         {
-            if (string.IsNullOrWhiteSpace(token))
-                return null;
-
-            if (!_actions.ContainsKey(token))
-                return null;
-
-            return _actions[token];
-        }
-
-        private Command GetSubCommandByAlias(string token)
-        {
-            return this.SubCommands.Values.FirstOrDefault(cmd => cmd.Aliases.Contains(token));
-        }
-
-        public string[] Aliases
-        {
-            get { return this.GetType().GetCustomAttribute<AliasAttribute>()?.Aliases.ToArray() ?? new string[] {}; }
-        }
-
-        private bool UseDefaultAction(string token)
-        {
-            return string.IsNullOrWhiteSpace(token) || !this.Actions.ContainsKey(token);
+            return SubCommands.Values.FirstOrDefault(cmd => cmd.IsIdentifiedBy(token));
         }
 
         private MethodInvocation GetDefaultAction()
         {
             return this.Actions.Values.FirstOrDefault(row => row.IsDefault);
-        }
-
-        private Command GetSubCommandByName(string name)
-        {
-            if (string.IsNullOrWhiteSpace(name))
-                return null;
-            return SubCommands.ContainsKey(name) ? SubCommands[name] : null;
-        }
-
-        public string[] GetFullCommandPath()
-        {
-            var stack = new Stack<string>();
-            stack.Push(this.Name);
-
-            var parent = this.Parent;
-            while (parent != null)
-            {
-                stack.Push(parent.Name);
-                parent = parent.Parent;
-            }
-
-            return stack.ToArray();
         }
 
         public bool IsRoot()
@@ -221,7 +188,7 @@ namespace Odin
             [Description("The name of the action to provide help for.")]
             string actionName = "")
         {
-            var help = this.HelpGenerator.GenerateHelp(this, actionName);
+            var help = this.HelpGenerator.Emit(this, actionName);
             this.Logger.Info(help);
         }
     }

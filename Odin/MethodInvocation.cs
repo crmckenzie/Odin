@@ -42,16 +42,23 @@ namespace Odin
             get { return this.MethodInfo.GetCustomAttribute<AliasAttribute>()?.Aliases.ToArray() ?? new string[] { }; }
         }
 
+        public bool IsIdentifiedBy(string token)
+        {
+            return Name == token || Aliases.Contains(token);
+        }
+
         public string GetDescription()
         {
             var descriptionAttr = MethodInfo.GetCustomAttribute<DescriptionAttribute>();
             return descriptionAttr == null ? "" : descriptionAttr.Description;
         }
 
-        private ParameterValue FindBySwitch(string arg)
+        private ParameterValue FindByToken(string token)
         {
+            //return this.ParameterValues.FirstOrDefault(p => p.Identifiers.Contains(token));
+
             return this.ParameterValues
-                .FirstOrDefault(p => p.IsIdentifiedBy(arg))
+                .FirstOrDefault(p => p.IsIdentifiedBy(token))
                 ;
         }
 
@@ -97,8 +104,8 @@ namespace Odin
             var i = 0;
             while (i < tokens.Length)
             {
-                var arg = tokens[i];
-                var parameter = FindBySwitch(arg) ?? FindByIndex(i);
+                var token = tokens[i];
+                var parameter = FindByToken(token) ?? FindByIndex(i);
                 if (parameter == null)
                 {
                     i++;
@@ -152,7 +159,6 @@ namespace Odin
             var typedInstance = (IParser)instance;
             return typedInstance;
         }
-
 
     }
 }

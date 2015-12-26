@@ -1,11 +1,9 @@
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
 using Odin.Attributes;
 using Odin.Configuration;
-using Odin.Exceptions;
 using Odin.Parsing;
 
 namespace Odin
@@ -54,6 +52,31 @@ namespace Odin
 
         public string LongOptionName => Conventions.GetLongOptionName(Name);
 
+        public string[] Aliases
+        {
+            get
+            {
+                var attr = ParameterInfo.GetCustomAttribute<AliasAttribute>();
+                if (attr == null)
+                    return new string[] {};
+
+                return attr.Aliases.Select(a => Conventions.GetShortOptionName(a)).ToArray();
+            }
+        }
+
+        public bool IsIdentifiedBy(string token)
+        {
+            if (Conventions.IsMatchingParameter(this, token))
+                return true;
+            if (Aliases.Contains(token))
+                return true;
+
+            if (IsBoolean() && Conventions.IsNegatedLongOptionName(this.Name, token))
+                return true;
+
+            return false;
+        }
+
         public string GetDescription()
         {
             var attr = ParameterInfo.GetCustomAttribute<DescriptionAttribute>();
@@ -67,50 +90,9 @@ namespace Odin
             return _isSet;
         }
 
-        internal bool IsBoolean()
+        public bool IsBoolean()
         {
-            return ParameterType.IsBoolean()
-                ;
-        }
-
-        public bool IsIdentifiedBy(string token)
-        {
-            if (Conventions.IsMatchingParameter(this, token))
-                return true;
-            return HasAlias(token);
-        }
-
-        private bool MatchesAlias(AliasAttribute aliasAttribute, string arg)
-        {
-            if (aliasAttribute == null)
-                return false;
-
-            var aliases = aliasAttribute.Aliases.Select(Conventions.GetShortOptionName);
-            return aliases.Contains(arg);
-        }
-
-        private bool HasAlias(string arg)
-        {
-            var attr = ParameterInfo.GetCustomAttribute<AliasAttribute>();
-            return MatchesAlias(attr, arg);
-        }
-
-        public bool HasAliases()
-        {
-            var attr = ParameterInfo.GetCustomAttribute<AliasAttribute>();
-            if (attr == null)
-                return false;
-
-            return attr.Aliases.Any();
-        }
-
-        public string[] GetAliases()
-        {
-            var attr = ParameterInfo.GetCustomAttribute<AliasAttribute>();
-            if (attr == null)
-                return new string[] {};
-
-            return attr.Aliases.Select(a => Conventions.GetShortOptionName(a)).ToArray();
+            return ParameterType.IsBoolean()       ;
         }
 
         public bool HasCustomParser()
@@ -123,7 +105,7 @@ namespace Odin
             if (!IsBoolean())
                 return false;
 
-            return Conventions.IsNegatedLongOptionName(this.Name, token);
+            return Conventions.IsNegatedLongOptionName(Name, token);
         }
     }
 }

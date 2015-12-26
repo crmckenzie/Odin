@@ -34,7 +34,7 @@ namespace Odin.Tests
         public void HelpDisplaysControllerDescription()
         {
             // When
-            var result = this.Subject.GenerateHelp(this.DefaultCommand);
+            var result = this.Subject.Emit(this.DefaultCommand);
 
             // Then
             var lines = result
@@ -52,7 +52,7 @@ namespace Odin.Tests
         public void HelpDisplaysSubCommands()
         {
             // When
-            var result = this.Subject.GenerateHelp(this.DefaultCommand);
+            var result = this.Subject.Emit(this.DefaultCommand);
 
             // Then
             var lines = result
@@ -73,7 +73,7 @@ namespace Odin.Tests
         public void HelpDisplaysActions()
         {
             // When
-            var result = this.Subject.GenerateHelp(this.DefaultCommand);
+            var result = this.Subject.Emit(this.DefaultCommand);
             Console.WriteLine(result);
 
             // Then
@@ -123,7 +123,7 @@ namespace Odin.Tests
         public void HelpForIndividualAction()
         {
             // When
-            var result = this.Subject.GenerateHelp(this.DefaultCommand, "do-something");
+            var result = this.Subject.Emit(this.DefaultCommand, "do-something");
             Console.WriteLine(result);
 
             // Then

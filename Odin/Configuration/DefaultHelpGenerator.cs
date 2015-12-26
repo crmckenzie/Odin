@@ -8,10 +8,25 @@ namespace Odin.Configuration
 {
     public class DefaultHelpGenerator : HelpGenerator
     {
-        public override string GenerateHelp(Command command, string actionName = "")
+        public override string Emit(Command command, string actionName = "")
         {
             var builder = new StringBuilder();
             return GenerateHelp(command, builder, actionName);
+        }
+
+        private string[] GetFullCommandPath(Command command)
+        {
+            var stack = new Stack<string>();
+            stack.Push(command.Name);
+
+            var parent = command.Parent;
+            while (parent != null)
+            {
+                stack.Push(parent.Name);
+                parent = parent.Parent;
+            }
+
+            return stack.ToArray();
         }
 
         private string GenerateHelp(Command command, StringBuilder builder, string actionName = "")
@@ -53,9 +68,9 @@ namespace Odin.Configuration
             {
                 var description = parameter.GetDescription();
                 builder.Append($"\t{parameter.LongOptionName,-26}");
-                if (parameter.HasAliases())
+                if (parameter.Aliases.Any())
                 {
-                    var aliases = string.Join(", ", parameter.GetAliases());
+                    var aliases = string.Join(", ", parameter.Aliases);
                     var text = $"aliases: {aliases}";
                     builder.AppendLine(text)
                         .Append($"\t{new string(' ', 26)}")
@@ -112,7 +127,7 @@ namespace Odin.Configuration
             }
             else
             {
-                var fullPath = command.GetFullCommandPath().Skip(1); // remove the root command from the path.
+                var fullPath = GetFullCommandPath(command).Skip(1); // remove the root command from the path.
                 var path = string.Join(" ", fullPath);
                 builder.AppendFormat("\t{0} {1} <subcommand>", path, helpActionName);
             }

@@ -2,7 +2,7 @@
 {
     public abstract class HelpGenerator
     {
-        public abstract string GenerateHelp(Command command, string actionName = "");
+        public abstract string Emit(Command command, string actionName = "");
 
     }
 }

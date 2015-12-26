@@ -4,7 +4,7 @@
 * [x] Map command line arguments to a method to execute.
 * [x] Handle parsing errors in a friendly manner.
 * [x] Support boolean actions and report proper exit code.
-* [ ] Seek consistent interfaces between commands, actions, and parameterValues, especially with respect to names and aliases.
+* [x] Seek consistent interfaces between commands, actions, and parameterValues, especially with respect to names and aliases.
 
 ## Command Line Options
 
@@ -68,6 +68,7 @@
   * [ ] Help should support an output file parameter
   * [x] Help generation should be customizable
   * [ ] Display default values using reflection
+  * [ ] Display negative argument style for negative booleans.
 
 ## Testability
 * [x] Provide testability of command structure separate from execution of command structure.
