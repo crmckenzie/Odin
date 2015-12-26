@@ -19,5 +19,6 @@ namespace Odin.Configuration
 
         public abstract IParser CreateParser(ParameterValue parameter);
 
+        public abstract bool IsParameterName(string token);
     }
 }

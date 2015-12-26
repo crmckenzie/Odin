@@ -35,9 +35,10 @@ namespace Odin.Configuration
 
             if (_parameter.IsBoolean())
             {
+                var value = !_parameter.Conventions.IsNegatedLongOptionName(_parameter.Name, token);
                 return new ParseResult()
                 {
-                    Value = true,
+                    Value = value,
                     TokensProcessed = 1,
                 };
             }

@@ -46,6 +46,7 @@
     <Compile Include="Configuration\DefaultHyphenCaseParser.cs" />
     <Compile Include="Configuration\SlashColonParser.cs" />
     <Compile Include="Configuration\SlashEqualsParser.cs" />
+    <Compile Include="Exceptions\UnmappedParameterException.cs" />
     <Compile Include="Parsing\IParser.cs" />
     <Compile Include="Configuration\DefaultHelpGenerator.cs" />
     <Compile Include="Configuration\EnumerableExtensions.cs" />

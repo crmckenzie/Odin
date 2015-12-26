@@ -153,6 +153,19 @@ namespace Odin.Tests.Lib.Configuration
         }
 
         [Test]
+        public void NegativeSwitch()
+        {
+            var args = new[] { "WithSwitch", "/no-argument" };
+
+            var result = this.Subject.GenerateInvocation(args);
+
+            result.ShouldNotBeNull();
+            result.ParameterValues.Count.ShouldBe(1);
+            result.ParameterValues[0].Name.ShouldBe("argument");
+            result.ParameterValues[0].Value.ShouldBe(false);
+        }
+
+        [Test]
         public void SwitchNotGiven()
         {
             var args = new[] { "WithSwitch" };

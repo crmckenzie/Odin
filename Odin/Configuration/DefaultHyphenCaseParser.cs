@@ -52,7 +52,7 @@ namespace Odin.Configuration
 
         private bool ArgIsIdentifier(string[] tokens, int indexOfCurrentArg)
         {
-            return indexOfCurrentArg < tokens.Length && HyphenCaseConvention.IsOptionIdentifier(tokens[indexOfCurrentArg]);
+            return indexOfCurrentArg < tokens.Length && _parameter.Conventions.IsParameterName(tokens[indexOfCurrentArg]);
         }
 
         private static ParseResult ParseNameValuePair(ParameterValue parameter, string[] tokens, int i)
@@ -74,7 +74,7 @@ namespace Odin.Configuration
 
         private ParseResult ParseArray(ParameterValue parameter, string[] tokens)
         {
-            var tokensToParse = tokens.Skip(1).TakeUntil(HyphenCaseConvention.IsOptionIdentifier);
+            var tokensToParse = tokens.Skip(1).TakeUntil(_parameter.Conventions.IsParameterName);
 
             var elementType = parameter.ParameterType.GetElementType();
 
@@ -82,7 +82,7 @@ namespace Odin.Configuration
             return new ParseResult()
             {
                 Value = range,
-                TokensProcessed = range.Length,
+                TokensProcessed = range.Length+1,
             };
         }
 

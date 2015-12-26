@@ -20,7 +20,7 @@ namespace Odin.Configuration
 
         public override string GetNegatedLongOptionName(string parameterName)
         {
-            return $"/No{parameterName}";
+            return $"/no-{parameterName}";
         }
 
         public override string GetActionName(string methodName)
@@ -41,6 +41,11 @@ namespace Odin.Configuration
         public override IParser CreateParser(ParameterValue parameter)
         {
             return new SlashColonParser(parameter);
+        }
+
+        public override bool IsParameterName(string token)
+        {
+            return token.StartsWith("/");
         }
     }
 }

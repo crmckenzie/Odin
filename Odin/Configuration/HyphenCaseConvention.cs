@@ -44,9 +44,10 @@ namespace Odin.Configuration
             return new DefaultHyphenCaseParser(parameter);
         }
 
-        public static bool IsOptionIdentifier(string value)
+        public override bool IsParameterName(string token)
         {
-            return value.StartsWith("--") ||value.StartsWith("-");
+            return token.StartsWith("--") || token.StartsWith("-");
         }
+
     }
 }

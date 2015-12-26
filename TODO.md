@@ -56,17 +56,17 @@
 * [x] Support an injectable Logger
 * [x] Support customizable conventions
   * [x] provide /argment:value style convention
-    * [ ]  negative arguments should be in the form /no-argument
+    * [x]  negative arguments should be in the form /no-argument
   * [x] provide /argument=value style convention
-    * [ ]  negative arguments should be in the form /no-argument
+    * [x]  negative arguments should be in the form /no-argument
 
 ## Help
 
 * [x] Generate help using reflection
   * [x] Aliases should be emitted by the help
+  * [x] Help generation should be customizable
   * [ ] Help should display available enum options
   * [ ] Help should support an output file parameter
-  * [x] Help generation should be customizable
   * [ ] Display default values using reflection
   * [ ] Display negative argument style for negative booleans.
 

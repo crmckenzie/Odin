@@ -1,10 +1,8 @@
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 using Odin.Attributes;
 using Odin.Configuration;
 using Odin.Exceptions;
@@ -16,12 +14,12 @@ namespace Odin
     {
         public MethodInvocation(Command command, MethodInfo methodInfo)
         {
-            this.Command = command;
-            this.MethodInfo = methodInfo;
+            Command = command;
+            MethodInfo = methodInfo;
 
             IsDefault = methodInfo.GetCustomAttribute<ActionAttribute>().IsDefault;
 
-            this.ParameterValues = this.MethodInfo.GetParameters()
+            ParameterValues = MethodInfo.GetParameters()
                 .Select(row => new ParameterValue(this, row))
                 .ToList()
                 .AsReadOnly()
@@ -39,7 +37,7 @@ namespace Odin
 
         public string[] Aliases
         {
-            get { return this.MethodInfo.GetCustomAttribute<AliasAttribute>()?.Aliases.ToArray() ?? new string[] { }; }
+            get { return MethodInfo.GetCustomAttribute<AliasAttribute>()?.Aliases.ToArray() ?? new string[] {}; }
         }
 
         public bool IsIdentifiedBy(string token)
@@ -57,16 +55,16 @@ namespace Odin
         {
             //return this.ParameterValues.FirstOrDefault(p => p.Identifiers.Contains(token));
 
-            return this.ParameterValues
+            return ParameterValues
                 .FirstOrDefault(p => p.IsIdentifiedBy(token))
                 ;
         }
 
         private ParameterValue FindByIndex(int i)
         {
-            if (i >= this.ParameterValues.Count)
+            if (i >= ParameterValues.Count)
                 return null;
-            return  this.ParameterValues
+            return ParameterValues
                 .OrderBy(p => p.Position)
                 .ToArray()[i]
                 ;
@@ -74,26 +72,26 @@ namespace Odin
 
         public bool CanInvoke()
         {
-            return this.ParameterValues.All(row => row.IsValueSet()) ;
+            return ParameterValues.All(row => row.IsValueSet());
         }
 
         public int Invoke()
         {
-            var args = this.ParameterValues
+            var args = ParameterValues
                 .OrderBy(map => map.ParameterInfo.Position)
                 .Select(row => row.Value)
                 .ToArray()
                 ;
 
-            var result = this.MethodInfo.Invoke(this.Command, args);
+            var result = MethodInfo.Invoke(Command, args);
             if (result is int)
             {
-                return (int)result;
+                return (int) result;
             }
 
             if (result is bool)
             {
-                return ((bool) result) ? 0 : -1;
+                return (bool) result ? 0 : -1;
             }
 
             return 0;
@@ -105,12 +103,23 @@ namespace Odin
             while (i < tokens.Length)
             {
                 var token = tokens[i];
-                var parameter = FindByToken(token) ?? FindByIndex(i);
+                var parameter = FindByToken(token);
+
+                if (parameter == null)
+                {
+                    if (Conventions.IsParameterName(token))
+                    {
+                        throw new UnmappedParameterException($"Unable to map parameter '{token}' to action '{Name}'");
+                    }
+                    parameter = FindByIndex(i);
+                }
+
                 if (parameter == null)
                 {
                     i++;
                     continue;
-                };
+                }
+
                 ParseResult result;
 
                 try
@@ -121,18 +130,21 @@ namespace Odin
                     {
                         i++;
                         continue;
-                    };
+                    }
+                    ;
 
                     parameter.Value = result.Value;
+                }
+                catch (UnmappedParameterException upe)
+                {
+                    throw;
                 }
                 catch (Exception e)
                 {
                     throw new ParameterConversionException(parameter, tokens[i], e);
                 }
                 i += result.TokensProcessed;
-
             }
-
         }
 
         private IParser CreateParser(ParameterValue parameter)
@@ -144,9 +156,10 @@ namespace Odin
         {
             var parserAttribute = parameter.ParameterInfo.GetCustomAttribute<ParserAttribute>();
             if (!parserAttribute.ParserType.Implements<IParser>())
-                throw new ArgumentOutOfRangeException($"'{parserAttribute.ParserType.FullName}' is not an implementation of '{typeof(IParser).FullName}.'");
+                throw new ArgumentOutOfRangeException(
+                    $"'{parserAttribute.ParserType.FullName}' is not an implementation of '{typeof (IParser).FullName}.'");
 
-            var types = new[] { typeof(ParameterValue) };
+            var types = new[] {typeof (ParameterValue)};
             var constructor = parserAttribute.ParserType.GetConstructor(types);
             if (constructor == null)
             {
@@ -154,11 +167,10 @@ namespace Odin
                     "Could not find a constructor with the signature (ParameterValue).", null);
             }
 
-            var parameters = new[] { parameter };
+            var parameters = new[] {parameter};
             var instance = constructor.Invoke(parameters);
-            var typedInstance = (IParser)instance;
+            var typedInstance = (IParser) instance;
             return typedInstance;
         }
-
     }
 }
