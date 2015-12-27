@@ -24,7 +24,6 @@ namespace Odin
 
             ReKeyActions();
 
-            this.Description = GetDescription();
             this.DisplayHelpWhenArgsAreEmpty = true;
         }
 
@@ -68,8 +67,6 @@ namespace Odin
             return this;
         }
 
-        public virtual string Description { get; }
-
         private void SetParent(Command parent)
         {
             this.Parent = parent;
@@ -105,13 +102,6 @@ namespace Odin
         private Dictionary<string, MethodInvocation> _actions;
 
         public IReadOnlyDictionary<string, MethodInvocation> Actions { get; private set; }
-
-        protected virtual string GetDescription()
-        {
-            var defaultDescription = IsRoot() ? "" : this.Name;
-            var attribute = this.GetType().GetCustomAttribute<DescriptionAttribute>(inherit:true);
-            return attribute != null ? attribute.Description : defaultDescription;
-        }
 
         public Command RegisterSubCommand(Command command)
         {
@@ -182,7 +172,7 @@ namespace Odin
             return SubCommands.Values.FirstOrDefault(cmd => cmd.IsIdentifiedBy(token));
         }
 
-        private MethodInvocation GetDefaultAction()
+        public MethodInvocation GetDefaultAction()
         {
             return this.Actions.Values.FirstOrDefault(row => row.IsDefault);
         }

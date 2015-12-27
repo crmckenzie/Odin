@@ -24,9 +24,8 @@ namespace Odin.Configuration
 
             var paragraphs = source.Split(new[] { "\r\n", "\r", "\n"}, StringSplitOptions.RemoveEmptyEntries);
 
-            for (int i = 0; i < paragraphs.Length; i++)
+            foreach (var paragraph in paragraphs)
             {
-                var paragraph = paragraphs[i];
                 var words = paragraph.Split(' ');
 
                 for (var j = 0; j < words.Length; j++)
@@ -48,9 +47,6 @@ namespace Odin.Configuration
 
                     yield return line;
                 }
-
-                //if (i < paragraphs.Length -1)
-                //    yield return "\n";
             }
         }
     }
