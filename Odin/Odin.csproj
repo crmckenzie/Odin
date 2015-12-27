@@ -48,9 +48,9 @@
     <Compile Include="Configuration\SlashEqualsParser.cs" />
     <Compile Include="Exceptions\UnmappedParameterException.cs" />
     <Compile Include="Parsing\IParser.cs" />
-    <Compile Include="Configuration\DefaultHelpGenerator.cs" />
+    <Compile Include="Configuration\DefaultHelpWriter.cs" />
     <Compile Include="Configuration\EnumerableExtensions.cs" />
-    <Compile Include="Configuration\HelpGenerator.cs" />
+    <Compile Include="Configuration\IHelpWriter.cs" />
     <Compile Include="Parsing\ParseResult.cs" />
     <Compile Include="Configuration\SlashEqualsConvention.cs" />
     <Compile Include="Configuration\StringExtensions.cs" />

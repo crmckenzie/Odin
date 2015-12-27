@@ -9,7 +9,7 @@ namespace Odin.Tests
     {
         public object[] MethodArguments { get; set; }
 
-        public DefaultCommand() : this(new SubCommand())
+        public DefaultCommand() 
         {
             
         }

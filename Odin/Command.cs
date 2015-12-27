@@ -17,7 +17,7 @@ namespace Odin
         protected Command()
         {
             _conventions = new HyphenCaseConvention();
-            _helpGenerator = new DefaultHelpGenerator();
+            _helpWriter = new DefaultHelpWriter();
 
             _subCommands = new Dictionary<string, Command>();
             SubCommands =new ReadOnlyDictionary<string, Command>(_subCommands);
@@ -25,7 +25,10 @@ namespace Odin
             ReKeyActions();
 
             this.Description = GetDescription();
+            this.DisplayHelpWhenArgsAreEmpty = true;
         }
+
+        public bool DisplayHelpWhenArgsAreEmpty { get; set; }
 
         public Command Use(Conventions conventions)
         {
@@ -59,13 +62,13 @@ namespace Odin
             return this;
         }
 
-        public Command Use(HelpGenerator helpGenerator)
+        public Command Use(IHelpWriter helpWriter)
         {
-            _helpGenerator = helpGenerator;
+            _helpWriter = helpWriter;
             return this;
         }
 
-        public string Description { get; }
+        public virtual string Description { get; }
 
         private void SetParent(Command parent)
         {
@@ -78,20 +81,20 @@ namespace Odin
         public Logger Logger => IsRoot() ? _logger : Parent.Logger;
 
         private  Conventions _conventions;
-        private HelpGenerator _helpGenerator;
+        private IHelpWriter _helpWriter;
 
-        public HelpGenerator HelpGenerator => IsRoot() ? _helpGenerator : Parent.HelpGenerator;
+        public IHelpWriter HelpWriter => IsRoot() ? _helpWriter : Parent.HelpWriter;
 
         public Conventions Conventions => IsRoot() ? _conventions : Parent.Conventions ;
 
-        public string Name => Conventions.GetCommandName(this);
+        public virtual string Name => Conventions.GetCommandName(this);
 
-        public string[] Aliases
+        public virtual string[] Aliases
         {
             get { return this.GetType().GetCustomAttribute<AliasAttribute>()?.Aliases.ToArray() ?? new string[] { }; }
         }
 
-        public bool IsIdentifiedBy(string token)
+        public virtual bool IsIdentifiedBy(string token)
         {
             return token == Name || Aliases.Contains(token);
         }
@@ -103,7 +106,7 @@ namespace Odin
 
         public IReadOnlyDictionary<string, MethodInvocation> Actions { get; private set; }
 
-        private string GetDescription()
+        protected virtual string GetDescription()
         {
             var defaultDescription = IsRoot() ? "" : this.Name;
             var attribute = this.GetType().GetCustomAttribute<DescriptionAttribute>(inherit:true);
@@ -119,6 +122,12 @@ namespace Odin
 
         public int Execute(params string[] args)
         {
+            if (this.DisplayHelpWhenArgsAreEmpty && !args.Any())
+            {
+                this.Help();
+                return 0;
+            }
+
             var result = -1;
             var invocation = this.GenerateInvocation(args);
             if (invocation?.CanInvoke() == true)
@@ -188,7 +197,7 @@ namespace Odin
             [Description("The name of the action to provide help for.")]
             string actionName = "")
         {
-            var help = this.HelpGenerator.Emit(this, actionName);
+            var help = this.HelpWriter.Write(this, actionName);
             this.Logger.Info(help);
         }
     }

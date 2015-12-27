@@ -77,14 +77,6 @@ namespace Odin
             return false;
         }
 
-        public string GetDescription()
-        {
-            var attr = ParameterInfo.GetCustomAttribute<DescriptionAttribute>();
-            if (attr != null)
-                return attr.Description;
-            return "";
-        }
-
         public bool IsValueSet()
         {
             return _isSet;

@@ -65,10 +65,13 @@
 * [x] Generate help using reflection
   * [x] Aliases should be emitted by the help
   * [x] Help generation should be customizable
-  * [ ] Help should display available enum options
-  * [ ] Help should support an output file parameter
-  * [ ] Display default values using reflection
-  * [ ] Display negative argument style for negative booleans.
+  * [ ] Actions
+      * [x] default actions should be prefixed with a *
+  * [ ] Parameters
+      * [ ] Help should display available enum options
+      * [x] Display default values using reflection
+      * [ ] Display negative argument style for negative booleans.
+  * [ ] SubCommands
 
 ## Testability
 * [x] Provide testability of command structure separate from execution of command structure.

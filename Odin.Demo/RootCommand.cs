@@ -6,6 +6,8 @@ using Odin.Logging;
 
 namespace Odin.Demo
 {
+    [Description(@"This is a demo of the Odin-Commands NuGet package.
+You can use this package to easily create command line applications that automatically route command-line arguments to the correct command based on customizable conventions.")]
     public class RootCommand : Command
     {
 

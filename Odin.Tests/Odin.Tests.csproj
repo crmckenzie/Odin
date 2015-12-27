@@ -54,10 +54,12 @@
   <ItemGroup>
     <Compile Include="Demo\RootCommandRouteTests.cs" />
     <Compile Include="Lib\AliasTests.cs" />
+    <Compile Include="Lib\HelpWriterTestCommand.cs" />
+    <Compile Include="Lib\StringExtensionsTests.cs" />
     <Compile Include="Parsing\ArgumentTypesCommand.cs" />
     <Compile Include="Configuration\SlashColonConventionTests.cs" />
     <Compile Include="Configuration\SlashEqualsConventionTests.cs" />
-    <Compile Include="Lib\HelpTests.cs" />
+    <Compile Include="Lib\DefaultHelpWriterTests.cs" />
     <Compile Include="Lib\CommandInvocationTests.cs" />
     <Compile Include="Lib\CommandTests.cs" />
     <Compile Include="Lib\NotTheDefaultCommand.cs" />

@@ -28,7 +28,7 @@ namespace Odin
 
         public bool IsDefault { get; }
 
-        private MethodInfo MethodInfo { get; }
+        public MethodInfo MethodInfo { get; }
 
         public Command Command { get; }
         public Conventions Conventions => Command.Conventions;
@@ -45,16 +45,9 @@ namespace Odin
             return Name == token || Aliases.Contains(token);
         }
 
-        public string GetDescription()
-        {
-            var descriptionAttr = MethodInfo.GetCustomAttribute<DescriptionAttribute>();
-            return descriptionAttr == null ? "" : descriptionAttr.Description;
-        }
 
         private ParameterValue FindByToken(string token)
         {
-            //return this.ParameterValues.FirstOrDefault(p => p.Identifiers.Contains(token));
-
             return ParameterValues
                 .FirstOrDefault(p => p.IsIdentifiedBy(token))
                 ;
@@ -103,39 +96,24 @@ namespace Odin
             while (i < tokens.Length)
             {
                 var token = tokens[i];
-                var parameter = FindByToken(token);
-
+                var parameter = FindParameter(token, i);
                 if (parameter == null)
-                {
-                    if (Conventions.IsParameterName(token))
-                    {
-                        throw new UnmappedParameterException($"Unable to map parameter '{token}' to action '{Name}'");
-                    }
-                    parameter = FindByIndex(i);
-                }
-
-                if (parameter == null)
-                {
-                    i++;
-                    continue;
-                }
-
-                ParseResult result;
+                    throw new UnmappedParameterException($"Unable to map parameter '{token}' to action '{Name}'");
 
                 try
                 {
                     var parser = CreateParser(parameter);
-                    result = parser.Parse(tokens, i);
+                    var result = parser.Parse(tokens, i);
                     if (result.TokensProcessed <= 0)
                     {
                         i++;
                         continue;
                     }
-                    ;
 
                     parameter.Value = result.Value;
+                    i += result.TokensProcessed;
                 }
-                catch (UnmappedParameterException upe)
+                catch (UnmappedParameterException)
                 {
                     throw;
                 }
@@ -143,8 +121,16 @@ namespace Odin
                 {
                     throw new ParameterConversionException(parameter, tokens[i], e);
                 }
-                i += result.TokensProcessed;
             }
+        }
+
+        private ParameterValue FindParameter(string token, int i)
+        {
+            var parameter = FindByToken(token);
+            if (parameter != null) return parameter;
+
+            if (Conventions.IsParameterName(token)) return null;
+            return FindByIndex(i);
         }
 
         private IParser CreateParser(ParameterValue parameter)
