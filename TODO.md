@@ -67,11 +67,11 @@
   * [x] Help generation should be customizable
   * [x] Actions
       * [x] default actions should be prefixed with a *
-  * [ ] Parameters
+  * [x] Parameters
       * [x] Help should display available enum options
       * [x] Display default values using reflection
-      * [ ] Display negative argument style for negative booleans.
-  * [ ] SubCommands
+      * [x] Display negative argument style for negative booleans.
+  * [x] SubCommands
 
 ## Testability
 * [x] Provide testability of command structure separate from execution of command structure.

@@ -103,8 +103,8 @@ namespace Odin.Tests
                 ;
 
             var i = -1;
-            lines[++i].ShouldBe("enum-action             Enumerated values should be listed before default");
-            lines[++i].ShouldBe("                        values.");
+            lines[++i].ShouldBe("enum-action             Enumerated parameters should be listed before");
+            lines[++i].ShouldBe("                        default value.");
             lines[++i].ShouldBe("");
             lines[++i].ShouldBe("    --input             valid values: One, Two, Three");
             lines[++i].ShouldBe("                        default value: One");
@@ -112,87 +112,163 @@ namespace Odin.Tests
         }
 
         [Test]
-        public void HelpDisplaysSubCommands()
+        public void BooleanParameters()
         {
             // When
-            var logger = new StringBuilderLogger();
-            var subCommand = new SubCommand().RegisterSubCommand(new KatasCommand());
-            var root = new DefaultCommand().RegisterSubCommand(subCommand).Use(logger);
+            var cmd = new HelpWriterTestCommand();
 
+            // Then
+            var result = this.Subject.Write(cmd);
+
+            var lines = result
+                .Split('\n')
+                .Select(row => row.Replace("\r", ""))
+                .SkipUntil(row => row.StartsWith("boolean-action"))
+                .ToArray()
+                ;
+
+            var i = -1;
+            lines[++i].ShouldBe("boolean-action          Boolean parameters should list the negative option");
+            lines[++i].ShouldBe("                        before default value.");
+            lines[++i].ShouldBe("");
+            lines[++i].ShouldBe("    --input             --no-input to negate");
+            lines[++i].ShouldBe("                        default value: False");
+            lines[++i].ShouldBe("");
+        }
+
+        [Test]
+        public void HelpDisplaysSubCommands()
+        {
+            // Given
+            var logger = new StringBuilderLogger();
+            var root = new HelpWriterTestCommand()
+                .RegisterSubCommand(new KatasCommand())
+                .Use(logger)
+                ;
+
+            // When
             var result = this.Subject.Write(root);
 
             // Then
             var lines = result
                 .Split('\n')
-                .Where(row => !string.IsNullOrWhiteSpace(row))
                 .Select(row => row.Replace("\r", ""))
                 .SkipUntil(row => row == "SUB COMMANDS")
                 .ToArray()
                 ;
 
-            var i = 0;
-            Assert.That(lines[i], Is.EqualTo("SUB COMMANDS"));
-            Assert.That(lines[++i], Is.EqualTo("sub                           Provides a component of testability for subcommands."));
-            Assert.That(lines[++i], Is.EqualTo("To get help for subcommands"));
-            Assert.That(lines[++i], Is.EqualTo("\thelp <subcommand>"));
+            var i = -1;
+            lines[++i].ShouldBe("SUB COMMANDS");
+            lines[++i].ShouldBe("katas                   This command is intended for demonstration purposes.");
+            lines[++i].ShouldBe("                        It provides some katas which can be executed as");
+            lines[++i].ShouldBe("                        actions.");
+            lines[++i].ShouldBe("To get help for subcommands");
+            lines[++i].ShouldBe("\thelp <subcommand>");
         }
 
         [Test]
-        public void HelpForSubCommands()
+        public void ExecuteHelpActionForSubCommand()
         {
-            // When
+            // Given
             var logger = new StringBuilderLogger();
-            var subCommand = new SubCommand().RegisterSubCommand(new KatasCommand());
-            var root = new DefaultCommand().RegisterSubCommand(subCommand).Use(logger);
-            var result = root.Execute("sub", "help");
+            var root = new HelpWriterTestCommand()
+                .RegisterSubCommand(new KatasCommand())
+                .Use(logger)
+                ;
+
+            // When
+            var result = root.Execute("katas", "help");
 
             // Then
             Assert.That(result, Is.EqualTo(0), logger.ErrorBuilder.ToString());
 
             var lines = logger.InfoBuilder.ToString()
                 .Split('\n')
-                .Where(row => !string.IsNullOrWhiteSpace(row))
                 .Select(row => row.Replace("\r", ""))
-                .SkipUntil(row =>row== "SUB COMMANDS")
                 .ToArray()
                 ;
 
-            var i = 0;
-            lines[++i].Trim().ShouldBe("katas                         Provides some katas.");
-            lines[++i].Trim().ShouldBe("To get help for subcommands");
-            lines[++i].Trim().ShouldBe("sub help <subcommand>");
+            var i = -1;
+            lines[++i].Trim().ShouldBe("This command is intended for demonstration purposes. It provides some katas");
+            lines[++i].Trim().ShouldBe("which can be executed as actions.");
+            lines[++i].Trim().ShouldBe("");
+            lines[++i].Trim().ShouldBe("default action: fizz-buzz");
+            //lines[++i].Trim().ShouldBe("To get help for subcommands");
+            //lines[++i].Trim().ShouldBe("sub help <subcommand>");
         }
+
+        [Test]
+        public void RootSubCommandSectionFooter()
+        {
+            // Given
+            var logger = new StringBuilderLogger();
+            var root = new HelpWriterTestCommand()
+                .RegisterSubCommand(new KatasCommand())
+                .Use(logger)
+                ;
+
+            // When
+            var result = root.Execute("help");
+
+            // Then
+            Assert.That(result, Is.EqualTo(0), logger.ErrorBuilder.ToString());
+
+            var lines = logger.InfoBuilder.ToString()
+                .Split('\n')
+                .Select(row => row.Replace("\r", ""))
+                .SkipUntil(row => row == "To get help for subcommands")
+                .ToArray()
+                ;
+
+            var i = -1;
+            lines[++i].Trim().ShouldBe("To get help for subcommands");
+            lines[++i].Trim().ShouldBe("help <subcommand>");
+        }
+
 
         [Test]
         public void AlternativeHelpForSubCommands()
         {
-            // When
+            // Given
             var logger = new StringBuilderLogger();
-            var subCommand = new SubCommand().RegisterSubCommand(new KatasCommand());
-            var root = new DefaultCommand().RegisterSubCommand(subCommand).Use(logger);
-            var result = root.Execute("help", "sub");
+            var root = new HelpWriterTestCommand()
+                .RegisterSubCommand(new KatasCommand())
+                .Use(logger)
+                ;
+
+            // When
+            var result = root.Execute("help", "katas");
 
             // Then
             Assert.That(result, Is.EqualTo(0), logger.ErrorBuilder.ToString());
 
             var lines = logger.InfoBuilder.ToString()
                 .Split('\n')
-                .Where(row => !string.IsNullOrWhiteSpace(row))
                 .Select(row => row.Replace("\r", ""))
                 .ToArray()
                 ;
 
-            var i = 0;
-            Assert.That(lines[i].Trim(), Is.EqualTo("Provides a component of testability for subcommands."));
+            var i = -1;
+            lines[++i].Trim().ShouldBe("This command is intended for demonstration purposes. It provides some katas");
+            lines[++i].Trim().ShouldBe("which can be executed as actions.");
+            lines[++i].Trim().ShouldBe("");
+            lines[++i].Trim().ShouldBe("default action: fizz-buzz");
         }
 
         [Test]
         public void HelpForSubSubCommands()
         {
-            // When
+            // Given
             var logger = new StringBuilderLogger();
-            var subCommand = new SubCommand().RegisterSubCommand(new KatasCommand());
-            var root = new DefaultCommand().RegisterSubCommand(subCommand).Use(logger);
+            var subCommand = new SubCommand()
+                .RegisterSubCommand(new KatasCommand())
+                ;
+            var root = new DefaultCommand()
+                .RegisterSubCommand(subCommand)
+                .Use(logger)
+                ;
+
+            // When
             var result = root.Execute("sub", "katas", "help");
 
             // Then
@@ -205,9 +281,39 @@ namespace Odin.Tests
                 .ToArray()
                 ;
 
-            var i = 0;
-            Assert.That(lines[i].Trim(), Is.EqualTo("Provides some katas."));
+            var i = -1;
+            lines[++i].Trim().ShouldBe("This command is intended for demonstration purposes. It provides some katas");
         }
 
+        [Test]
+        public void SubCommandSectionFooter()
+        {
+            // Given
+            var logger = new StringBuilderLogger();
+            var subCommand = new SubCommand()
+                .RegisterSubCommand(new KatasCommand())
+                ;
+            var root = new DefaultCommand()
+                .RegisterSubCommand(subCommand)
+                .Use(logger)
+                ;
+
+            // When
+            var result = root.Execute("sub", "help");
+
+            // Then
+            Assert.That(result, Is.EqualTo(0), logger.ErrorBuilder.ToString());
+
+            var lines = logger.InfoBuilder.ToString()
+                .Split('\n')
+                .Select(row => row.Replace("\r", ""))
+                .SkipUntil(row => row == "To get help for subcommands")
+                .ToArray()
+                ;
+
+            var i = -1;
+            lines[++i].Trim().ShouldBe("To get help for subcommands");
+            lines[++i].Trim().ShouldBe("sub help <subcommand>");
+        }
     }
 }

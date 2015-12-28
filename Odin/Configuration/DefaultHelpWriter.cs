@@ -217,6 +217,12 @@ namespace Odin.Configuration
         {
             var builder = new System.Text.StringBuilder();
 
+            if (parameter.IsBoolean())
+            {
+                var line = $"{parameter.Conventions.GetNegatedLongOptionName(parameter.Name)} to negate";
+                builder.AppendLine(line);
+            }
+
             if (parameter.ParameterType.IsEnum)
             {
                 var values = System.Enum.GetNames(parameter.ParameterType);
@@ -249,7 +255,7 @@ namespace Odin.Configuration
         {
             builder.AppendLine();
             builder.AppendLine("To get help for actions");
-            var helpActionName = command.Conventions.GetActionName(command.GetType().GetMethod("Help"));
+            var helpActionName = GetHelpActionName(command);
 
             if (command.IsRoot())
             {
@@ -277,19 +283,33 @@ namespace Odin.Configuration
 
             foreach (var subCommand in command.SubCommands.Values)
             {
-                builder
-                    .AppendFormat("{0,-30}", subCommand.Name)
-                    .AppendLine(GetDescription(subCommand))
+                var descriptions = GetDescription(subCommand)
+                    .Paginate(this.DescriptionWidth)
+                    .ToArray()
                     ;
+
+                var first = descriptions.FirstOrDefault() ?? "";
+                var theRest = descriptions.Skip(1);
+                var spacer = new string(' ', this.SpacerWidth);
+                var name = subCommand.Name.PadRight(this.IdentifierWidth);
+                var firstLine = $"{name}{spacer}{first}";
+
+                builder.AppendLine(firstLine);
+
+                foreach (var description in theRest)
+                {
+                    spacer = new string(' ', this.IdentifierWidth + this.SpacerWidth);
+                    var line = $"{spacer}{description}";
+                    builder.AppendLine(line);
+                }
             }
 
         }
 
         private void WriteSubCommandsHelpFooter(Command command, StringBuilder builder)
         {
-            builder.AppendLine();
             builder.AppendLine("To get help for subcommands");
-            var helpActionName = command.Conventions.GetActionName(command.GetType().GetMethod("Help"));
+            var helpActionName = GetHelpActionName(command);
 
             if (command.IsRoot())
             {
@@ -301,6 +321,12 @@ namespace Odin.Configuration
                 var path = string.Join(" ", fullPath);
                 builder.AppendFormat("\t{0} {1} <subcommand>", path, helpActionName);
             }
+        }
+
+        private static string GetHelpActionName(Command command)
+        {
+            var helpActionName = command.Conventions.GetActionName(command.GetType().GetMethod("Help"));
+            return helpActionName;
         }
 
         #endregion

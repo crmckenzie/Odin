@@ -29,8 +29,15 @@ Use the AliasAttribute to indicate an alias for the action.")]
         }
 
         [Action]
-        [Description("Enumerated values should be listed before default values.")]
+        [Description("Enumerated parameters should be listed before default value.")]
         public void EnumAction(Numbers input = Numbers.One)
+        {
+            
+        }
+
+        [Action]
+        [Description("Boolean parameters should list the negative option before default value.")]
+        public void BooleanAction(bool input = false)
         {
             
         }
