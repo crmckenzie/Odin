@@ -21,6 +21,12 @@ namespace Odin.Configuration
             this.DescriptionWidth = 52;
         }
 
+        public int PageWidth => this.IdentifierWidth + this.SpacerWidth + this.DescriptionWidth;
+        public int IdentifierWidth { get; set; }
+        public int SpacerWidth { get; set; }
+        public int IndentWidth { get; set; }
+        public int DescriptionWidth { get; set; }
+
         public string Write(Command command, string actionName = "")
         {
             var builder = new StringBuilder();
@@ -28,6 +34,7 @@ namespace Odin.Configuration
             return builder.ToString();
         }
 
+        #region commands
         private string[] GetFullCommandPath(Command command)
         {
             var stack = new Stack<string>();
@@ -109,6 +116,8 @@ namespace Odin.Configuration
             return builder.ToString();
         }
 
+        #endregion
+
         #region actions
 
         private void WriteActionsHelp(Command command, StringBuilder builder)
@@ -122,16 +131,16 @@ namespace Odin.Configuration
                 WriteActionHelp(method, builder); ;
             }
 
-            WriteActionsHelpFooter(command, builder);
+            WriteActionFooter(command, builder);
         }
 
         private void WriteActionHelp(MethodInvocation action, StringBuilder builder)
         {
-            WriteMethodHeader(action, builder);
-            WriteMethodParameters(action, builder);
+            WriteActionHeader(action, builder);
+            WriteParameters(action, builder);
         }
 
-        private void WriteMethodHeader(MethodInvocation action, StringBuilder builder)
+        private void WriteActionHeader(MethodInvocation action, StringBuilder builder)
         {
             var name = (action.IsDefault ? $"{action.Name}*" : action.Name)
                 .PadRight(this.IdentifierWidth, ' ');
@@ -153,16 +162,15 @@ namespace Odin.Configuration
             builder.AppendLine("");
         }
 
-
-        private void WriteMethodParameters(MethodInvocation action, StringBuilder builder)
+        private void WriteParameters(MethodInvocation action, StringBuilder builder)
         {
             foreach (var parameter in action.ParameterValues)
             {
-                WriteMethodParameter(builder, parameter);
+                WriteParameter(builder, parameter);
             }
         }
 
-        private void WriteMethodParameter(StringBuilder builder, ParameterValue parameter)
+        private void WriteParameter(StringBuilder builder, ParameterValue parameter)
         {
             var indent = new string(' ', this.IndentWidth);
             var spacer = new string(' ', this.SpacerWidth);
@@ -208,6 +216,14 @@ namespace Odin.Configuration
         private string GetDescription(ParameterValue parameter)
         {
             var builder = new System.Text.StringBuilder();
+
+            if (parameter.ParameterType.IsEnum)
+            {
+                var values = System.Enum.GetNames(parameter.ParameterType);
+                var line = $"valid values: {string.Join(", ", values)}";
+                builder.AppendLine(line);
+            }
+
             if (parameter.ParameterInfo.HasDefaultValue)
             {
                 builder.Append("default value: ");
@@ -229,7 +245,7 @@ namespace Odin.Configuration
             return builder.ToString();
         }
 
-        private void WriteActionsHelpFooter(Command command, StringBuilder builder)
+        private void WriteActionFooter(Command command, StringBuilder builder)
         {
             builder.AppendLine();
             builder.AppendLine("To get help for actions");
@@ -249,6 +265,8 @@ namespace Odin.Configuration
         }
 
         #endregion
+
+        #region subcommands
 
         private void WriteSubCommandsHelp(Command command, StringBuilder builder)
         {
@@ -285,10 +303,6 @@ namespace Odin.Configuration
             }
         }
 
-        public int PageWidth => this.IdentifierWidth + this.SpacerWidth + this.DescriptionWidth;
-        public int IdentifierWidth { get; set; }
-        public int SpacerWidth { get; set; }
-        public int IndentWidth { get; set; }
-        public int DescriptionWidth { get; set; }
+        #endregion
     }
 }

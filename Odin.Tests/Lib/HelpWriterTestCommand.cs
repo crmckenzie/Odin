@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Odin.Tests.Parsing;
 
 namespace Odin.Tests.Lib
 {
@@ -23,6 +24,13 @@ Use the AliasAttribute to indicate an alias for the action.")]
             [Alias("r", "p2")]
             [Description(@"Default values are displayed first, followed by aliases. Each parameter can have its own DescriptionAttribute.")]
             string param2 = "42")
+        {
+            
+        }
+
+        [Action]
+        [Description("Enumerated values should be listed before default values.")]
+        public void EnumAction(Numbers input = Numbers.One)
         {
             
         }

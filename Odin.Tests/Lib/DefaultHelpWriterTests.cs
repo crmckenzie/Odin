@@ -87,6 +87,31 @@ namespace Odin.Tests
         }
 
         [Test]
+        public void EnumParamters()
+        {
+            // When
+            var cmd = new HelpWriterTestCommand();
+
+            // Then
+            var result = this.Subject.Write(cmd);
+
+            var lines = result
+                .Split('\n')
+                .Select(row => row.Replace("\r", ""))
+                .SkipUntil(row => row.StartsWith("enum-action"))
+                .ToArray()
+                ;
+
+            var i = -1;
+            lines[++i].ShouldBe("enum-action             Enumerated values should be listed before default");
+            lines[++i].ShouldBe("                        values.");
+            lines[++i].ShouldBe("");
+            lines[++i].ShouldBe("    --input             valid values: One, Two, Three");
+            lines[++i].ShouldBe("                        default value: One");
+            lines[++i].ShouldBe("");
+        }
+
+        [Test]
         public void HelpDisplaysSubCommands()
         {
             // When

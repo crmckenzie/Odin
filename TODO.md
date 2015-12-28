@@ -65,10 +65,10 @@
 * [x] Generate help using reflection
   * [x] Aliases should be emitted by the help
   * [x] Help generation should be customizable
-  * [ ] Actions
+  * [x] Actions
       * [x] default actions should be prefixed with a *
   * [ ] Parameters
-      * [ ] Help should display available enum options
+      * [x] Help should display available enum options
       * [x] Display default values using reflection
       * [ ] Display negative argument style for negative booleans.
   * [ ] SubCommands
