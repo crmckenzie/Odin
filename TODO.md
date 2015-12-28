@@ -5,6 +5,7 @@
 * [x] Handle parsing errors in a friendly manner.
 * [x] Support boolean actions and report proper exit code.
 * [x] Seek consistent interfaces between commands, actions, and parameterValues, especially with respect to names and aliases.
+* [ ] Paginate should honor line breaks.
 
 ## Command Line Options
 

@@ -1,5 +1,7 @@
 using System;
+using System.CodeDom.Compiler;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
 
 namespace Odin.Configuration
@@ -22,7 +24,7 @@ namespace Odin.Configuration
             if (string.IsNullOrWhiteSpace(source))
                 yield break;
 
-            var paragraphs = source.Split(new[] { "\r\n", "\r", "\n"}, StringSplitOptions.RemoveEmptyEntries);
+            var paragraphs = source.Split(new[] { "\r\n", "\r", "\n"}, StringSplitOptions.None);
 
             foreach (var paragraph in paragraphs)
             {

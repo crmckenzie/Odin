@@ -61,7 +61,7 @@ namespace Odin.Tests
 
             var lines = result
                 .Split('\n')
-                .Select(row => row.Replace("\r", ""))
+                .Select(row => row.Replace("\r", "").TrimEnd())
                 .SkipUntil(row => row.StartsWith("default-action"))
                 .ToArray()
                 ;
@@ -97,7 +97,7 @@ namespace Odin.Tests
 
             var lines = result
                 .Split('\n')
-                .Select(row => row.Replace("\r", ""))
+                .Select(row => row.Replace("\r", "").TrimEnd())
                 .SkipUntil(row => row.StartsWith("enum-action"))
                 .ToArray()
                 ;
@@ -122,7 +122,7 @@ namespace Odin.Tests
 
             var lines = result
                 .Split('\n')
-                .Select(row => row.Replace("\r", ""))
+                .Select(row => row.Replace("\r", "").TrimEnd())
                 .SkipUntil(row => row.StartsWith("boolean-action"))
                 .ToArray()
                 ;
@@ -152,7 +152,7 @@ namespace Odin.Tests
             // Then
             var lines = result
                 .Split('\n')
-                .Select(row => row.Replace("\r", ""))
+                .Select(row => row.Replace("\r", "").TrimEnd())
                 .SkipUntil(row => row == "SUB COMMANDS")
                 .ToArray()
                 ;

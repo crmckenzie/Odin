@@ -106,11 +106,11 @@ namespace Odin.Configuration
 
             if (attribute == null)
             {
-                builder.AppendLine(defaultDescription);
+                builder.Append(defaultDescription);
             }
             else
             {
-                builder.AppendLine(attribute.Description);
+                builder.Append(attribute.Description);
             }
 
             return builder.ToString();
@@ -207,7 +207,7 @@ namespace Odin.Configuration
 
             if (descriptionAttr != null)
             {
-                builder.AppendLine(descriptionAttr.Description);
+                builder.Append(descriptionAttr.Description);
             }
 
             return builder.ToString();
@@ -245,7 +245,7 @@ namespace Odin.Configuration
 
             if (descriptionAttr != null)
             {
-                builder.AppendLine(descriptionAttr.Description);
+                builder.Append(descriptionAttr.Description);
             }
 
             return builder.ToString();
