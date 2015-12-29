@@ -40,6 +40,11 @@ namespace Odin
             get { return MethodInfo.GetCustomAttribute<AliasAttribute>()?.Aliases.ToArray() ?? new string[] {}; }
         }
 
+        public string[] Identifiers
+        {
+            get { return Aliases.Concat(new string[] {this.Name}).ToArray(); }
+        }
+
         public bool IsIdentifiedBy(string token)
         {
             return Name == token || Aliases.Contains(token);

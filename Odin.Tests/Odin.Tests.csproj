@@ -56,6 +56,9 @@
     <Compile Include="Lib\AliasTests.cs" />
     <Compile Include="Lib\HelpWriterTestCommand.cs" />
     <Compile Include="Lib\StringExtensionsTests.cs" />
+    <Compile Include="Validation\CommandWithMultipleDefaultActions.cs" />
+    <Compile Include="Validation\CommandWithNamingConflictBetweenSubCommandAndAction.cs" />
+    <Compile Include="Validation\ValidationTests.cs" />
     <Compile Include="Parsing\ArgumentTypesCommand.cs" />
     <Compile Include="Configuration\SlashColonConventionTests.cs" />
     <Compile Include="Configuration\SlashEqualsConventionTests.cs" />

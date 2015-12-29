@@ -12,6 +12,18 @@ using Odin.Logging;
 
 namespace Odin
 {
+    public class ValidationResult
+    {
+        public string CommandName { get;}
+        public string[] Messages { get; }
+
+        public ValidationResult(string commandName, string[]messages)
+        {
+            this.CommandName = commandName;
+            this.Messages = messages;
+        }
+    }
+
     public abstract class Command
     {
         protected Command()
@@ -89,6 +101,11 @@ namespace Odin
         public virtual string[] Aliases
         {
             get { return this.GetType().GetCustomAttribute<AliasAttribute>()?.Aliases.ToArray() ?? new string[] { }; }
+        }
+
+        public string[] Identifiers
+        {
+            get { return Aliases.Concat(new string[] {this.Name}).ToArray(); }
         }
 
         public virtual bool IsIdentifiedBy(string token)
@@ -189,6 +206,39 @@ namespace Odin
         {
             var help = this.HelpWriter.Write(this, actionName);
             this.Logger.Info(help);
+        }
+
+        public IEnumerable<ValidationResult> Validate()
+        {
+            var messages = GetValidationMessages().ToArray();
+            if (messages.Any())
+                yield return new ValidationResult(this.Name, messages);
+
+
+            var validationResults = this.SubCommands.Values.SelectMany(cmd => cmd.Validate());
+            foreach (var validationResult in validationResults)
+            {
+                yield return validationResult;
+            }
+        }
+
+        private IEnumerable<string> GetValidationMessages()
+        {
+            var defaultActions = this.Actions.Values.Where(row => row.IsDefault).ToArray();
+            if (defaultActions.Count() > 1)
+            {
+                var actionNames = defaultActions.Select(row => row.Name).Join(", ");
+                yield return $"There is more than one default action: {actionNames}.";
+            }
+
+            var actionIdentifiers = this.Actions.Values.SelectMany(action => action.Identifiers);
+            var subCommandIdentifiers = this.SubCommands.Values.SelectMany(cmd => cmd.Identifiers);
+            var matchingNames = actionIdentifiers.Intersect(subCommandIdentifiers);
+
+            foreach (var matchingName in matchingNames)
+            {
+                yield return $"There is more than one executable action named '{matchingName}'.";
+            }
         }
     }
 }

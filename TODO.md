@@ -5,7 +5,7 @@
 * [x] Handle parsing errors in a friendly manner.
 * [x] Support boolean actions and report proper exit code.
 * [x] Seek consistent interfaces between commands, actions, and parameterValues, especially with respect to names and aliases.
-* [ ] Paginate should honor line breaks.
+* [x] Paginate should honor line breaks.
 
 ## Command Line Options
 
@@ -76,13 +76,16 @@
 
 ## Testability
 * [x] Provide testability of command structure separate from execution of command structure.
-* [ ] Validation
-  * [ ] Validate no more than one default action per command
-  * [ ] Validate no more than one of the same alias on a method
-  * [ ] Detect conflicts between subcommands and action names
+* [x] Validation
+  * [x] Validate no more than one default action per command
+  * [x] Detect conflicts between subcommands and action names
+  * [x] Validate no more than one of the same alias on a method
 
 ## Deployment
 * [x] Create a nuget package
+  * [ ] create xml comments for public methods
+  * [ ] include xml comments in nuget package
+  * [ ] emit xml comments and wiki pages.
 * [x] Setup AppVeyor Build
 
 ## Documentation
