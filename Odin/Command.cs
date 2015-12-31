@@ -12,18 +12,6 @@ using Odin.Logging;
 
 namespace Odin
 {
-    public class ValidationResult
-    {
-        public string CommandName { get;}
-        public string[] Messages { get; }
-
-        public ValidationResult(string commandName, string[]messages)
-        {
-            this.CommandName = commandName;
-            this.Messages = messages;
-        }
-    }
-
     public abstract class Command
     {
         protected Command()
@@ -41,7 +29,7 @@ namespace Odin
 
         public bool DisplayHelpWhenArgsAreEmpty { get; set; }
 
-        public Command Use(Conventions conventions)
+        public Command Use(IConventions conventions)
         {
             _conventions = conventions;
             ReKeySubCommands();
@@ -89,12 +77,12 @@ namespace Odin
         private Logger _logger = new DefaultLogger();
         public Logger Logger => IsRoot() ? _logger : Parent.Logger;
 
-        private  Conventions _conventions;
+        private  IConventions _conventions;
         private IHelpWriter _helpWriter;
 
         public IHelpWriter HelpWriter => IsRoot() ? _helpWriter : Parent.HelpWriter;
 
-        public Conventions Conventions => IsRoot() ? _conventions : Parent.Conventions ;
+        public IConventions Conventions => IsRoot() ? _conventions : Parent.Conventions ;
 
         public virtual string Name => Conventions.GetCommandName(this);
 

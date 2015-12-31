@@ -3,15 +3,24 @@ using Odin.Parsing;
 
 namespace Odin.Configuration
 {
-    public class DefaultHyphenCaseParser : IParser
+    /// <summary>
+    /// Provides parsing capabilities for hyphen-cased parameters.
+    /// </summary>
+    public class HyphenCaseParser : IParser
     {
         private readonly ParameterValue _parameter;
 
-        public DefaultHyphenCaseParser(ParameterValue parameter)
+        public HyphenCaseParser(ParameterValue parameter)
         {
             this._parameter = parameter;
         }
 
+        /// <summary>
+        /// Returns a <see cref="ParseResult"/> given a position in a list of tokens.
+        /// </summary>
+        /// <param name="tokens"></param>
+        /// <param name="i"></param>
+        /// <returns></returns>
         public ParseResult Parse(string[] tokens, int i)
         {
             var token = tokens[i];

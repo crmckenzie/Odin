@@ -5,46 +5,96 @@ using Odin.Parsing;
 
 namespace Odin.Configuration
 {
-    public class HyphenCaseConvention : Conventions
+    /// <summary>
+    /// Provides a convention for hyphen-case command-line argument styles.
+    /// </summary>
+    /// <remarks>
+    /// All command identifiers are lower-cased.
+    /// Word breaks are denoted by -'s.
+    /// Long option names begin with --
+    /// Short option names begin with -
+    /// </remarks>
+    public class HyphenCaseConvention : IConventions
     {
-        public override string GetCommandName(Command command)
+        /// <summary>
+        /// Returns the hyphen-cased name of the command.
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        public string GetCommandName(Command command)
         {
             var name = command.GetType().Name;
             var hyphenCased = name.Replace("Command", "").HyphenCase();
             return hyphenCased;
         }
 
-        public override string GetLongOptionName(string parameterName)
+        /// <summary>
+        /// Returns the hyphen-cased long option name for a parameter.
+        /// </summary>
+        /// <param name="parameterName"></param>
+        /// <returns></returns>
+        public string GetLongOptionName(string parameterName)
         {
             return $"--{parameterName.HyphenCase()}";
         }
 
-        public override string GetActionName(string methodName)
+        /// <summary>
+        /// Returns the hyphen-cased name of an action.
+        /// </summary>
+        /// <param name="actionName"></param>
+        /// <returns></returns>
+        public string GetActionName(string actionName)
         {
-            return methodName.HyphenCase();
+            return actionName.HyphenCase();
         }
 
-        public override string GetShortOptionName(string alias)
+        /// <summary>
+        /// Returns the short version of a parameter name.
+        /// </summary>
+        /// <param name="alias"></param>
+        /// <returns></returns>
+        public string GetShortOptionName(string alias)
         {
             return $"-{alias}";
         }
 
-        public override bool IsMatchingParameterName(string parameterName, string token)
+        /// <summary>
+        /// Returns true of the token matches the parameter name. Otherwise false.
+        /// </summary>
+        /// <param name="parameterName"></param>
+        /// <param name="token"></param>
+        /// <returns></returns>
+        public bool IsMatchingParameterName(string parameterName, string token)
         {
             return GetLongOptionName(parameterName) == token;
         }
 
-        public override string GetNegatedLongOptionName(string parameterName)
+        /// <summary>
+        /// Returns the negative version of a boolean switch.
+        /// </summary>
+        /// <param name="parameterName"></param>
+        /// <returns></returns>
+        public string GetNegatedLongOptionName(string parameterName)
         {
             return $"--no-{parameterName}".HyphenCase();
         }
 
-        public override IParser CreateParser(ParameterValue parameter)
+        /// <summary>
+        /// Returns a parser able to process the parameter.
+        /// </summary>
+        /// <param name="parameter"></param>
+        /// <returns></returns>
+        public IParser CreateParser(ParameterValue parameter)
         {
-            return new DefaultHyphenCaseParser(parameter);
+            return new HyphenCaseParser(parameter);
         }
 
-        public override bool IsParameterName(string token)
+        /// <summary>
+        /// Returns true of token represents a parameter name. Otherwise false.
+        /// </summary>
+        /// <param name="token"></param>
+        /// <returns></returns>
+        public bool IsParameterName(string token)
         {
             return token.StartsWith("--") || token.StartsWith("-");
         }

@@ -21,12 +21,37 @@ namespace Odin.Configuration
             this.DescriptionWidth = 52;
         }
 
+        /// <summary>
+        /// Gets the total width of the help window.
+        /// </summary>
         public int PageWidth => this.IdentifierWidth + this.SpacerWidth + this.DescriptionWidth;
+
+        /// <summary>
+        /// Gets the width of the space allocated for the Identifier.
+        /// </summary>
         public int IdentifierWidth { get; set; }
+
+        /// <summary>
+        /// Gets the width of the empty space between columns.
+        /// </summary>
         public int SpacerWidth { get; set; }
+
+        /// <summary>
+        /// Gets the width of indentation space.
+        /// </summary>
         public int IndentWidth { get; set; }
+
+        /// <summary>
+        /// Gets the width of the Description column.
+        /// </summary>
         public int DescriptionWidth { get; set; }
 
+        /// <summary>
+        /// Returns the help text for the command.
+        /// </summary>
+        /// <param name="command"></param>
+        /// <param name="actionName">If specified, help is scoped to a particular action.</param>
+        /// <returns></returns>
         public string Write(Command command, string actionName = "")
         {
             var builder = new StringBuilder();

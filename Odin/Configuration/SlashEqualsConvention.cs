@@ -3,45 +3,45 @@ using Odin.Parsing;
 
 namespace Odin.Configuration
 {
-    public class SlashEqualsConvention : Conventions
+    public class SlashEqualsConvention : IConventions
     {
-        public override string GetCommandName(Command command)
+        public string GetCommandName(Command command)
         {
             var name = command.GetType().Name;
             return name.Replace("Command", "");
         }
 
-        public override string GetLongOptionName(string parameterName)
+        public string GetLongOptionName(string parameterName)
         {
             return $"/{parameterName}";
         }
 
-        public override string GetNegatedLongOptionName(string parameterName)
+        public string GetNegatedLongOptionName(string parameterName)
         {
             return $"/no-{parameterName}";
         }
 
-        public override string GetActionName(string methodName)
+        public string GetActionName(string actionName)
         {
-            return methodName;
+            return actionName;
         }
 
-        public override string GetShortOptionName(string alias)
+        public string GetShortOptionName(string alias)
         {
             return $"/{alias}";
         }
 
-        public override bool IsMatchingParameterName(string parameterName, string token)
+        public bool IsMatchingParameterName(string parameterName, string token)
         {
             return token.StartsWith(GetLongOptionName(parameterName));
         }
 
-        public override IParser CreateParser(ParameterValue parameter)
+        public IParser CreateParser(ParameterValue parameter)
         {
             return new SlashEqualsParser(parameter);
         }
 
-        public override bool IsParameterName(string token)
+        public bool IsParameterName(string token)
         {
             return token.StartsWith("/");
         }

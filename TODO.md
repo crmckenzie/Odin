@@ -68,6 +68,7 @@
   * [x] Help generation should be customizable
   * [x] Actions
       * [x] default actions should be prefixed with a *
+      * [ ] get help for action by alias.
   * [x] Parameters
       * [x] Help should display available enum options
       * [x] Display default values using reflection
@@ -80,6 +81,7 @@
   * [x] Validate no more than one default action per command
   * [x] Detect conflicts between subcommands and action names
   * [x] Validate no more than one of the same alias on a method
+  * [ ] Validate no duplicate identifiers for parameter methods.
 
 ## Deployment
 * [x] Create a nuget package

@@ -31,7 +31,7 @@ namespace Odin
 
         private MethodInvocation MethodInvocation { get; }
 
-        public Conventions Conventions => MethodInvocation.Conventions;
+        public IConventions Conventions => MethodInvocation.Conventions;
 
         public ParameterInfo ParameterInfo { get; }
         public Type ParameterType => ParameterInfo.ParameterType;

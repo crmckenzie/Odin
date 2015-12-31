@@ -31,7 +31,7 @@ namespace Odin
         public MethodInfo MethodInfo { get; }
 
         public Command Command { get; }
-        public Conventions Conventions => Command.Conventions;
+        public IConventions Conventions => Command.Conventions;
         public string Name => Conventions.GetActionName(MethodInfo);
         public ReadOnlyCollection<ParameterValue> ParameterValues { get; }
 
