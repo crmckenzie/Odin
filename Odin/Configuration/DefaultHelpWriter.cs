@@ -77,7 +77,7 @@ namespace Odin.Configuration
 
         private void WriteCommandHelp(Command command, StringBuilder builder, string actionName = "")
         {
-            var action = command.Actions.Values.FirstOrDefault(row => row.Identifiers.Contains(actionName));
+            var action = command.Actions.FirstOrDefault(row => row.Identifiers.Contains(actionName));
             if (action != null)
             {
                 WriteActionHelp(action, builder);
@@ -151,7 +151,7 @@ namespace Odin.Configuration
                 .AppendLine()
                 .AppendLine("ACTIONS");
 
-            foreach (var method in command.Actions.Values.OrderBy(m => m.Name))
+            foreach (var method in command.Actions.OrderBy(m => m.Name))
             {
                 WriteActionHelp(method, builder); ;
             }

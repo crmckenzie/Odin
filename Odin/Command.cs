@@ -29,7 +29,7 @@ namespace Odin
 
             _subCommands = new List<Command>();
 
-            ReKeyActions();
+            InitializeActions();
 
             this.DisplayHelpWhenArgsAreEmpty = true;
         }
@@ -47,20 +47,18 @@ namespace Odin
         public Command Use(IConventions conventions)
         {
             _conventions = conventions;
-            ReKeyActions();
             return this;
         }
 
-        private void ReKeyActions()
+        private void InitializeActions()
         {
             this._actions = this
                 .GetType()
                 .GetMethods()
                 .Where(m => m.GetCustomAttribute<ActionAttribute>() != null)
                 .Select(row => new MethodInvocation(this, row))
-                .ToList().ToDictionary(action => action.Name)
+                .ToList()
                 ;
-            this.Actions = new ReadOnlyDictionary<string, MethodInvocation>(this._actions);
         }
 
         /// <summary>
@@ -152,10 +150,18 @@ namespace Odin
         /// </summary>
         public IReadOnlyCollection<Command> SubCommands => this._subCommands.AsReadOnly();
 
-        private Dictionary<string, MethodInvocation> _actions;
+        private List<MethodInvocation> _actions;
 
-        public IReadOnlyDictionary<string, MethodInvocation> Actions { get; private set; }
+        /// <summary>
+        /// Gets the actions registered with the current command.
+        /// </summary>
+        public IReadOnlyCollection<MethodInvocation> Actions => this._actions.AsReadOnly();
 
+        /// <summary>
+        /// Adds a command to the command tree.
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
         public Command RegisterSubCommand(Command command)
         {
             command.SetParent(this);
@@ -163,6 +169,11 @@ namespace Odin
             return this;
         }
 
+        /// <summary>
+        /// Executes the command.
+        /// </summary>
+        /// <param name="args"></param>
+        /// <returns>0 if successful.</returns>
         public int Execute(params string[] args)
         {
             if (this.DisplayHelpWhenArgsAreEmpty && !args.Any())
@@ -184,6 +195,12 @@ namespace Odin
             return result;
         }
 
+        /// <summary>
+        /// Generates an invocation for the current command.
+        /// </summary>
+        /// <param name="tokens"></param>
+        /// <returns></returns>
+        /// <remarks>Useful in testing your command structure.</remarks>
         public MethodInvocation GenerateInvocation(params string[] tokens)
         {
             try
@@ -217,7 +234,7 @@ namespace Odin
 
         private MethodInvocation GetActionByToken(string token)
         {
-            return _actions.Values.FirstOrDefault(action => action.IsIdentifiedBy(token));
+            return _actions.FirstOrDefault(action => action.Identifiers.Contains(token));
         }
 
         private Command GetSubCommandByToken(string token)
@@ -225,16 +242,28 @@ namespace Odin
             return SubCommands.FirstOrDefault(cmd => cmd.IsIdentifiedBy(token));
         }
 
+        /// <summary>
+        /// Returns the default action for the command.
+        /// </summary>
+        /// <returns></returns>
         public MethodInvocation GetDefaultAction()
         {
-            return this.Actions.Values.FirstOrDefault(row => row.IsDefault);
+            return this.Actions.FirstOrDefault(row => row.IsDefault);
         }
 
+        /// <summary>
+        /// True if this command is the root of the command tree. Otherwise false.
+        /// </summary>
+        /// <returns></returns>
         public bool IsRoot()
         {
             return this.Parent == null;
         }
 
+        /// <summary>
+        /// Emits help to the logger.
+        /// </summary>
+        /// <param name="actionName"></param>
         [Action]
         public void Help(
             [Description("The name of the action to provide help for.")]
@@ -244,6 +273,10 @@ namespace Odin
             this.Logger.Info(help);
         }
 
+        /// <summary>
+        /// Gets a list of validation messages for the command.
+        /// </summary>
+        /// <returns></returns>
         public IEnumerable<ValidationResult> Validate()
         {
             var messages = GetValidationMessages().ToArray();
@@ -260,14 +293,14 @@ namespace Odin
 
         private IEnumerable<string> GetValidationMessages()
         {
-            var defaultActions = this.Actions.Values.Where(row => row.IsDefault).ToArray();
+            var defaultActions = this.Actions.Where(row => row.IsDefault).ToArray();
             if (defaultActions.Count() > 1)
             {
                 var actionNames = defaultActions.Select(row => row.Name).Join(", ");
                 yield return $"There is more than one default action: {actionNames}.";
             }
 
-            var actionIdentifiers = this.Actions.Values.SelectMany(action => action.Identifiers);
+            var actionIdentifiers = this.Actions.SelectMany(action => action.Identifiers);
             var subCommandIdentifiers = this.SubCommands.SelectMany(cmd => cmd.Identifiers);
             var matchingNames = actionIdentifiers.Intersect(subCommandIdentifiers);
 

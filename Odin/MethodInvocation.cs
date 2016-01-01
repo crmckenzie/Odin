@@ -10,6 +10,9 @@ using Odin.Parsing;
 
 namespace Odin
 {
+    /// <summary>
+    /// Represents an action to be executed.
+    /// </summary>
     public class MethodInvocation
     {
         public MethodInvocation(Command command, MethodInfo methodInfo)
@@ -26,30 +29,47 @@ namespace Odin
                 ;
         }
 
+        /// <summary>
+        /// Gets whether or not this action is the default one for its Command.
+        /// </summary>
         public bool IsDefault { get; }
 
+        /// <summary>
+        /// Gets the MethodInfo wrapped by the action.
+        /// </summary>
         public MethodInfo MethodInfo { get; }
 
+        /// <summary>
+        /// Gets the command the action is tied to.
+        /// </summary>
         public Command Command { get; }
+
+        /// <summary>
+        /// Gets the conventions used in the command tree.
+        /// </summary>
         public IConventions Conventions => Command.Conventions;
+
+        /// <summary>
+        /// Gets the conventional name of the action.
+        /// </summary>
         public string Name => Conventions.GetActionName(MethodInfo);
         public ReadOnlyCollection<ParameterValue> ParameterValues { get; }
 
+        /// <summary>
+        /// Gets the list of aliases applied to the action.
+        /// </summary>
         public string[] Aliases
         {
             get { return MethodInfo.GetCustomAttribute<AliasAttribute>()?.Aliases.ToArray() ?? new string[] {}; }
         }
 
+        /// <summary>
+        /// Gets the list of identifiers representing the action.
+        /// </summary>
         public string[] Identifiers
         {
             get { return Aliases.Concat(new string[] {this.Name}).ToArray(); }
         }
-
-        public bool IsIdentifiedBy(string token)
-        {
-            return Name == token || Aliases.Contains(token);
-        }
-
 
         private ParameterValue FindByToken(string token)
         {
@@ -68,11 +88,19 @@ namespace Odin
                 ;
         }
 
+        /// <summary>
+        /// True if the action is invokable. Otherwise false.
+        /// </summary>
+        /// <returns></returns>
         public bool CanInvoke()
         {
             return ParameterValues.All(row => row.IsValueSet());
         }
 
+        /// <summary>
+        /// Invokes the action with the parsed parameters.
+        /// </summary>
+        /// <returns>0 for success.</returns>
         public int Invoke()
         {
             var args = ParameterValues
