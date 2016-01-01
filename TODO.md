@@ -68,7 +68,7 @@
   * [x] Help generation should be customizable
   * [x] Actions
       * [x] default actions should be prefixed with a *
-      * [ ] get help for action by alias.
+      * [x] get help for action by alias.
   * [x] Parameters
       * [x] Help should display available enum options
       * [x] Display default values using reflection

@@ -1,13 +1,8 @@
-﻿using Odin.Attributes;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel;
+using Odin.Attributes;
 using Odin.Tests.Parsing;
 
-namespace Odin.Tests.Lib
+namespace Odin.Tests.Help
 {
     [Description(@"This is a demo of the Odin-Commands NuGet package.
 You can use this package to easily create command line applications that automatically route command-line arguments to the correct command based on customizable conventions.")]
@@ -29,6 +24,7 @@ Use the AliasAttribute to indicate an alias for the action.")]
         }
 
         [Action]
+        [Alias("enum")]
         [Description("Enumerated parameters should be listed before default value.")]
         public void EnumAction(Numbers input = Numbers.One)
         {

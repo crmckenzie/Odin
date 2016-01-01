@@ -77,16 +77,16 @@ namespace Odin.Configuration
 
         private void WriteCommandHelp(Command command, StringBuilder builder, string actionName = "")
         {
-            if (command.Actions.ContainsKey(actionName))
+            var action = command.Actions.Values.FirstOrDefault(row => row.Identifiers.Contains(actionName));
+            if (action != null)
             {
-                var action = command.Actions[actionName];
                 WriteActionHelp(action, builder);
                 return;
             }
 
-            if (command.SubCommands.ContainsKey(actionName))
+            var subCommand = command.SubCommands.Values.FirstOrDefault(row => row.Identifiers.Contains(actionName));
+            if (subCommand!= null)
             {
-                var subCommand = command.SubCommands[actionName];
                 WriteCommandHelp(subCommand, builder);
                 return;
             }

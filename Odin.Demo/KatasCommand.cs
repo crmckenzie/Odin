@@ -5,6 +5,7 @@ using Odin.Attributes;
 namespace Odin.Demo
 {
     [Description(@"This command is intended for demonstration purposes. It provides some katas which can be executed as actions.")]
+    [Alias("exercise")]
     public class KatasCommand : Command
     {
         [Action(IsDefault = true)]

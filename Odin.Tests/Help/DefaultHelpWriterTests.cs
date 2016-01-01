@@ -1,13 +1,11 @@
-﻿using System;
-using System.Linq;
-using NSubstitute;
+﻿using System.Linq;
 using NUnit.Framework;
 using Odin.Configuration;
 using Odin.Demo;
 using Odin.Tests.Lib;
 using Shouldly;
 
-namespace Odin.Tests
+namespace Odin.Tests.Help
 {
     [TestFixture]
     public class DefaultHelpWriterTests
@@ -103,7 +101,8 @@ namespace Odin.Tests
                 ;
 
             var i = -1;
-            lines[++i].ShouldBe("enum-action             Enumerated parameters should be listed before");
+            lines[++i].ShouldBe("enum-action             aliases: enum");
+            lines[++i].ShouldBe("                        Enumerated parameters should be listed before");
             lines[++i].ShouldBe("                        default value.");
             lines[++i].ShouldBe("");
             lines[++i].ShouldBe("    --input             valid values: One, Two, Three");
@@ -136,6 +135,74 @@ namespace Odin.Tests
             lines[++i].ShouldBe("");
         }
 
+        #region actions
+
+        [Test]
+        public void HelpForAGivenAction()
+        {
+            // Given
+            var logger = new StringBuilderLogger();
+            var root = new HelpWriterTestCommand()
+                .Use(logger)
+                ;
+
+            // When
+            var result = this.Subject.Write(root, "enum-action");
+
+            // Then
+            var lines = result
+                .Split('\n')
+                .Select(row => row.Replace("\r", "").TrimEnd())
+                .ToArray()
+                ;
+
+            var i = -1;
+            lines[++i].ShouldBe("enum-action             aliases: enum");
+            lines[++i].ShouldBe("                        Enumerated parameters should be listed before");
+            lines[++i].ShouldBe("                        default value.");
+            lines[++i].ShouldBe("");
+            lines[++i].ShouldBe("    --input             valid values: One, Two, Three");
+            lines[++i].ShouldBe("                        default value: One");
+            lines[++i].ShouldBe("");
+            lines[++i].ShouldBe("");
+            lines[++i].ShouldBe("");
+        }
+
+        [Test]
+        public void HelpForAGivenActionUsingAlias()
+        {
+            // Given
+            var logger = new StringBuilderLogger();
+            var root = new HelpWriterTestCommand()
+                .Use(logger)
+                ;
+
+            // When
+            var result = this.Subject.Write(root, "enum");
+
+            // Then
+            var lines = result
+                .Split('\n')
+                .Select(row => row.Replace("\r", "").TrimEnd())
+                .ToArray()
+                ;
+
+            var i = -1;
+            lines[++i].ShouldBe("enum-action             aliases: enum");
+            lines[++i].ShouldBe("                        Enumerated parameters should be listed before");
+            lines[++i].ShouldBe("                        default value.");
+            lines[++i].ShouldBe("");
+            lines[++i].ShouldBe("    --input             valid values: One, Two, Three");
+            lines[++i].ShouldBe("                        default value: One");
+            lines[++i].ShouldBe("");
+            lines[++i].ShouldBe("");
+            lines[++i].ShouldBe("");
+        }
+
+        #endregion
+
+        #region subcommands
+
         [Test]
         public void HelpDisplaysSubCommands()
         {
@@ -167,7 +234,7 @@ namespace Odin.Tests
         }
 
         [Test]
-        public void ExecuteHelpActionForSubCommand()
+        public void HelpInvokedAsSubCommandAction()
         {
             // Given
             var logger = new StringBuilderLogger();
@@ -193,8 +260,33 @@ namespace Odin.Tests
             lines[++i].Trim().ShouldBe("which can be executed as actions.");
             lines[++i].Trim().ShouldBe("");
             lines[++i].Trim().ShouldBe("default action: fizz-buzz");
-            //lines[++i].Trim().ShouldBe("To get help for subcommands");
-            //lines[++i].Trim().ShouldBe("sub help <subcommand>");
+        }
+
+        [Test]
+        public void HelpForSubCommandUsingAlias()
+        {
+            // Given
+            var logger = new StringBuilderLogger();
+            var root = new HelpWriterTestCommand()
+                .RegisterSubCommand(new KatasCommand())
+                .Use(logger)
+                ;
+
+            // When
+            var result = this.Subject.Write(root, "exercise");
+
+            // Then
+            var lines = result
+                .Split('\n')
+                .Select(row => row.Replace("\r", ""))
+                .ToArray()
+                ;
+
+            var i = -1;
+            lines[++i].Trim().ShouldBe("This command is intended for demonstration purposes. It provides some katas");
+            lines[++i].Trim().ShouldBe("which can be executed as actions.");
+            lines[++i].Trim().ShouldBe("");
+            lines[++i].Trim().ShouldBe("default action: fizz-buzz");
         }
 
         [Test]
@@ -225,9 +317,8 @@ namespace Odin.Tests
             lines[++i].Trim().ShouldBe("help <subcommand>");
         }
 
-
         [Test]
-        public void AlternativeHelpForSubCommands()
+        public void HelpInvokedAsActionOnParent()
         {
             // Given
             var logger = new StringBuilderLogger();
@@ -315,5 +406,6 @@ namespace Odin.Tests
             lines[++i].Trim().ShouldBe("To get help for subcommands");
             lines[++i].Trim().ShouldBe("sub help <subcommand>");
         }
+        #endregion
     }
 }

@@ -54,7 +54,7 @@
   <ItemGroup>
     <Compile Include="Demo\RootCommandRouteTests.cs" />
     <Compile Include="Lib\AliasTests.cs" />
-    <Compile Include="Lib\HelpWriterTestCommand.cs" />
+    <Compile Include="Help\HelpWriterTestCommand.cs" />
     <Compile Include="Lib\StringExtensionsTests.cs" />
     <Compile Include="Validation\CommandWithMultipleDefaultActions.cs" />
     <Compile Include="Validation\CommandWithNamingConflictBetweenSubCommandAndAction.cs" />
@@ -62,7 +62,7 @@
     <Compile Include="Parsing\ArgumentTypesCommand.cs" />
     <Compile Include="Configuration\SlashColonConventionTests.cs" />
     <Compile Include="Configuration\SlashEqualsConventionTests.cs" />
-    <Compile Include="Lib\DefaultHelpWriterTests.cs" />
+    <Compile Include="Help\DefaultHelpWriterTests.cs" />
     <Compile Include="Lib\CommandInvocationTests.cs" />
     <Compile Include="Lib\CommandTests.cs" />
     <Compile Include="Lib\NotTheDefaultCommand.cs" />
