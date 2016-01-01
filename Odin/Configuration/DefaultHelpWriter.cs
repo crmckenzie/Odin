@@ -84,7 +84,7 @@ namespace Odin.Configuration
                 return;
             }
 
-            var subCommand = command.SubCommands.Values.FirstOrDefault(row => row.Identifiers.Contains(actionName));
+            var subCommand = command.SubCommands.FirstOrDefault(row => row.Identifiers.Contains(actionName));
             if (subCommand!= null)
             {
                 WriteCommandHelp(subCommand, builder);
@@ -306,7 +306,7 @@ namespace Odin.Configuration
                 .AppendLine()
                 .AppendLine("SUB COMMANDS");
 
-            foreach (var subCommand in command.SubCommands.Values)
+            foreach (var subCommand in command.SubCommands)
             {
                 var descriptions = GetDescription(subCommand)
                     .Paginate(this.DescriptionWidth)

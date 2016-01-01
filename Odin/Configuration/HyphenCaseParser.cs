@@ -54,7 +54,7 @@ namespace Odin.Configuration
 
             return new ParseResult()
             {
-                Value = _parameter.ParameterType.Coerce(token),
+                Value = _parameter.Coerce(token),
                 TokensProcessed = 1,
             };
         }
@@ -69,7 +69,7 @@ namespace Odin.Configuration
             var value = tokens[i + 1];
             return new ParseResult()
             {
-                Value = parameter.ParameterType.Coerce(value),
+                Value = parameter.Coerce(value),
                 TokensProcessed = 2,
             };
         }

@@ -87,6 +87,12 @@ namespace Odin.Parsing
             return string.IsNullOrWhiteSpace(input) ? (bool?) null : bool.Parse(input);
         }
 
+
+        public static object Coerce(this ParameterValue parameter, string token)
+        {
+            return parameter.ParameterType.Coerce(token);
+        }
+
         public static object Coerce(this Type type, string token)
         {
             if (Coercion.ContainsKey(type))

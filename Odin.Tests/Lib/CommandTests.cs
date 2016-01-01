@@ -79,7 +79,7 @@ namespace Odin.Tests
             this.Subject.Use(new SlashColonConvention());
             this.Subject.Name.ShouldBe("DefaultProxy");
             this.SubCommand.Name.ShouldBe("SubProxy");
-            this.Subject.SubCommands["SubProxy"].ShouldBe(this.SubCommand);
+            this.Subject.SubCommands.ElementAt(0).ShouldBe(this.SubCommand);
         }
     }
 }

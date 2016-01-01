@@ -62,8 +62,8 @@
     <Compile Include="Configuration\IConventions.cs" />
     <Compile Include="Configuration\SlashColonConvention.cs" />
     <Compile Include="Configuration\HyphenCaseConvention.cs" />
-    <Compile Include="Logging\DefaultLogger.cs" />
-    <Compile Include="Logging\Logger.cs" />
+    <Compile Include="Logging\ConsoleLogger.cs" />
+    <Compile Include="Logging\ILogger.cs" />
     <Compile Include="Exceptions\ParameterConversionException.cs" />
     <Compile Include="ParameterValue.cs" />
     <Compile Include="Parsing\ReflectionExtensions.cs" />

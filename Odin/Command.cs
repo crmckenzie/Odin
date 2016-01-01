@@ -12,6 +12,14 @@ using Odin.Logging;
 
 namespace Odin
 {
+    /// <summary>
+    /// Base class an Odin command.
+    /// </summary>
+    /// <remarks>
+    /// Commands are organized in a tree structure to indicate subcomands.
+    /// Actions on commands are callable at their level in tree structure.
+    /// SubCommands, Actions, and Parameters are resolved from the input tokens by convention.
+    /// </remarks>
     public abstract class Command
     {
         protected Command()
@@ -19,20 +27,26 @@ namespace Odin
             _conventions = new HyphenCaseConvention();
             _helpWriter = new DefaultHelpWriter();
 
-            _subCommands = new Dictionary<string, Command>();
-            SubCommands =new ReadOnlyDictionary<string, Command>(_subCommands);
+            _subCommands = new List<Command>();
 
             ReKeyActions();
 
             this.DisplayHelpWhenArgsAreEmpty = true;
         }
 
+        /// <summary>
+        /// Gets or sets if the command should emit help when args are empty.
+        /// </summary>
         public bool DisplayHelpWhenArgsAreEmpty { get; set; }
 
+        /// <summary>
+        /// Sets the convention to be used with the command. Only conventions applied to the root command are used.
+        /// </summary>
+        /// <param name="conventions"></param>
+        /// <returns></returns>
         public Command Use(IConventions conventions)
         {
             _conventions = conventions;
-            ReKeySubCommands();
             ReKeyActions();
             return this;
         }
@@ -49,18 +63,22 @@ namespace Odin
             this.Actions = new ReadOnlyDictionary<string, MethodInvocation>(this._actions);
         }
 
-        private void ReKeySubCommands()
+        /// <summary>
+        /// Sets the logger to be used with the command. Only the logger applied to the root command is used.
+        /// </summary>
+        /// <param name="logger"></param>
+        /// <returns></returns>
+        public Command Use(ILogger logger)
         {
-            this._subCommands = this._subCommands.Values.ToDictionary(row => row.Name);
-            SubCommands = new ReadOnlyDictionary<string, Command>(_subCommands);
-        }
-
-        public Command Use(Logger logger)
-        {
-            _logger = logger ?? new DefaultLogger();
+            _logger = logger ?? new ConsoleLogger();
             return this;
         }
 
+        /// <summary>
+        /// Sets the helpwriter to be used with the command. Only the helpwriter applied to the root command is used.
+        /// </summary>
+        /// <param name="helpWriter"></param>
+        /// <returns></returns>
         public Command Use(IHelpWriter helpWriter)
         {
             _helpWriter = helpWriter;
@@ -72,37 +90,67 @@ namespace Odin
             this.Parent = parent;
         }
 
-        public Command Parent { get; set; }
+        /// <summary>
+        /// Gets the parent of the command.
+        /// </summary>
+        public Command Parent { get; private set; }
 
-        private Logger _logger = new DefaultLogger();
-        public Logger Logger => IsRoot() ? _logger : Parent.Logger;
+        private ILogger _logger = new ConsoleLogger();
+        /// <summary>
+        /// Gets the logger for the command tree.
+        /// </summary>
+        public ILogger Logger => IsRoot() ? _logger : Parent.Logger;
 
         private  IConventions _conventions;
         private IHelpWriter _helpWriter;
 
+        /// <summary>
+        /// Gets the helpwriter for the command tree.
+        /// </summary>
         public IHelpWriter HelpWriter => IsRoot() ? _helpWriter : Parent.HelpWriter;
 
+        /// <summary>
+        /// Gets the conventions for the command tree.
+        /// </summary>
         public IConventions Conventions => IsRoot() ? _conventions : Parent.Conventions ;
 
+        /// <summary>
+        /// Gets the conventional name of the command.
+        /// </summary>
         public virtual string Name => Conventions.GetCommandName(this);
 
+        /// <summary>
+        /// Gets the aliases applied to the command.
+        /// </summary>
         public virtual string[] Aliases
         {
             get { return this.GetType().GetCustomAttribute<AliasAttribute>()?.Aliases.ToArray() ?? new string[] { }; }
         }
 
+        /// <summary>
+        /// Gets all of the identifiers applied to the command.
+        /// </summary>
         public string[] Identifiers
         {
             get { return Aliases.Concat(new string[] {this.Name}).ToArray(); }
         }
 
+        /// <summary>
+        /// True if the token matches the command, otherwise false.
+        /// </summary>
+        /// <param name="token"></param>
+        /// <returns></returns>
         public virtual bool IsIdentifiedBy(string token)
         {
             return token == Name || Aliases.Contains(token);
         }
 
-        private Dictionary<string, Command> _subCommands;
-        public IReadOnlyDictionary<string, Command> SubCommands { get; private set; }
+        private List<Command> _subCommands;
+
+        /// <summary>
+        /// Gets the subcommands registered with the current command.
+        /// </summary>
+        public IReadOnlyCollection<Command> SubCommands => this._subCommands.AsReadOnly();
 
         private Dictionary<string, MethodInvocation> _actions;
 
@@ -111,7 +159,7 @@ namespace Odin
         public Command RegisterSubCommand(Command command)
         {
             command.SetParent(this);
-            this._subCommands[command.Name] = command;
+            this._subCommands.Add(command);
             return this;
         }
 
@@ -174,7 +222,7 @@ namespace Odin
 
         private Command GetSubCommandByToken(string token)
         {
-            return SubCommands.Values.FirstOrDefault(cmd => cmd.IsIdentifiedBy(token));
+            return SubCommands.FirstOrDefault(cmd => cmd.IsIdentifiedBy(token));
         }
 
         public MethodInvocation GetDefaultAction()
@@ -203,7 +251,7 @@ namespace Odin
                 yield return new ValidationResult(this.Name, messages);
 
 
-            var validationResults = this.SubCommands.Values.SelectMany(cmd => cmd.Validate());
+            var validationResults = this.SubCommands.SelectMany(cmd => cmd.Validate());
             foreach (var validationResult in validationResults)
             {
                 yield return validationResult;
@@ -220,7 +268,7 @@ namespace Odin
             }
 
             var actionIdentifiers = this.Actions.Values.SelectMany(action => action.Identifiers);
-            var subCommandIdentifiers = this.SubCommands.Values.SelectMany(cmd => cmd.Identifiers);
+            var subCommandIdentifiers = this.SubCommands.SelectMany(cmd => cmd.Identifiers);
             var matchingNames = actionIdentifiers.Intersect(subCommandIdentifiers);
 
             foreach (var matchingName in matchingNames)
