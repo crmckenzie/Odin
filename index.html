@@ -1,143 +1,18 @@
-<!doctype html>
-<html>
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <title>Odin by crmckenzie</title>
-    <link rel="stylesheet" href="stylesheets/styles.css">
-    <link rel="stylesheet" href="stylesheets/github-dark.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
-    <script src="javascripts/respond.js"></script>
-    <!--[if lt IE 9]>
-      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
-    <!--[if lt IE 8]>
-    <link rel="stylesheet" href="stylesheets/ie.css">
-    <![endif]-->
-    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+---
+layout: default
+---
 
-  </head>
-  <body>
-      <div id="header">
-        <nav>
-          <li class="fork"><a href="https://github.com/crmckenzie/Odin">View On GitHub</a></li>
-          <li class="downloads"><a href="https://github.com/crmckenzie/Odin/zipball/master">ZIP</a></li>
-          <li class="downloads"><a href="https://github.com/crmckenzie/Odin/tarball/master">TAR</a></li>
-          <li class="title">DOWNLOADS</li>
-        </nav>
-      </div><!-- end header -->
+<div class="posts">
+  {% for post in site.posts %}
+    <article class="post">
 
-    <div class="wrapper">
+      <h1><a href="{{ site.baseurl }}{{ post.url }}">{{ post.title }}</a></h1>
 
-      <section>
-        <div id="title">
-          <h1>Odin</h1>
-          <p>Conventions based command line routing</p>
-          <hr>
-          <span class="credits left">Project maintained by <a href="https://github.com/crmckenzie">crmckenzie</a></span>
-          <span class="credits right">Hosted on GitHub Pages &mdash; Theme by <a href="https://twitter.com/michigangraham">mattgraham</a></span>
-        </div>
+      <div class="entry">
+        {{ post.excerpt }}
+      </div>
 
-        <h1>
-<a id="odin" class="anchor" href="#odin" aria-hidden="true"><span class="octicon octicon-link"></span></a>Odin</h1>
-
-<p><a href="https://ci.appveyor.com/project/crmckenzie/odin/branch/master"><img src="https://ci.appveyor.com/api/projects/status/4s75vka56cos0h87/branch/master?svg=true" alt="Build status"></a></p>
-
-<p>In the .NET space there are a number of good libraries to handle run-of-the-mill command line argument parsing.
-My current favorite is a nuget package called simply <a href="https://www.nuget.org/packages/CommandLineParser">CommandLineParser</a>.
-So why write a new one?</p>
-
-<h2>
-<a id="inspired-by-thor" class="anchor" href="#inspired-by-thor" aria-hidden="true"><span class="octicon octicon-link"></span></a>Inspired By Thor</h2>
-
-<p>I've done some work with Ruby over the last couple of years and I was really impressed with the feature set offered by a ruby project called <a href="http://whatisthor.com">thor</a>
-In addition to a declarative approach to binding options to actions and arguments, thor supports the concept of subcommands.
-We've seen subcommands used to great effect in command-line programs such as <code>git</code> and <code>nuget</code>, but current command line parser packages
-offer little help with this feature.</p>
-
-<h2>
-<a id="inspired-by-convention-over-configuration" class="anchor" href="#inspired-by-convention-over-configuration" aria-hidden="true"><span class="octicon octicon-link"></span></a>Inspired by Convention Over Configuration</h2>
-
-<p>In ASP .NET MVC, urls are routed to the appropriate controller and action by convention. <code>http://mysite.domain/Home/Index</code> is understood to route to a controller called "Home" and invoke a method called "Index."
-In addition, little manual wiring is required because ASP .NET MVC can discover and instantiate the controller easily at runtime.
-I wondered if it would be possible to use a combination of reflection and convention to create a command-line application in C#.</p>
-
-<h2>
-<a id="goals" class="anchor" href="#goals" aria-hidden="true"><span class="octicon octicon-link"></span></a>Goals</h2>
-
-<ul>
-<li>Given <code>program command subcommand action --arg1 value1 --arg2 value2</code>
-</li>
-<li>Odin should resolve to the correct method invocation with as little wiring as possible.
-
-<ul>
-<li>The above example should be interpreted as:
-
-<ul>
-<li>find a component called <code>command</code>
-</li>
-<li>within <code>command</code> find a component or action called <code>subcommand</code>
-</li>
-<li>within <code>subcommand</code> find a subcommand or action called <code>action</code>
-</li>
-<li>once a method is located, coerce the arguments to that method to the correct types and invoke the method</li>
-</ul>
-</li>
-<li>Failure to resolve a command should result in context-sensitive help</li>
-</ul>
-</li>
-<li>Odin commands should support a default action.</li>
-<li>Odin should support custom conventions for how arguments should be formatted and routed.
-
-<ul>
-<li>Provide some built-in conventions for common argument styles</li>
-<li>e.g. -a, --argument, --compound-argument, /argument, /argument:value</li>
-<li>conventions should be overridable via attributes+</li>
-</ul>
-</li>
-<li>Odin should provide auto-generated help.
-
-<ul>
-<li>Help should be context sensitive</li>
-<li>Help format should be overridable</li>
-</ul>
-</li>
-<li>Odin should communicate to the Console via an overridable Logger.</li>
-<li>Odin should not impose overall program structure on developers</li>
-<li>Odin should interoperate with arbitrary Dependency Injection frameworks.</li>
-<li>Odin should report its interpretation of routing in an externally testable manner.</li>
-<li>Odin should automatically parse arguments into common framework types
-
-<ul>
-<li>Odin should allow overrideble parsing algorithms.</li>
-</ul>
-</li>
-</ul>
-
-<h2>
-<a id="back-of-the-paper-napkin-usage-design" class="anchor" href="#back-of-the-paper-napkin-usage-design" aria-hidden="true"><span class="octicon octicon-link"></span></a>Back of the Paper Napkin Usage Design</h2>
-
-<div class="highlight highlight-source-cs"><pre>[DefaultAction(<span class="pl-s"><span class="pl-pds">"</span>DoSomething<span class="pl-pds">"</span></span>)]
-[Description(<span class="pl-s"><span class="pl-pds">"</span>This is the default controller<span class="pl-pds">"</span></span>)]
-<span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-en">DefaultController</span> : <span class="pl-k">Controller</span>
-{
-    [Action]
-    [Description(<span class="pl-s"><span class="pl-pds">"</span>A description of the DoSomething() method.<span class="pl-pds">"</span></span>)]
-    <span class="pl-k">public</span> <span class="pl-k">void</span> <span class="pl-en">DoSomething</span>(
-        [Description(<span class="pl-s"><span class="pl-pds">"</span>Lorem ipsum dolor sit amet, consectetur adipiscing elit<span class="pl-pds">"</span></span>)]
-        <span class="pl-k">string</span> argument1 = "value1-not-passed", 
-        [<span class="pl-en">Description</span>(<span class="pl-s"><span class="pl-pds">"</span>sed do eiusmod tempor incididunt ut labore et dolore magna aliqua<span class="pl-pds">"</span></span>)]
-        <span class="pl-k">string</span> argument2 = "value2-not-passed", 
-        [<span class="pl-en">Description</span>(<span class="pl-s"><span class="pl-pds">"</span>Ut enim ad minim veniam<span class="pl-pds">"</span></span>)]
-        <span class="pl-k">string</span> argument3 = "value3-not-passed")
-    {
-        <span class="pl-c">// do something here</span>
-    }
-}</pre></div>
-      </section>
-
-    </div>
-    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
-    
-  </body>
-</html>
+      <a href="{{ site.baseurl }}{{ post.url }}" class="read-more">Read More</a>
+    </article>
+  {% endfor %}
+</div>
