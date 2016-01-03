@@ -8,6 +8,10 @@ In the .NET space there are a number of good libraries to handle run-of-the-mill
 My current favorite is a nuget package called simply [CommandLineParser].
 So why write a new one?
 
+In short, current .NET command-line libraries focus only on parsing the args. 
+You are left reponsible for interpreting the args to call the right methods with the correct arguments.
+What if CLI's could be as easy to structure and execute as ASP .NET MVC applications?
+
 ## Try it out!
 
 ```powershell
