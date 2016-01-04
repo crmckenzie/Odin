@@ -4,8 +4,14 @@ environment:
   packageVersion: 0.1.0
 
 init:
+- ps: $env:release = $true
 - ps: $env:buildVersion = "$env:packageVersion.$env:appveyor_build_number"
-- ps: $env:nugetVersion = "$env:packageVersion-beta-$env:appveyor_build_number"
+- ps: if ($env:release -eq $true) { 
+- ps:     $env:nugetVersion = $packageVersion
+- ps: }
+- ps: else {
+- ps:     $env:nugetVersion = "$env:packageVersion-beta-$env:appveyor_build_number" 
+- ps: }
 - ps: Update-AppveyorBuild -Version $env:buildVersion
 
 assembly_info:
