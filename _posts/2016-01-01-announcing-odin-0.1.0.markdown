@@ -16,7 +16,7 @@ What if CLI's could be as easy to structure and execute as ASP .NET MVC applicat
 ## Try it out!
 
 ```powershell
-Install-Package Odin-Commands -Pre
+Install-Package Odin-Commands
 ```
 
 **Resources**
