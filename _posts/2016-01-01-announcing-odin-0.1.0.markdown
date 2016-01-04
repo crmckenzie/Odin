@@ -1,9 +1,3 @@
----
-layout: post
-title:  "Announcing Odin-Commands"
-date:   2016-01-01 21:16:08 -0800
-categories: .NET, CLI
----
 In the .NET space there are a number of good libraries to handle run-of-the-mill command line argument parsing.
 My current favorite is a nuget package called simply [CommandLineParser].
 So why write a new one?
@@ -18,7 +12,12 @@ What if CLI's could be as easy to structure and execute as ASP .NET MVC applicat
 Install-Package Odin-Commands -Pre
 ```
 
-Then read [Getting Started](https://github.com/crmckenzie/Odin/wiki/Getting-Started) from the [wiki](https://github.com/crmckenzie/Odin/wiki).
+**Resources**
+
+* [Getting Started](https://github.com/crmckenzie/Odin/wiki/Getting-Started)
+* [Wiki](https://github.com/crmckenzie/Odin/wiki)
+* [Official Blog](https://crmckenzie.github.io/Odin)
+* [Source Code](https://github.com/crmckenzie/odin)
 
 **Feedback Welcome**
 
