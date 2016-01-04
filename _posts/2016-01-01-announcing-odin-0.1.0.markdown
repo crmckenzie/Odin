@@ -1,3 +1,10 @@
+----
+ -layout: post
+ -title:  "Announcing Odin-Commands 0.1.0"
+ -date:   2016-01-01 21:16:08 -0800
+ -categories: .NET, CLI
+ ----
+ 
 In the .NET space there are a number of good libraries to handle run-of-the-mill command line argument parsing.
 My current favorite is a nuget package called simply [CommandLineParser].
 So why write a new one?
