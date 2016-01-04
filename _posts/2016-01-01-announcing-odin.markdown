@@ -18,9 +18,9 @@ What if CLI's could be as easy to structure and execute as ASP .NET MVC applicat
 Install-Package Odin-Commands -Pre
 ```
 
-Then read [Getting Started](https://github.com/crmckenzie/Odin/wiki/Getting-Started)
+Then read [Getting Started](https://github.com/crmckenzie/Odin/wiki/Getting-Started) from the [wiki](https://github.com/crmckenzie/Odin/wiki).
 
-Read the [wiki](https://github.com/crmckenzie/Odin/wiki).
+**Feedback Welcome**
 
 ## Inspired By Thor
 
