@@ -9,6 +9,10 @@ namespace Odin.Demo
     public class KatasCommand : Command
     {
         [Action(IsDefault = true)]
+        [Description("If <input> is a multiple of 3, emit 'Fizz'." +
+                     "If it is a multiple of 5, emit 'Buzz'." +
+                     "If it is a multiple of 3 and 5, emit 'FizzBuzz'." +
+                     "Otherwise, emit <input>.")]
         public int FizzBuzz(
             [Alias("i")]
             int input
@@ -35,6 +39,7 @@ namespace Odin.Demo
         }
 
         [Action]
+        [Description("Emit the prime factors of <input>.")]
         public int PrimeFactors(int input)
         {
             var result = PrimeFactorGenerator.Generate(input);
