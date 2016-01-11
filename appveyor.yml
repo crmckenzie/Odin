@@ -1,16 +1,15 @@
-version: 0.2.0.{build}
-
-environment:
-  packageVersion: 0.2.0
-
 -
- branches:
-	only: 
-	- master
+	version: 0.2.0.{build}
+	environment:
+		packageVersion: 0.2.0
+
+	branches:
+		only:
+		- master
 
 	init:
 	- ps: $env:buildVersion = "$env:packageVersion.$env:appveyor_build_number"
-	- ps: $env:nugetVersion = $env:packageVersion 
+	- ps: $env:nugetVersion = $env:packageVersion
 	- ps: Update-AppveyorBuild -Version $env:buildVersion
 
 	assembly_info:
@@ -49,8 +48,12 @@ environment:
 		branch: master
 
 -
- branches:
-	only: 
+	version: 0.2.0.{build}
+	environment:
+		packageVersion: 0.2.0
+
+  branches:
+	only:
 	- /release\/.*/
 
 	init:
@@ -95,16 +98,20 @@ environment:
 
 
 -
+	version: 0.2.0.{build}
+	environment:
+		packageVersion: 0.2.0
+
 	init:
 	- ps: $env:buildVersion = "$env:packageVersion.$env:appveyor_build_number"
 	- ps: Update-AppveyorBuild -Version $env:buildVersion
 
 	assembly_info:
-	  patch: true
-	  file: '**\AssemblyInfo.*'
-	  assembly_version: '$(buildVersion)'
-	  assembly_file_version: '$(buildVersion)'
-	  assembly_informational_version: '$(nugetVersion)'
+		patch: true
+		file: '**\AssemblyInfo.*'
+		assembly_version: '$(buildVersion)'
+		assembly_file_version: '$(buildVersion)'
+		assembly_informational_version: '$(nugetVersion)'
 
 	configuration: Release
 
@@ -112,4 +119,4 @@ environment:
 	- nuget restore
 
 	build:
-	  verbosity: minimal
+		verbosity: minimal
