@@ -1,11 +1,11 @@
 -
-	version: 0.2.0.{build}
-	environment:
-		packageVersion: 0.2.0
-
 	branches:
 		only:
 		- master
+
+	version: 0.2.0.{build}
+	environment:
+		packageVersion: 0.2.0
 
 	init:
 	- ps: $env:buildVersion = "$env:packageVersion.$env:appveyor_build_number"
