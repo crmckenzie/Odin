@@ -1,50 +1,123 @@
-version: 0.1.0.{build}
+# master branch
+# compile, test, release to nuget
+-
+  branches:
+    only:
+    - master
 
-environment:
-  packageVersion: 0.1.0
-  release: true
+  version: 0.2.0.{build}
+  environment:
+    packageVersion: 0.2.0
 
-init:
-- ps: $env:buildVersion = "$env:packageVersion.$env:appveyor_build_number"
-- ps: >-
-    if ($env:release -eq $true) { 
-      $env:nugetVersion = $env:packageVersion 
-    } else {
-      $env:nugetVersion = "$env:packageVersion-beta-$env:appveyor_build_number"
-    }
-- ps: Update-AppveyorBuild -Version $env:buildVersion
+  init:
+  - ps: $env:buildVersion = "$env:packageVersion.$env:appveyor_build_number"
+  - ps: $env:nugetVersion = $env:packageVersion
+  - ps: Update-AppveyorBuild -Version $env:buildVersion
 
-assembly_info:
-  patch: true
-  file: '**\AssemblyInfo.*'
-  assembly_version: '$(buildVersion)'
-  assembly_file_version: '$(buildVersion)'
-  assembly_informational_version: '$(nugetVersion)'
+  assembly_info:
+    patch: true
+    file: '**\AssemblyInfo.*'
+    assembly_version: '$(buildVersion)'
+    assembly_file_version: '$(buildVersion)'
+    assembly_informational_version: '$(nugetVersion)'
 
-configuration: Release
+  configuration: Release
 
-nuget:
-  account_feed: true
-  project_feed: true
-  disable_publish_on_pr: true
+  nuget:
+    account_feed: true
+    project_feed: true
+    disable_publish_on_pr: true
 
-before_build:
-- nuget restore
+  before_build:
+  - nuget restore
 
-build:
-  verbosity: minimal
+  build:
+    verbosity: minimal
 
-after_build:
-- ps: nuget pack Odin-Commands.nuspec -version "$env:nugetVersion"
+  after_build:
+  - ps: nuget pack Odin-Commands.nuspec -version "$env:nugetVersion"
 
-artifacts:
-- path: 'Odin-Commands*.nupkg'
-  name: odin-nuget-package
+  artifacts:
+  - path: 'Odin-Commands*.nupkg'
+    name: odin-nuget-package
 
-deploy:
-- provider: NuGet
-  api_key:
+  deploy:
+  - provider: NuGet
+    api_key:
     secure: oZLUyd94wnic5VlRfHZnlopK4I2tNOT30JMOp0nWrH/i+ZOyVYKayPbfy407OZdL
-  artifact: odin-nuget-package
-  on:
-    branch: master
+    artifact: odin-nuget-package
+
+# release branches
+# compile, test, release beta version to nuget
+-
+  version: 0.2.0.{build}
+  environment:
+    packageVersion: 0.2.0
+
+  branches:
+    only:
+    - /release\/.*/
+
+  init:
+  - ps: $env:buildVersion = "$env:packageVersion.$env:appveyor_build_number"
+  - ps: $env:nugetVersion = "$env:packageVersion-beta-$env:appveyor_build_number"
+  - ps: Update-AppveyorBuild -Version $env:buildVersion
+
+  assembly_info:
+    patch: true
+    file: '**\AssemblyInfo.*'
+    assembly_version: '$(buildVersion)'
+    assembly_file_version: '$(buildVersion)'
+    assembly_informational_version: '$(nugetVersion)'
+
+  configuration: Release
+
+  nuget:
+    account_feed: true
+    project_feed: true
+    disable_publish_on_pr: true
+
+  before_build:
+  - nuget restore
+
+  build:
+    verbosity: minimal
+
+  after_build:
+  - ps: nuget pack Odin-Commands.nuspec -version "$env:nugetVersion"
+
+  artifacts:
+  - path: 'Odin-Commands*.nupkg'
+    name: odin-nuget-package
+
+  deploy:
+  - provider: NuGet
+    api_key:
+    secure: oZLUyd94wnic5VlRfHZnlopK4I2tNOT30JMOp0nWrH/i+ZOyVYKayPbfy407OZdL
+    artifact: odin-nuget-package
+
+# all other branches
+# compile, test
+-
+  version: 0.2.0.{build}
+  environment:
+    packageVersion: 0.2.0
+
+  init:
+  - ps: $env:buildVersion = "$env:packageVersion.$env:appveyor_build_number"
+  - ps: Update-AppveyorBuild -Version $env:buildVersion
+
+  assembly_info:
+    patch: true
+    file: '**\AssemblyInfo.*'
+    assembly_version: '$(buildVersion)'
+    assembly_file_version: '$(buildVersion)'
+    assembly_informational_version: '$(nugetVersion)'
+
+  configuration: Release
+
+  before_build:
+  - nuget restore
+
+  build:
+    verbosity: minimal
