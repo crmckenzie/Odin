@@ -4,8 +4,10 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
 using NSubstitute;
+using NSubstitute.ExceptionExtensions;
 using NUnit.Framework;
 using Odin.Configuration;
+using Odin.Exceptions;
 using Shouldly;
 
 namespace Odin.Tests
@@ -80,6 +82,34 @@ namespace Odin.Tests
             this.Subject.Name.ShouldBe("DefaultProxy");
             this.SubCommand.Name.ShouldBe("SubProxy");
             this.Subject.SubCommands.ElementAt(0).ShouldBe(this.SubCommand);
+        }
+
+        [Test]
+        public void GenerateInvocation_WhenArgumentsAreInvalid()
+        {
+            // When
+            Assert.Throws<UnmappedParameterException>(() => this.Subject.GenerateInvocation("too", "many", "arguments", "passed"));
+        }
+
+        [Test]
+        public void GenerateInvocation_Execute()
+        {
+            // Given
+            var logger = new StringBuilderLogger();
+            this.Subject.Logger.Returns(logger);
+
+            // When
+            var result = this.Subject.Execute("too", "many", "arguments", "passed");
+
+            // Then
+            result.ShouldBe(-1);
+
+
+            var info = logger.InfoBuilder.ToString();
+            info.ShouldStartWith("This is the default command");
+
+            var error = logger.ErrorBuilder.ToString();
+            error.ShouldStartWith("Could not interpret the command.");
         }
     }
 }

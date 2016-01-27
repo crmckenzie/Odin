@@ -97,7 +97,7 @@ namespace Odin
         /// <summary>
         /// Gets the logger for the command tree.
         /// </summary>
-        public ILogger Logger => IsRoot() ? _logger : Parent.Logger;
+        public virtual ILogger Logger => IsRoot() ? _logger : Parent.Logger;
 
         private  IConventions _conventions;
         private IHelpWriter _helpWriter;
@@ -183,7 +183,20 @@ namespace Odin
             }
 
             var result = -1;
-            var invocation = this.GenerateInvocation(args);
+
+            MethodInvocation invocation;
+            try
+            {
+                invocation = this.GenerateInvocation(args);
+
+            }
+            catch (UnmappedParameterException umpe)
+            {
+                this.Logger.Error($"Could not interpret the command. You sent [{args.Join(", ")}]");
+                this.Help();
+                return result;
+            }
+
             if (invocation?.CanInvoke() == true)
                 result =  invocation.Invoke();
 
