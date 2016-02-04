@@ -47,6 +47,13 @@
     secure: oZLUyd94wnic5VlRfHZnlopK4I2tNOT30JMOp0nWrH/i+ZOyVYKayPbfy407OZdL
     artifact: odin-nuget-package
 
+  notifications:
+  - provider: Webhook
+    url: https://webhooks.gitter.im/e/e2b34b4f752cb15b4b35
+    on_build_failure: true
+    on_build_success: false
+    on_build_status_changed: true
+
 # release branches
 # compile, test, release beta version to nuget
 -
@@ -96,6 +103,13 @@
     secure: oZLUyd94wnic5VlRfHZnlopK4I2tNOT30JMOp0nWrH/i+ZOyVYKayPbfy407OZdL
     artifact: odin-nuget-package
 
+  notifications:
+  - provider: Webhook
+    url: https://webhooks.gitter.im/e/e2b34b4f752cb15b4b35
+    on_build_failure: true
+    on_build_success: false
+    on_build_status_changed: true
+
 # all other branches
 # compile, test
 -
@@ -121,3 +135,10 @@
 
   build:
     verbosity: minimal
+    
+  notifications:
+  - provider: Webhook
+    url: https://webhooks.gitter.im/e/e2b34b4f752cb15b4b35
+    on_build_failure: true
+    on_build_success: false
+    on_build_status_changed: true
