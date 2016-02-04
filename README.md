@@ -1,5 +1,7 @@
 # Odin
 
+[![Join the chat at https://gitter.im/crmckenzie/Odin](https://badges.gitter.im/crmckenzie/Odin.svg)](https://gitter.im/crmckenzie/Odin?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 [![Build status](https://ci.appveyor.com/api/projects/status/4s75vka56cos0h87/branch/master?svg=true)](https://ci.appveyor.com/project/crmckenzie/odin/branch/master)
 
 In the .NET space there are a number of good libraries to handle run-of-the-mill command line argument parsing.
