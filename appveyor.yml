@@ -49,9 +49,9 @@
 
   notifications:
   - provider: Webhook
-    url: https://webhooks.gitter.im/e/e2b34b4f752cb15b4b35
+    url: https://webhooks.gitter.im/e/3712526962bd70e49d63
     on_build_failure: true
-    on_build_success: false
+    on_build_success: true
     on_build_status_changed: true
 
 # release branches
@@ -105,9 +105,9 @@
 
   notifications:
   - provider: Webhook
-    url: https://webhooks.gitter.im/e/e2b34b4f752cb15b4b35
+    url: https://webhooks.gitter.im/e/3712526962bd70e49d63
     on_build_failure: true
-    on_build_success: false
+    on_build_success: true
     on_build_status_changed: true
 
 # all other branches
@@ -138,7 +138,7 @@
     
   notifications:
   - provider: Webhook
-    url: https://webhooks.gitter.im/e/e2b34b4f752cb15b4b35
+    url: https://webhooks.gitter.im/e/3712526962bd70e49d63
     on_build_failure: true
-    on_build_success: false
+    on_build_success: true
     on_build_status_changed: true
