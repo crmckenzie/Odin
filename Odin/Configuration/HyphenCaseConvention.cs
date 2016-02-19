@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using System.Reflection;
 using Odin.Attributes;
@@ -76,7 +77,7 @@ namespace Odin.Configuration
         /// <returns></returns>
         public string GetNegatedLongOptionName(string parameterName)
         {
-            return $"--no-{parameterName}".HyphenCase();
+            return $"--no-{parameterName.HyphenCase()}";
         }
 
         /// <summary>
@@ -84,7 +85,7 @@ namespace Odin.Configuration
         /// </summary>
         /// <param name="parameter"></param>
         /// <returns></returns>
-        public IParser CreateParser(ParameterValue parameter)
+        public IParser CreateParser(Parameter parameter)
         {
             return new HyphenCaseParser(parameter);
         }

@@ -3,7 +3,10 @@ using System.Collections.Generic;
 
 namespace Odin.Parsing
 {
-    public static class ReflectionExtensions
+    /// <summary>
+    /// Extension methods useful for reflection purposes.
+    /// </summary>
+    internal static class ReflectionExtensions
     {
         public static bool IsNullableType(this Type type)
         {
@@ -57,7 +60,7 @@ namespace Odin.Parsing
             if (string.IsNullOrWhiteSpace(token))
                 return null;
 
-            return int.Parse(token);
+            return long.Parse(token);
         }
         private static object ParseNullableDecimal(string token)
         {
@@ -88,7 +91,7 @@ namespace Odin.Parsing
         }
 
 
-        public static object Coerce(this ParameterValue parameter, string token)
+        public static object Coerce(this Parameter parameter, string token)
         {
             return parameter.ParameterType.Coerce(token);
         }

@@ -8,6 +8,9 @@ namespace Odin.Attributes
     [AttributeUsage(AttributeTargets.Method)]
     public class ActionAttribute : System.Attribute
     {
+        /// <summary>
+        /// True if the action is the default action for the command, otherwise false.
+        /// </summary>
         public bool IsDefault { get; set; }
     }
 }

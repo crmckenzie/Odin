@@ -7,6 +7,11 @@ namespace Odin.Exceptions
     /// </summary>
     public class UnmappedParameterException : Exception
     {
+
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="message"></param>
         public UnmappedParameterException(string message) : base(message)
         {
             

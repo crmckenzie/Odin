@@ -9,9 +9,13 @@ namespace Odin.Configuration
     /// </summary>
     public class SlashEqualsParser : IParser
     {
-        private readonly ParameterValue _parameter;
+        private readonly Parameter _parameter;
 
-        public SlashEqualsParser(ParameterValue parameter)
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="parameter"></param>
+        public SlashEqualsParser(Parameter parameter)
         {
             _parameter = parameter;
         }

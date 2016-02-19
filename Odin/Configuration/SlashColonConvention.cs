@@ -77,7 +77,7 @@ namespace Odin.Configuration
         /// </summary>
         /// <param name="parameter"></param>
         /// <returns></returns>
-        public IParser CreateParser(ParameterValue parameter)
+        public IParser CreateParser(Parameter parameter)
         {
             return new SlashColonParser(parameter);
         }

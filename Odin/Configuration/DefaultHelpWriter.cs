@@ -13,6 +13,9 @@ namespace Odin.Configuration
     /// </summary>
     public class DefaultHelpWriter : IHelpWriter
     {
+        /// <summary>
+        /// Constructor
+        /// </summary>
         public DefaultHelpWriter()
         {
             this.IdentifierWidth = 20;
@@ -81,6 +84,7 @@ namespace Odin.Configuration
             if (action != null)
             {
                 WriteActionHelp(action, builder);
+                WriteCommonParameters(command, builder);
                 return;
             }
 
@@ -153,11 +157,28 @@ namespace Odin.Configuration
 
             foreach (var method in command.Actions.OrderBy(m => m.Name))
             {
-                WriteActionHelp(method, builder); ;
+                WriteActionHelp(method, builder); 
             }
+
+            WriteCommonParameters(command, builder);
 
             WriteActionFooter(command, builder);
         }
+
+        private void WriteCommonParameters(Command command, StringBuilder builder)
+        {
+            if (!command.CommonParameters.Any())
+                return;
+
+            builder.AppendLine()
+                .AppendLine("COMMON PARAMETERS")
+                ;
+            foreach (var param in command.CommonParameters)
+            {
+                WriteParameter(builder, param);
+            }
+        }
+
 
         private void WriteActionHelp(MethodInvocation action, StringBuilder builder)
         {
@@ -189,13 +210,13 @@ namespace Odin.Configuration
 
         private void WriteParameters(MethodInvocation action, StringBuilder builder)
         {
-            foreach (var parameter in action.ParameterValues)
+            foreach (var parameter in action.MethodParameters)
             {
                 WriteParameter(builder, parameter);
             }
         }
 
-        private void WriteParameter(StringBuilder builder, ParameterValue parameter)
+        private void WriteParameter(StringBuilder builder, Parameter parameter)
         {
             var indent = new string(' ', this.IndentWidth);
             var spacer = new string(' ', this.SpacerWidth);
@@ -238,7 +259,7 @@ namespace Odin.Configuration
             return builder.ToString();
         }
 
-        private string GetDescription(ParameterValue parameter)
+        private string GetDescription(Parameter parameter)
         {
             var builder = new System.Text.StringBuilder();
 
@@ -255,10 +276,10 @@ namespace Odin.Configuration
                 builder.AppendLine(line);
             }
 
-            if (parameter.ParameterInfo.HasDefaultValue)
+            if (parameter.HasDefaultValue)
             {
                 builder.Append("default value: ");
-                builder.AppendLine(parameter.ParameterInfo.DefaultValue.ToString());
+                builder.AppendLine(parameter.DefaultValue?.ToString());
             }
 
             if (parameter.Aliases.Any())
@@ -266,11 +287,11 @@ namespace Odin.Configuration
                 builder.Append("aliases: ");
                 builder.AppendLine(parameter.Aliases.Join(", "));
             }
-            var descriptionAttr = parameter.ParameterInfo.GetCustomAttribute<DescriptionAttribute>();
+            var description = parameter.Description;
 
-            if (descriptionAttr != null)
+            if (!string.IsNullOrWhiteSpace(description))
             {
-                builder.Append(descriptionAttr.Description);
+                builder.Append(description);
             }
 
             return builder.ToString();

@@ -52,12 +52,20 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Configuration\StringExtensionsTests.cs" />
     <Compile Include="Demo\RootCommandRouteTests.cs" />
     <Compile Include="Lib\AliasTests.cs" />
     <Compile Include="Help\HelpWriterTestCommand.cs" />
+    <Compile Include="Lib\CommonParameterTests.cs" />
     <Compile Include="Lib\StringExtensionsTests.cs" />
+    <Compile Include="Parsing\CommonParameterTypeConversionTests.cs" />
+    <Compile Include="Parsing\CommonParameterTypesCommand.cs" />
+    <Compile Include="Validation\CommandWithCommonParameterAliasDuplication.cs" />
+    <Compile Include="Validation\CommandWithCommonParameterAndMethodParameterAliasConflict.cs" />
+    <Compile Include="Validation\CommandWithCommonParameterAndMethodParameterNameConflict.cs" />
     <Compile Include="Validation\CommandWithMultipleDefaultActions.cs" />
     <Compile Include="Validation\CommandWithNamingConflictBetweenSubCommandAndAction.cs" />
+    <Compile Include="Validation\CommandWithMethodParameterAliasDuplication.cs" />
     <Compile Include="Validation\ValidationTests.cs" />
     <Compile Include="Parsing\ArgumentTypesCommand.cs" />
     <Compile Include="Configuration\SlashColonConventionTests.cs" />
@@ -66,7 +74,7 @@
     <Compile Include="Lib\CommandInvocationTests.cs" />
     <Compile Include="Lib\CommandTests.cs" />
     <Compile Include="Lib\NotTheDefaultCommand.cs" />
-    <Compile Include="Parsing\ParseArgumentTypesTests.cs" />
+    <Compile Include="Parsing\MethodParameterTypeConversionTests.cs" />
     <Compile Include="Parsing\YesNoParser.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Lib\DefaultCommand.cs" />

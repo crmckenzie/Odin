@@ -43,12 +43,15 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Attributes\ActionAttribute.cs" />
+    <Compile Include="Attributes\ParameterAttribute.cs" />
     <Compile Include="Attributes\ParserAttribute.cs" />
+    <Compile Include="CommonParameter.cs" />
     <Compile Include="Configuration\ConventionsExtensions.cs" />
     <Compile Include="Configuration\HyphenCaseParser.cs" />
     <Compile Include="Configuration\SlashColonParser.cs" />
     <Compile Include="Configuration\SlashEqualsParser.cs" />
     <Compile Include="Exceptions\UnmappedParameterException.cs" />
+    <Compile Include="Parameter.cs" />
     <Compile Include="Parsing\IParser.cs" />
     <Compile Include="Configuration\DefaultHelpWriter.cs" />
     <Compile Include="Configuration\EnumerableExtensions.cs" />
@@ -65,7 +68,7 @@
     <Compile Include="Logging\ConsoleLogger.cs" />
     <Compile Include="Logging\ILogger.cs" />
     <Compile Include="Exceptions\ParameterConversionException.cs" />
-    <Compile Include="ParameterValue.cs" />
+    <Compile Include="MethodParameter.cs" />
     <Compile Include="Parsing\ReflectionExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ValidationResult.cs" />
