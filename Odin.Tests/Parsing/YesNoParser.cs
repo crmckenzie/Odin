@@ -5,7 +5,7 @@ namespace Odin.Tests.Parsing
 {
     public class YesNoParser : IParser
     {
-        private readonly ParameterValue _parameterValue;
+        private readonly Parameter _parameterValue;
 
         public ParseResult Parse(string[] tokens, int i)
         {
@@ -25,7 +25,7 @@ namespace Odin.Tests.Parsing
             return result;
         }
 
-        public YesNoParser(ParameterValue parameterValue)
+        public YesNoParser(Parameter parameterValue)
         {
             _parameterValue = parameterValue;
         }

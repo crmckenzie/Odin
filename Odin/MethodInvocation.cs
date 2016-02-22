@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
@@ -15,6 +16,11 @@ namespace Odin
     /// </summary>
     public class MethodInvocation
     {
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="command"></param>
+        /// <param name="methodInfo"></param>
         public MethodInvocation(Command command, MethodInfo methodInfo)
         {
             Command = command;
@@ -22,12 +28,18 @@ namespace Odin
 
             IsDefault = methodInfo.GetCustomAttribute<ActionAttribute>().IsDefault;
 
-            ParameterValues = MethodInfo.GetParameters()
-                .Select(row => new ParameterValue(this, row))
+            MethodParameters = MethodInfo
+                .GetParameters()
+                .Select(row => new MethodParameter(this, row))
                 .ToList()
                 .AsReadOnly()
                 ;
         }
+
+        /// <summary>
+        /// Gets the list of <see cref="CommonParameter"/>'s available to the MethodInvocation.
+        /// </summary>
+        public ReadOnlyCollection<CommonParameter> CommonParameters => Command.CommonParameters;
 
         /// <summary>
         /// Gets whether or not this action is the default one for its Command.
@@ -53,7 +65,11 @@ namespace Odin
         /// Gets the conventional name of the action.
         /// </summary>
         public string Name => Conventions.GetActionName(MethodInfo);
-        public ReadOnlyCollection<ParameterValue> ParameterValues { get; }
+
+        /// <summary>
+        /// Gets the collection of <see cref="MethodParameter"/>'s available to the MethodInvocation.
+        /// </summary>
+        public ReadOnlyCollection<MethodParameter> MethodParameters { get; }
 
         /// <summary>
         /// Gets the list of aliases applied to the action.
@@ -71,18 +87,24 @@ namespace Odin
             get { return Aliases.Concat(new string[] {this.Name}).ToArray(); }
         }
 
-        private ParameterValue FindByToken(string token)
+        private Parameter FindByToken(string token)
         {
-            return ParameterValues
+            Parameter result = MethodParameters
                 .FirstOrDefault(p => p.IsIdentifiedBy(token))
                 ;
+
+            if (result == null)
+            {
+                result = CommonParameters.FirstOrDefault(p => p.IsIdentifiedBy(token));
+            }
+            return result;
         }
 
-        private ParameterValue FindByIndex(int i)
+        private MethodParameter FindByIndex(int i)
         {
-            if (i >= ParameterValues.Count)
+            if (i >= MethodParameters.Count)
                 return null;
-            return ParameterValues
+            return MethodParameters
                 .OrderBy(p => p.Position)
                 .ToArray()[i]
                 ;
@@ -94,7 +116,7 @@ namespace Odin
         /// <returns></returns>
         public bool CanInvoke()
         {
-            return ParameterValues.All(row => row.IsValueSet());
+            return MethodParameters.All(row => row.IsValueSet());
         }
 
         /// <summary>
@@ -103,8 +125,10 @@ namespace Odin
         /// <returns>0 for success.</returns>
         public int Invoke()
         {
-            var args = ParameterValues
-                .OrderBy(map => map.ParameterInfo.Position)
+            this.CommonParameters.ToList().ForEach(cp => cp.WriteToCommand() );
+
+            var args = MethodParameters
+                .OrderBy(map => map.Position)
                 .Select(row => row.Value)
                 .ToArray()
                 ;
@@ -157,7 +181,7 @@ namespace Odin
             }
         }
 
-        private ParameterValue FindParameter(string token, int i)
+        private Parameter FindParameter(string token, int i)
         {
             var parameter = FindByToken(token);
             if (parameter != null) return parameter;
@@ -166,19 +190,19 @@ namespace Odin
             return FindByIndex(i);
         }
 
-        private IParser CreateParser(ParameterValue parameter)
+        private IParser CreateParser(Parameter parameter)
         {
             return parameter.HasCustomParser() ? CreateCustomParser(parameter) : Conventions.CreateParser(parameter);
         }
 
-        private IParser CreateCustomParser(ParameterValue parameter)
+        private IParser CreateCustomParser(Parameter parameter)
         {
-            var parserAttribute = parameter.ParameterInfo.GetCustomAttribute<ParserAttribute>();
+            var parserAttribute = parameter.ParserAttribute;
             if (!parserAttribute.ParserType.Implements<IParser>())
                 throw new ArgumentOutOfRangeException(
                     $"'{parserAttribute.ParserType.FullName}' is not an implementation of '{typeof (IParser).FullName}.'");
 
-            var types = new[] {typeof (ParameterValue)};
+            var types = new[] {typeof (Parameter)};
             var constructor = parserAttribute.ParserType.GetConstructor(types);
             if (constructor == null)
             {

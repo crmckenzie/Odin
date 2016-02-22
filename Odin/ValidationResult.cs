@@ -15,6 +15,11 @@ namespace Odin
         /// </summary>
         public string[] Messages { get; }
 
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="commandName"></param>
+        /// <param name="messages"></param>
         public ValidationResult(string commandName, string[]messages)
         {
             this.CommandName = commandName;

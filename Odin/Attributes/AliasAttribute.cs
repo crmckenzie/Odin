@@ -8,12 +8,13 @@ namespace Odin.Attributes
 {
     /// <summary>
     /// Identifies aliases for <see cref="Command">Commands</see>, 
-    /// <see cref="ActionAttribute">Actions</see>, or <see cref="ParameterValue">Parameters.</see>
+    /// <see cref="ActionAttribute">Actions</see>, or <see cref="MethodParameter">Parameters.</see>
     /// </summary>
     [AttributeUsage(
         AttributeTargets.Parameter | 
         AttributeTargets.GenericParameter | 
         AttributeTargets.Class | 
+        AttributeTargets.Property |
         AttributeTargets.Method, AllowMultiple = false)]
     public class AliasAttribute : Attribute
     {
@@ -22,6 +23,10 @@ namespace Odin.Attributes
         /// </summary>
         public IReadOnlyCollection<string> Aliases { get; }
 
+        /// <summary>
+        /// Identifies aliases for <see cref="Command">Commands</see>
+        /// </summary>
+        /// <param name="aliases"></param>
         public AliasAttribute(params string[] aliases)
         {
             Aliases = aliases.ToList().AsReadOnly();

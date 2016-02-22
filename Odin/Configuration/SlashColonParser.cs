@@ -9,9 +9,13 @@ namespace Odin.Configuration
     /// </summary>
     public class SlashColonParser : IParser
     {
-        private readonly ParameterValue _parameter;
+        private readonly Parameter _parameter;
 
-        public SlashColonParser(ParameterValue parameter)
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="parameter"></param>
+        public SlashColonParser(Parameter parameter)
         {
             _parameter = parameter;
         }

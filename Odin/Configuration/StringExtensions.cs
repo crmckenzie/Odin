@@ -6,6 +6,9 @@ using System.Text.RegularExpressions;
 
 namespace Odin.Configuration
 {
+    /// <summary>
+    /// Extension methods for <see cref="string"/>
+    /// </summary>
     public static class StringExtensions
     {
         /// <summary>

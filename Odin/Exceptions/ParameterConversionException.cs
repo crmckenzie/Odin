@@ -11,17 +11,23 @@ namespace Odin.Exceptions
         /// <summary>
         /// Gets the ParameterValue that could not be parse the token.
         /// </summary>
-        public ParameterValue ParameterValue { get; }
+        public Parameter Parameter { get; }
 
         /// <summary>
         /// Gets the token that could not be parsed.
         /// </summary>
         public string Token { get; }
         
-        public ParameterConversionException(ParameterValue parameterValue, string token, Exception exception) : 
-            base($"Argument conversion failed for parameter {parameterValue.Name}.\nCould not convert '{token}' to type {parameterValue.ParameterType.FullName}.\n", exception)
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="parameter"></param>
+        /// <param name="token"></param>
+        /// <param name="exception"></param>
+        public ParameterConversionException(Parameter parameter, string token, Exception exception) : 
+            base($"Argument conversion failed for parameter {parameter.Name}.\nCould not convert '{token}' to type {parameter.ParameterType.FullName}.\n", exception)
         {
-            ParameterValue = parameterValue;
+            Parameter = parameter;
             Token = token;
         }
     }
