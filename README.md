@@ -9,7 +9,7 @@ So why write a new one?
 ## Try it out!
 
 ```powershell
-Install-Package Odin-Commands -Pre
+Install-Package Odin-Commands
 ```
 
 ## Inspired By Thor
@@ -25,95 +25,96 @@ In ASP .NET MVC, urls are routed to the appropriate controller and action by con
 In addition, little manual wiring is required because ASP .NET MVC can discover and instantiate the controller easily at runtime.
 I wondered if it would be possible to use a combination of reflection and convention to create a command-line application in C#.
 
-## Goals
-
-* Given `program command subcommand action --arg1 value1 --arg2 value2`
-* Odin should resolve to the correct method invocation with as little wiring as possible.
-    * The above example should be interpreted as:
-        * find a component called `command`
-        * within `command` find a component or action called `subcommand`
-        * within `subcommand` find a subcommand or action called `action`
-        * once a method is located, coerce the arguments to that method to the correct types and invoke the method
-    * Failure to resolve a command should result in context-sensitive help
-* Odin commands should support a default action.
-* Odin should support custom conventions for how arguments should be formatted and routed.
-  * Provide some built-in conventions for common argument styles
-  * e.g. -a, --argument, --compound-argument, /argument, /argument:value
-  * conventions should be overridable via attributes+
-* Odin should provide auto-generated help.
-  * Help should be context sensitive
-  * Help format should be overridable
-* Odin should communicate to the Console via an overridable Logger.
-* Odin should not impose overall program structure on developers
-* Odin should interoperate with arbitrary Dependency Injection frameworks.
-* Odin should report its interpretation of routing in an externally testable manner.
-* Odin should automatically parse arguments into common framework types
-  * Odin should allow overrideble parsing algorithms.
-
 ### Show Me The Code
 
 #### Setup Code
 
 ```csharp
 
-public class RootCommand : Command
-{
-    public RootCommand() : this(new KatasCommand())
+    public class BooksCommand : Command
     {
+        public BooksCommand()
+        {
+            base.RegisterSubCommand(new SearchCommand());
+        }
+
+        [Parameter]
+        [Alias("t")]
+        [Description("The title of the book being added.")]
+        public string Title { get; set; }
+
+        [Parameter]
+        [Alias("a")]
+        [Description("The author of the book being added.")]
+        public string Author { get; set; }
+
+        [Action]
+        [Description("Adds a book to the index.")]
+        public void Add(
+            [Alias("r")]
+            [Description("The date the book was released.")]
+            DateTime releaseDate)
+        {   
+            Logger.Info("Adding '{0}' by '{1}' - released on '{2:MM/dd/yyyy}' to the index.\n", Title, Author, releaseDate);
+        }
+
+        [Action]
+        [Description("Removes a book from the index.")]
+        public void Delete()
+        {
+            Logger.Info("Remvoing '{0}' by '{1}' from the index.\n", Title, Author);
+        }
     }
 
-    public RootCommand(KatasCommand katas)
+    [Description("Provides search capabilities for books.")]
+    public class SearchCommand : Command
     {
-        base.RegisterSubCommand(katas);
+        [Parameter]
+        [Alias("s")]
+        [Description("The order to sort the results of the search.")]
+        public SortBooksBy SortBy { get; set; }
+
+        [Action]
+        [Description("Searches books by author.")]
+        public void Author(
+            [Alias("a")]
+            [Description("The author of the book being searched for.")]
+            string author)
+        {
+            Logger.Info("Find books by author '{0}'; sort results by '{1}'.\n", author, SortBy);
+        }
+
+        [Action(IsDefault = true)]
+        [Description("Searches books by title.")]
+        public void Title(
+            [Alias("t")]
+            [Description("The title of the book being searched for.")]
+            string title)
+        {
+            Logger.Info("Find books by title '{0}'; sort results by '{1}'.\n", title, SortBy);
+        }
+
+        [Action]
+        [Description("Searches books by release date.")]
+        public void ReleaseDate(
+            [Alias("f")]
+            [Description("The release date from which to search.")]
+            DateTime? from = null, 
+            
+            [Alias("t")]
+            [Description("The release date to which to search.")]
+            DateTime? to = null)
+        {
+            Logger.Info("Find books by release date: '{0}' - '{1}'; sort results by '{2}'.\n", from, to, SortBy);
+        }
     }
 
-    [Action]
-    [Description("The proverbial 'hello world' application.")]
-    public int Hello(
-        [Description("Override who to say hello to. Defaults to 'World'.")]
-        [Alias("w")]
-        string who = "World")
+    public enum SortBooksBy
     {
-        this.Logger.Info($"Hello {who}!\n");
-        return 0;
+        Author,
+        Title,
+        ReleaseDate
     }
-
-    [Action]
-    [Description("Display the current time")]
-    public void Time(
-        [Description("The format of the time. (default) hh:mm:ss tt")]
-        [Alias("f")]
-        string format = "hh:mm:ss tt")
-    {
-        this.Logger.Info($"The time is {DateTime.Now.ToLocalTime():format}\n");
-    }
-}
-
-[Description("Provides some katas.")]
-public class KatasCommand : Command
-{
-    [Action(IsDefault = true)]
-    public int FizzBuzz(
-        [Alias("i")]
-        int input
-        )
-    {
-        FizzBuzzGame.Play(this.Logger, input);
-        return 0;
-    }
-
-    [Action]
-    public int PrimeFactors(
-      [Alias("i")]
-      int input
-      )
-    {
-        var result = PrimeFactorGenerator.Generate(input);
-        var output = string.Join(" ", result.Select(row => row.ToString()));
-        this.Logger.Info($"{output}\n");
-        return 0;
-    }
-}
 
 
 ```
@@ -121,15 +122,15 @@ public class KatasCommand : Command
 #### The Program
 
 ```csharp
-class Program
-{
-    static void Main(string[] args)
+    class Program
     {
-        var root = new RootCommand(new KatasCommand());
-        var result = root.Execute(args);
-        Environment.Exit(result);
+        static void Main(string[] args)
+        {
+            var root = new BooksCommand();
+            var result = root.Execute(args);
+            Environment.Exit(result);
+        }
     }
-}
 ```
 
 ### What Do I Get For My Trouble?
@@ -138,15 +139,51 @@ You get a command line executable that can be invoked like so:
 
 ```
 
-exe hello --who "world"                 # explicit invocation
-exe hello -w "world"                    # argument alias
-exe hello "world"                       # implicit argument by order
+exe add --author "Ayn Rand" --title "Atlas Shrugged" --release-date  1957/10/10   # explicit invocation
+exe add -a "Ayn Rand" -t "Atlas Shrugged" -r 1957/10/10                           # argument alias
 
-exe katas fizz-buzz --input 11          # explicit subcommand invocation
-exe katas --input 11                    # subcommand + default action
-exe katas -i 11                         # subcommand + default action + argument alias
-exe katas 11                            # subcommand + default action + implicit argument by order
-exe katas prime-factors --input 27      # subcommand + non-default action + explicit argument
+exe search title --title "Atlas Shrugged" --sort-by author                        # explicit subcommand invocation
+exe search --title "Atlas Shrugged" --sort-by author                              # subcommand + default action
+exe search -t "Atlas Shrugged"  --sort-by author                                  # subcommand + default action + argument alias
+exe search "Atlas Shrugged"                                                       # subcommand + default action + implicit argument by order
+exe search author --author "Ayn Rand" --sort-by author                            # subcommand + non-default action + explicit argument
+```
+
+And help output that looks like:
+
+```
+ACTIONS
+add                     Adds a book to the index.
+
+    --release-date      aliases: -r
+                        The date the book was released.
+
+delete                  Removes a book from the index.
+
+help
+
+    --action-name       default value:
+                        The name of the action to provide help for.
+
+
+COMMON PARAMETERS
+    --title             default value:
+                        aliases: -t
+                        The title of the book being added.
+
+    --author            default value:
+                        aliases: -a
+                        The author of the book being added.
+
+
+To get help for actions
+        help <action>
+
+
+SUB COMMANDS
+search                  Provides search capabilities for books.
+To get help for subcommands
+        help <subcommand>
 ```
 
 [CommandLineParser]:https://www.nuget.org/packages/CommandLineParser
