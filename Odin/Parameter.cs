@@ -1,7 +1,5 @@
 using System;
-using System.ComponentModel;
 using System.Linq;
-using System.Reflection;
 using Odin.Attributes;
 using Odin.Configuration;
 using Odin.Parsing;
@@ -9,55 +7,59 @@ using Odin.Parsing;
 namespace Odin
 {
     /// <summary>
-    /// Represents an action parameter and its value.
+    /// Base class representing parameters passed to an Action
     /// </summary>
-    public class ParameterValue
+    public abstract class Parameter
     {
         private bool _isSet;
-
         private object _value;
 
-        public ParameterValue(MethodInvocation methodInvocation, ParameterInfo parameterInfo)
-        {
-            MethodInvocation = methodInvocation;
-            ParameterInfo = parameterInfo;
-
-            if (ParameterType == typeof (bool))
-                Value = false;
-
-            if (ParameterType.IsNullableType())
-                Value = null;
-
-            if (ParameterInfo.IsOptional)
-                Value = Type.Missing;
-        }
-
-        private MethodInvocation MethodInvocation { get; }
+        /// <summary>
+        /// The description of the parameter.
+        /// </summary>
+        public abstract string Description { get; }
 
         /// <summary>
-        /// Gets the conventions used in the command tree.
+        /// Gets the default value of the parameter.
         /// </summary>
-        public IConventions Conventions => MethodInvocation.Conventions;
+        public abstract object DefaultValue { get; }
 
         /// <summary>
-        /// Gets the ParameterInfo wrapped by the ParameterValue.
+        /// True if the parameter has a default value, otherwise false.
         /// </summary>
-        public ParameterInfo ParameterInfo { get; }
+        public abstract bool HasDefaultValue { get; }
+
+        /// <summary>
+        /// Gets the <see cref="ParserAttribute"/> associated with this parameter.
+        /// </summary>
+        public abstract ParserAttribute ParserAttribute { get; }
+
+        /// <summary>
+        /// Gets the conventional name of the parameter.
+        /// </summary>
+        public abstract string Name { get; }
 
         /// <summary>
         /// Gets the Type of the parameter.
         /// </summary>
-        public Type ParameterType => ParameterInfo.ParameterType;
+        public abstract Type ParameterType { get; }
+
 
         /// <summary>
-        /// Gets the position of the parameter.
+        /// Gets the <see cref="AliasAttribute"/> associated with this parameter.
         /// </summary>
-        public int Position => ParameterInfo.Position;
+        protected abstract AliasAttribute AliasAttribute { get; }
+
+        /// <summary>
+        /// Gets the conventions used in the command tree.
+        /// </summary>
+        public abstract IConventions Conventions { get;  }
+
 
         /// <summary>
         /// Gets or sets the value of the parameter.
         /// </summary>
-        public object Value
+        public virtual object Value
         {
             get { return _value; }
             set
@@ -67,26 +69,22 @@ namespace Odin
             }
         }
 
-
-        /// <summary>
-        /// Gets the conventional name of the parameter.
-        /// </summary>
-        public string Name => ParameterInfo.Name;
-
         /// <summary>
         /// Gets the conventional long option name for the parameter.
         /// </summary>
         public string LongOptionName => Conventions.GetLongOptionName(Name);
 
+        /// <summary>
+        /// Gets the list of aliases used to identify the parameter.
+        /// </summary>
         public string[] Aliases
         {
             get
             {
-                var attr = ParameterInfo.GetCustomAttribute<AliasAttribute>();
-                if (attr == null)
-                    return new string[] {};
+                if (AliasAttribute == null)
+                    return new string[] { };
 
-                return attr.Aliases.Select(a => Conventions.GetShortOptionName(a)).ToArray();
+                return AliasAttribute.Aliases.Select(a => Conventions.GetShortOptionName(a)).ToArray();
             }
         }
 
@@ -132,7 +130,7 @@ namespace Odin
         /// <returns></returns>
         public bool HasCustomParser()
         {
-            return ParameterInfo.GetCustomAttribute<ParserAttribute>() != null;
+            return ParserAttribute != null;
         }
 
         /// <summary>

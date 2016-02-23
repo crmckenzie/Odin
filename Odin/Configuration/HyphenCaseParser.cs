@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using Odin.Parsing;
 
@@ -8,9 +9,13 @@ namespace Odin.Configuration
     /// </summary>
     public class HyphenCaseParser : IParser
     {
-        private readonly ParameterValue _parameter;
+        private readonly Parameter _parameter;
 
-        public HyphenCaseParser(ParameterValue parameter)
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="parameter"></param>
+        public HyphenCaseParser(Parameter parameter)
         {
             this._parameter = parameter;
         }
@@ -64,7 +69,7 @@ namespace Odin.Configuration
             return indexOfCurrentArg < tokens.Length && _parameter.Conventions.IsParameterName(tokens[indexOfCurrentArg]);
         }
 
-        private static ParseResult ParseNameValuePair(ParameterValue parameter, string[] tokens, int i)
+        private static ParseResult ParseNameValuePair(Parameter parameter, string[] tokens, int i)
         {
             var value = tokens[i + 1];
             return new ParseResult()
@@ -74,28 +79,31 @@ namespace Odin.Configuration
             };
         }
 
-        private static bool ShouldParseNameValuePair(ParameterValue parameter, string[] tokens, int i)
+        private static bool ShouldParseNameValuePair(Parameter parameter, string[] tokens, int i)
         {
             var token = tokens[i];
             var hasNextArgument = tokens.Length > (i + 1);
             return parameter.IsIdentifiedBy(token) && hasNextArgument;
         }
 
-        private ParseResult ParseArray(ParameterValue parameter, string[] tokens)
+        private ParseResult ParseArray(Parameter parameter, string[] tokens)
         {
             var tokensToParse = tokens.Skip(1).TakeUntil(_parameter.Conventions.IsParameterName);
 
             var elementType = parameter.ParameterType.GetElementType();
 
             var range = tokensToParse.Select(elementType.Coerce).ToArray();
+            var value = Array.CreateInstance(elementType, range.Length);
+            Array.Copy(range, value, range.Length);
+
             return new ParseResult()
             {
-                Value = range,
+                Value = value,
                 TokensProcessed = range.Length+1,
             };
         }
 
-        private static bool ShouldParseArray(ParameterValue parameter, string token)
+        private static bool ShouldParseArray(Parameter parameter, string token)
         {
             return parameter.IsIdentifiedBy(token) && parameter.ParameterType.IsArray();
         }

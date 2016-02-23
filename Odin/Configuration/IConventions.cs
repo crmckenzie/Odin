@@ -59,7 +59,7 @@ namespace Odin.Configuration
         /// </summary>
         /// <param name="parameter"></param>
         /// <returns></returns>
-        IParser CreateParser(ParameterValue parameter);
+        IParser CreateParser(Parameter parameter);
 
         /// <summary>
         /// True if token represents a conventional parameter name. Otherwise false.

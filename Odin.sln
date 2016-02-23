@@ -12,7 +12,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		appveyor.yml = appveyor.yml
 		Odin-Commands.nuspec = Odin-Commands.nuspec
 		README.md = README.md
-		TODO.md = TODO.md
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Odin.Demo", "Odin.Demo\Odin.Demo.csproj", "{F3682E22-F249-40F5-922A-9758ACF6E3FE}"

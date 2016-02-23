@@ -8,6 +8,11 @@ namespace Odin.Tests.Help
 You can use this package to easily create command line applications that automatically route command-line arguments to the correct command based on customizable conventions.")]
     public class HelpWriterTestCommand : Command
     {
+        [Parameter]
+        [Alias("c")]
+        [Description(@"Common parameters are displayed after all of the actions")]
+        public string Common1 { get; set; }
+
         [Action(IsDefault = true)]
         [Alias("default")]
         [Description(@"Use the ActionAttribute to indicate which methods should be mapped to command line arguments. Set IsDefault=True to mark an action as the default. Only one action per command can be marked default.

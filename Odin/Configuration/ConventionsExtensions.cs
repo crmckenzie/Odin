@@ -2,6 +2,9 @@ using System.Reflection;
 
 namespace Odin.Configuration
 {
+    /// <summary>
+    /// Provides extension methods related to the <see cref="IConventions"/> interface.
+    /// </summary>
     public static class ConventionsExtensions
     {
         /// <summary>
@@ -19,12 +22,12 @@ namespace Odin.Configuration
         /// Returns true if the parameter is matched by the token. Otherwise false.
         /// </summary>
         /// <param name="conventions"></param>
-        /// <param name="parameterMap"></param>
+        /// <param name="parameter"></param>
         /// <param name="token"></param>
         /// <returns></returns>
-        public static bool IsMatchingParameter(this IConventions conventions, ParameterValue parameterMap, string token)
+        public static bool IsMatchingParameter(this IConventions conventions, Parameter parameter, string token)
         {
-            return conventions.IsMatchingParameterName(parameterMap.ParameterInfo.Name, token);
+            return conventions.IsMatchingParameterName(parameter.Name, token);
         }
 
         /// <summary>

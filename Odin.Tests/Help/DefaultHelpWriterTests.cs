@@ -135,6 +135,29 @@ namespace Odin.Tests.Help
             lines[++i].ShouldBe("");
         }
 
+        [Test]
+        public void CommonParameters()
+        {
+            // When
+            var cmd = new HelpWriterTestCommand();
+
+            // Then
+            var result = this.Subject.Write(cmd);
+
+            var lines = result
+                .Split('\n')
+                .Select(row => row.Replace("\r", "").TrimEnd())
+                .SkipUntil(row => row.StartsWith("COMMON PARAMETERS"))
+                .ToArray()
+                ;
+            int i = 0;
+            lines[i++].ShouldBe("COMMON PARAMETERS");
+            lines[i++].ShouldBe("    --common1           default value:");
+            lines[i++].ShouldBe("                        aliases: -c");
+            lines[i++].ShouldBe("                        Common parameters are displayed after all of the");
+            lines[i++].ShouldBe("                        actions");
+        }
+
         #region actions
 
         [Test]
@@ -156,16 +179,21 @@ namespace Odin.Tests.Help
                 .ToArray()
                 ;
 
-            var i = -1;
-            lines[++i].ShouldBe("enum-action             aliases: enum");
-            lines[++i].ShouldBe("                        Enumerated parameters should be listed before");
-            lines[++i].ShouldBe("                        default value.");
-            lines[++i].ShouldBe("");
-            lines[++i].ShouldBe("    --input             valid values: One, Two, Three");
-            lines[++i].ShouldBe("                        default value: One");
-            lines[++i].ShouldBe("");
-            lines[++i].ShouldBe("");
-            lines[++i].ShouldBe("");
+            var i = 0;
+            lines[i++].ShouldBe("enum-action             aliases: enum");
+            lines[i++].ShouldBe("                        Enumerated parameters should be listed before");
+            lines[i++].ShouldBe("                        default value.");
+            lines[i++].ShouldBe("");
+            lines[i++].ShouldBe("    --input             valid values: One, Two, Three");
+            lines[i++].ShouldBe("                        default value: One");
+            lines[i++].ShouldBe("");
+            lines[i++].ShouldBe("");
+            lines[i++].ShouldBe("");
+            lines[i++].ShouldBe("COMMON PARAMETERS");
+            lines[i++].ShouldBe("    --common1           default value:");
+            lines[i++].ShouldBe("                        aliases: -c");
+            lines[i++].ShouldBe("                        Common parameters are displayed after all of the");
+            lines[i++].ShouldBe("                        actions");
         }
 
         [Test]

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Data;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -22,6 +23,9 @@ namespace Odin
     /// </remarks>
     public abstract class Command
     {
+        /// <summary>
+        /// Base class an Odin command.
+        /// </summary>
         protected Command()
         {
             _conventions = new HyphenCaseConvention();
@@ -59,7 +63,16 @@ namespace Odin
                 .Select(row => new MethodInvocation(this, row))
                 .ToList()
                 ;
+
+            this.CommonParameters  = this.GetType().GetProperties()
+                .Where(row => row.GetCustomAttribute<ParameterAttribute>() != null)
+                .Select(row => new CommonParameter(this, row))
+                .ToList()
+                .AsReadOnly()
+                ;
         }
+
+        internal ReadOnlyCollection<CommonParameter> CommonParameters { get; set; }
 
         /// <summary>
         /// Sets the logger to be used with the command. Only the logger applied to the root command is used.
@@ -97,7 +110,7 @@ namespace Odin
         /// <summary>
         /// Gets the logger for the command tree.
         /// </summary>
-        public ILogger Logger => IsRoot() ? _logger : Parent.Logger;
+        public virtual ILogger Logger => IsRoot() ? _logger : Parent.Logger;
 
         private  IConventions _conventions;
         private IHelpWriter _helpWriter;
@@ -183,9 +196,24 @@ namespace Odin
             }
 
             var result = -1;
-            var invocation = this.GenerateInvocation(args);
+
+            MethodInvocation invocation;
+            try
+            {
+                invocation = this.GenerateInvocation(args);
+
+            }
+            catch (UnmappedParameterException)
+            {
+                this.Logger.Error($"Could not interpret the command. You sent [{args.Join(", ")}]");
+                this.Help();
+                return result;
+            }
+
             if (invocation?.CanInvoke() == true)
+            {
                 result =  invocation.Invoke();
+            }
 
             if (result == 0)
                 return result;
@@ -308,6 +336,42 @@ namespace Odin
             {
                 yield return $"There is more than one executable action named '{matchingName}'.";
             }
+
+            foreach (var action in this._actions)
+            {
+                var aliases = action.MethodParameters.SelectMany(row => row.Aliases);
+                var duplicates = aliases.GroupBy((s) => s).Where(row => row.Count() > 1);
+                foreach (var dup in duplicates)
+                {
+                    yield return $"The alias '{dup.Key}' is duplicated for action '{action.Name}'.";
+                }
+
+                foreach (var parameter in action.MethodParameters)
+                {
+                    foreach (var commonParameter in CommonParameters)
+                    {
+                        if (commonParameter.LongOptionName == parameter.LongOptionName)
+                        {
+                            yield return $"The common parameter name '{parameter.LongOptionName}' conflicts with a parameter defined for action '{action.Name}'.";
+                        }
+
+                        foreach (var alias in commonParameter.Aliases.Where(alias => parameter.Aliases.Contains(alias)))
+                        {
+                            yield return
+                                $"The alias '{alias}' for common parameter '{commonParameter.LongOptionName}' is duplicated for parameter '{parameter.LongOptionName}' on action '{action.Name}'."
+                                ;
+                        }
+                    }
+                }
+            }
+
+            var commonParameterAliases = this.CommonParameters.SelectMany(row => row.Aliases);
+            var commonParameterDuplicates = commonParameterAliases.GroupBy((s) => s).Where(row => row.Count() > 1);
+            foreach (var dup in commonParameterDuplicates)
+            {
+                yield return $"The alias '{dup.Key}' is duplicated amongst common parameters.";
+            }
+
         }
     }
 }
