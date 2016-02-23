@@ -69,6 +69,7 @@
   - ps: $env:buildVersion = "$env:packageVersion.$env:appveyor_build_number"
   - ps: $env:nugetVersion = "$env:packageVersion-beta-$env:appveyor_build_number"
   - ps: Update-AppveyorBuild -Version $env:buildVersion
+  - ps: write-host "Release branch build version: $env:buildVersion"
 
   assembly_info:
     patch: true
