@@ -44,7 +44,7 @@
   deploy:
   - provider: NuGet
     api_key:
-    secure: oZLUyd94wnic5VlRfHZnlopK4I2tNOT30JMOp0nWrH/i+ZOyVYKayPbfy407OZdL
+      secure: oZLUyd94wnic5VlRfHZnlopK4I2tNOT30JMOp0nWrH/i+ZOyVYKayPbfy407OZdL
     artifact: odin-nuget-package
 
   notifications:
@@ -100,7 +100,7 @@
   deploy:
   - provider: NuGet
     api_key:
-    secure: oZLUyd94wnic5VlRfHZnlopK4I2tNOT30JMOp0nWrH/i+ZOyVYKayPbfy407OZdL
+      secure: oZLUyd94wnic5VlRfHZnlopK4I2tNOT30JMOp0nWrH/i+ZOyVYKayPbfy407OZdL
     artifact: odin-nuget-package
 
   notifications:
