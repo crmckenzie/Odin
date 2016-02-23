@@ -66,11 +66,13 @@
     - /release\/.*/
 
   init:
-  - ps: $env:buildVersion = "{0}.{1}" -f $env:packageVersion, $env:appveyor_build_number
-  - ps: $env:nugetVersion = "{0}-beta-{1}" -f $env:packageVersion, $env:appveyor_build_number
-  - ps: write-host "Release branch build version   -  $env:buildVersion"
-  - ps: write-host "Release branch package version -  $env:nugetVersion"
-  - ps: Update-AppveyorBuild -Version $env:buildVersion
+  - ps: >-
+      gci env:
+      $env:buildVersion = "{0}.{1}" -f $env:packageVersion, $env:appveyor_build_number
+      $env:nugetVersion = "{0}-beta-{1}" -f $env:packageVersion, $env:appveyor_build_number
+      write-host "Release branch build version   -  $env:buildVersion"
+      write-host "Release branch package version -  $env:nugetVersion"
+      Update-AppveyorBuild -Version $env:buildVersion
 
   assembly_info:
     patch: true
@@ -137,7 +139,7 @@
 
   build:
     verbosity: minimal
-    
+
   notifications:
   - provider: Webhook
     url: https://webhooks.gitter.im/e/3712526962bd70e49d63
