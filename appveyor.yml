@@ -6,20 +6,16 @@
     - master
 
   version: 0.2.0.{build}
-  environment:
-    packageVersion: 0.2.0
 
   init:
-  - ps: $env:buildVersion = "$env:packageVersion.$env:appveyor_build_number"
-  - ps: $env:nugetVersion = $env:packageVersion
-  - ps: Update-AppveyorBuild -Version $env:buildVersion
+  - ps: $env:PackageVersion = $env:APPVEYOR_BUILD_VERSION
 
   assembly_info:
     patch: true
     file: '**\AssemblyInfo.*'
-    assembly_version: '$(buildVersion)'
-    assembly_file_version: '$(buildVersion)'
-    assembly_informational_version: '$(nugetVersion)'
+    assembly_version: '$(APPVEYOR_BUILD_VERSION)'
+    assembly_file_version: '$(APPVEYOR_BUILD_VERSION)'
+    assembly_informational_version: '$(APPVEYOR_BUILD_VERSION)'
 
   configuration: Release
 
@@ -35,7 +31,7 @@
     verbosity: minimal
 
   after_build:
-  - ps: nuget pack Odin-Commands.nuspec -version "$env:nugetVersion"
+  - ps: nuget pack Odin-Commands.nuspec -version "$env:PackageVersion"
 
   artifacts:
   - path: 'Odin-Commands*.nupkg'
@@ -65,10 +61,8 @@
 
   init:
   - ps: |
-      gci env:
       $version = new-object System.Version $env:APPVEYOR_BUILD_VERSION
       $env:PackageVersion = "{0}.{1}.{2}-beta-{3}" -f $version.Major, $version.Minor, $version.Build, $version.Revision
-      write-host "Package Version - $env:PackageVersion"
 
   assembly_info:
     patch: true
@@ -114,19 +108,6 @@
 # compile, test
 -
   version: 0.2.0.{build}
-  environment:
-    packageVersion: 0.2.0
-
-  init:
-  - ps: $env:buildVersion = "$env:PackageVersion.$env:appveyor_build_number"
-  - ps: Update-AppveyorBuild -Version $env:buildVersion
-
-  assembly_info:
-    patch: true
-    file: '**\AssemblyInfo.*'
-    assembly_version: '$(buildVersion)'
-    assembly_file_version: '$(buildVersion)'
-    assembly_informational_version: '$(nugetVersion)'
 
   configuration: Release
 
