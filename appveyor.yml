@@ -75,7 +75,7 @@
     file: '**\AssemblyInfo.*'
     assembly_version: '$(buildVersion)'
     assembly_file_version: '$(buildVersion)'
-    assembly_informational_version: '$(nugetVersion)'
+    assembly_informational_version: '$(PackageVersion)'
 
   configuration: Release
 
