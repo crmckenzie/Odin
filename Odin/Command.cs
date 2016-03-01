@@ -183,6 +183,25 @@ namespace Odin
         }
 
         /// <summary>
+        /// Called after arguments are parsed but before the invocation is executed.
+        /// </summary>
+        /// <param name="invocation"></param>
+        protected virtual void OnBeforeExecute(MethodInvocation invocation)
+        {
+        }
+
+        /// <summary>
+        /// Called after the invocation is executed.
+        /// </summary>
+        /// <param name="invocation"></param>
+        /// <param name="result"></param>
+        /// <returns></returns>
+        protected virtual int OnAfterExecute(MethodInvocation invocation, int result)
+        {
+            return result;
+        }
+
+        /// <summary>
         /// Executes the command.
         /// </summary>
         /// <param name="args"></param>
@@ -201,7 +220,6 @@ namespace Odin
             try
             {
                 invocation = this.GenerateInvocation(args);
-
             }
             catch (UnmappedParameterException)
             {
@@ -212,7 +230,9 @@ namespace Odin
 
             if (invocation?.CanInvoke() == true)
             {
+                this.OnBeforeExecute(invocation);
                 result =  invocation.Invoke();
+                this.OnAfterExecute(invocation, result);
             }
 
             if (result == 0)
