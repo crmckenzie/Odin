@@ -125,8 +125,6 @@ namespace Odin
         /// <returns>0 for success.</returns>
         public int Invoke()
         {
-            this.CommonParameters.ToList().ForEach(cp => cp.WriteToCommand() );
-
             var args = MethodParameters
                 .OrderBy(map => map.Position)
                 .Select(row => row.Value)
