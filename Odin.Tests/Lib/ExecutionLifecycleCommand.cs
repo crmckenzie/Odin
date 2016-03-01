@@ -5,8 +5,11 @@ namespace Odin.Tests
 {
     public class ExecutionLifecycleCommand : Command
     {
+        [Parameter]
         public DateTime Before { get; set; }
+        [Parameter]
         public DateTime Begin { get; set; }
+        [Parameter]
         public DateTime After { get; set; }
 
         protected override void OnBeforeExecute(MethodInvocation invocation)

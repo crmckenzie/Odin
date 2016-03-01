@@ -230,6 +230,7 @@ namespace Odin
 
             if (invocation?.CanInvoke() == true)
             {
+                this.CommonParameters.ToList().ForEach(cp => cp.WriteToCommand());
                 this.OnBeforeExecute(invocation);
                 result =  invocation.Invoke();
                 this.OnAfterExecute(invocation, result);
