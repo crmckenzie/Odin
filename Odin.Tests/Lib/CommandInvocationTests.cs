@@ -74,6 +74,21 @@ namespace Odin.Tests
             result.MethodParameters.Count.ShouldBe(0);
         }
 
+        [Test]
+        public void BeforeAndAfterEventsAreExecuted()
+        {
+            // Given
+            var subject = new ExecutionLifecycleCommand();
+
+            // When
+            subject.Execute("do-stuff");
+
+            // Then
+            subject.Before.ShouldNotBe(DateTime.MinValue);
+            subject.Begin.ShouldBeGreaterThan(subject.Before);
+            subject.After.ShouldBeGreaterThan(subject.Begin);
+        }
+
         #endregion
 
         #region Required arguments

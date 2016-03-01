@@ -57,6 +57,7 @@
     <Compile Include="Lib\AliasTests.cs" />
     <Compile Include="Help\HelpWriterTestCommand.cs" />
     <Compile Include="Lib\CommonParameterTests.cs" />
+    <Compile Include="Lib\ExecutionLifecycleCommand.cs" />
     <Compile Include="Lib\StringExtensionsTests.cs" />
     <Compile Include="Parsing\CommonParameterTypeConversionTests.cs" />
     <Compile Include="Parsing\CommonParameterTypesCommand.cs" />
