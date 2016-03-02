@@ -186,7 +186,7 @@ namespace Odin
         /// Called after arguments are parsed but before the invocation is executed.
         /// </summary>
         /// <param name="invocation"></param>
-        protected virtual void OnBeforeExecute(MethodInvocation invocation)
+        protected internal virtual void OnBeforeExecute(MethodInvocation invocation)
         {
         }
 
@@ -194,11 +194,11 @@ namespace Odin
         /// Called after the invocation is executed.
         /// </summary>
         /// <param name="invocation"></param>
-        /// <param name="result"></param>
+        /// <param name="exitCode"></param>
         /// <returns></returns>
-        protected virtual int OnAfterExecute(MethodInvocation invocation, int result)
+        protected internal virtual int OnAfterExecute(MethodInvocation invocation, int exitCode)
         {
-            return result;
+            return exitCode;
         }
 
         /// <summary>
@@ -230,10 +230,7 @@ namespace Odin
 
             if (invocation?.CanInvoke() == true)
             {
-                this.CommonParameters.ToList().ForEach(cp => cp.WriteToCommand());
-                this.OnBeforeExecute(invocation);
                 result =  invocation.Invoke();
-                this.OnAfterExecute(invocation, result);
             }
 
             if (result == 0)

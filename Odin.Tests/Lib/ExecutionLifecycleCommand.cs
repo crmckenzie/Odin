@@ -17,10 +17,10 @@ namespace Odin.Tests
             Before = DateTime.Now;
         }
 
-        protected override int OnAfterExecute(MethodInvocation invocation, int result)
+        protected override int OnAfterExecute(MethodInvocation invocation, int exitCode)
         {
             After = DateTime.Now;
-            return base.OnAfterExecute(invocation, result);
+            return base.OnAfterExecute(invocation, exitCode);
         }
 
         [Action]
