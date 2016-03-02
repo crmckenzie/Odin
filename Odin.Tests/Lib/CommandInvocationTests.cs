@@ -2,6 +2,7 @@
 using System.Linq;
 using NSubstitute;
 using NUnit.Framework;
+using Odin.Demo;
 using Shouldly;
 
 namespace Odin.Tests
@@ -82,6 +83,24 @@ namespace Odin.Tests
 
             // When
             subject.Execute("do-stuff");
+
+            // Then
+            subject.Before.ShouldNotBe(DateTime.MinValue);
+            subject.Begin.ShouldBeGreaterThan(subject.Before);
+            subject.After.ShouldBeGreaterThan(subject.Begin);
+        }
+
+
+        [Test]
+        public void BeforeAndAfterEventsAreExecutedOnSubCommand()
+        {
+            // Given
+            var root = new RootCommand();
+            var subject = new ExecutionLifecycleCommand();
+            root.RegisterSubCommand(subject);
+
+            // When
+            root.Execute("execution-lifecycle", "do-stuff");
 
             // Then
             subject.Before.ShouldNotBe(DateTime.MinValue);

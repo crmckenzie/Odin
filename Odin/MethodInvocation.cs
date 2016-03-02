@@ -131,18 +131,23 @@ namespace Odin
                 .ToArray()
                 ;
 
+            this.CommonParameters.ToList().ForEach(cp => cp.WriteToCommand());
+
+            this.Command.OnBeforeExecute(this);
+
             var result = MethodInfo.Invoke(Command, args);
+            int exitCode = 0;
             if (result is int)
             {
-                return (int) result;
+                exitCode =  (int) result;
             }
 
             if (result is bool)
             {
-                return (bool) result ? 0 : -1;
+                exitCode =  (bool) result ? 0 : -1;
             }
 
-            return 0;
+            return this.Command.OnAfterExecute(this, exitCode);
         }
 
         internal void SetParameterValues(string[] tokens)
