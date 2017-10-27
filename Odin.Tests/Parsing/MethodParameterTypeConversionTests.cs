@@ -4,11 +4,13 @@ using Shouldly;
 
 namespace Odin.Tests.Parsing
 {
-    [TestFixture]
+    using Odin.Tests.Lib;
+
+    using Xunit;
+
     public class MethodParameterTypeConversionTests
     {
-        [SetUp]
-        public void BeforeEach()
+        public MethodParameterTypeConversionTests()
         {
             this.Logger = new StringBuilderLogger();
             this.Subject = new ArgumentTypesCommand()
@@ -20,7 +22,7 @@ namespace Odin.Tests.Parsing
 
         public StringBuilderLogger Logger { get; set; }
 
-        [Test]
+        [Fact]
         public void WithBoolean()
         {
             // When
@@ -30,7 +32,7 @@ namespace Odin.Tests.Parsing
             result.MethodParameters[0].Value.ShouldBe(true);
         }
 
-        [Test]
+        [Fact]
         public void WithNegatedBoolean()
         {
             // When
@@ -41,7 +43,7 @@ namespace Odin.Tests.Parsing
         }
 
 
-        [Test]
+        [Fact]
         public void WithBoolean_False()
         {
             // When
@@ -51,7 +53,7 @@ namespace Odin.Tests.Parsing
             result.MethodParameters[0].Value.ShouldBe(false);
         }
 
-        [Test]
+        [Fact]
         public void WithBoolean_ArgumentIdentifierOnly()
         {
             // When
@@ -62,7 +64,7 @@ namespace Odin.Tests.Parsing
         }
 
 
-        [Test]
+        [Fact]
         public void WithBoolean_NoArgumentIdentifier()
         {
             // When
@@ -73,7 +75,7 @@ namespace Odin.Tests.Parsing
         }
 
 
-        [Test]
+        [Fact]
         public void WithInt32()
         {
             // When
@@ -83,7 +85,7 @@ namespace Odin.Tests.Parsing
             result.MethodParameters[0].Value.ShouldBe(37);
         }
 
-        [Test]
+        [Fact]
         public void WithInt64()
         {
             // When
@@ -93,7 +95,7 @@ namespace Odin.Tests.Parsing
             result.MethodParameters[0].Value.ShouldBe(37);
         }
 
-        [Test]
+        [Fact]
         public void WithDouble()
         {
             // When
@@ -103,7 +105,7 @@ namespace Odin.Tests.Parsing
             result.MethodParameters[0].Value.ShouldBe(37.45);
         }
 
-        [Test]
+        [Fact]
         public void WithDecimal()
         {
             // When
@@ -113,7 +115,7 @@ namespace Odin.Tests.Parsing
             result.MethodParameters[0].Value.ShouldBe(37.45m);
         }
 
-        [Test]
+        [Fact]
         public void WithEnum()
         {
             // When
@@ -123,7 +125,7 @@ namespace Odin.Tests.Parsing
             result.MethodParameters[0].Value.ShouldBe(Numbers.Two);
         }
 
-        [Test]
+        [Fact]
         public void WithDateTime()
         {
             // When
@@ -133,7 +135,7 @@ namespace Odin.Tests.Parsing
             result.MethodParameters[0].Value.ShouldBe(new DateTime(1975,07,29));
         }
 
-        [Test]
+        [Fact]
         public void WithNullableBoolean()
         {
             // When
@@ -143,7 +145,7 @@ namespace Odin.Tests.Parsing
             result.MethodParameters[0].Value.ShouldBe(true);
         }
 
-        [Test]
+        [Fact]
         public void WithNullableBoolean_ArgumentIdentifierOnly()
         {
             // When
@@ -153,7 +155,7 @@ namespace Odin.Tests.Parsing
             result.MethodParameters[0].Value.ShouldBe(true);
         }
 
-        [Test]
+        [Fact]
         public void WithNullableBoolean_False()
         {
             // When
@@ -163,7 +165,7 @@ namespace Odin.Tests.Parsing
             result.MethodParameters[0].Value.ShouldBe(false);
         }
 
-        [Test]
+        [Fact]
         public void WithNullableBoolean_NoArgumentIdentifier()
         {
             // When
@@ -175,7 +177,7 @@ namespace Odin.Tests.Parsing
         }
 
 
-        [Test]
+        [Fact]
         public void WithNullableInt32()
         {
             // When
@@ -185,7 +187,7 @@ namespace Odin.Tests.Parsing
             result.MethodParameters[0].Value.ShouldBe(37);
         }
 
-        [Test]
+        [Fact]
         public void WithNullableInt32_ArgumentIdentifierUnspecified()
         {
             // When
@@ -195,7 +197,7 @@ namespace Odin.Tests.Parsing
             result.MethodParameters[0].Value.ShouldBe(null);
         }
 
-        [Test]
+        [Fact]
         public void WithNullableInt64()
         {
             // When
@@ -205,7 +207,7 @@ namespace Odin.Tests.Parsing
             result.MethodParameters[0].Value.ShouldBe(37);
         }
 
-        [Test]
+        [Fact]
         public void WithNullableInt64_ArgumentIdentifierUnspecified()
         {
             // When
@@ -215,7 +217,7 @@ namespace Odin.Tests.Parsing
             result.MethodParameters[0].Value.ShouldBe(null);
         }
 
-        [Test]
+        [Fact]
         public void WithNullableDouble()
         {
             // When
@@ -225,7 +227,7 @@ namespace Odin.Tests.Parsing
             result.MethodParameters[0].Value.ShouldBe(37);
         }
 
-        [Test]
+        [Fact]
         public void WithNullableDouble_ArgumentIdentifierUnspecified()
         {
             // When
@@ -235,7 +237,7 @@ namespace Odin.Tests.Parsing
             result.MethodParameters[0].Value.ShouldBe(null);
         }
 
-        [Test]
+        [Fact]
         public void WithNullableDecimal()
         {
             // When
@@ -245,7 +247,7 @@ namespace Odin.Tests.Parsing
             result.MethodParameters[0].Value.ShouldBe(37);
         }
 
-        [Test]
+        [Fact]
         public void WithNullableDecimal_ArgumentIdentifierUnspecified()
         {
             // When
@@ -255,7 +257,7 @@ namespace Odin.Tests.Parsing
             result.MethodParameters[0].Value.ShouldBe(null);
         }
 
-        [Test]
+        [Fact]
         public void WithNullableEnum()
         {
             // When
@@ -265,7 +267,7 @@ namespace Odin.Tests.Parsing
             result.MethodParameters[0].Value.ShouldBe(Numbers.Two);
         }
 
-        [Test]
+        [Fact]
         public void WithNullableEnum_ArgumentIdentifierUnspecified()
         {
             // When
@@ -276,7 +278,7 @@ namespace Odin.Tests.Parsing
         }
 
 
-        [Test]
+        [Fact]
         public void WithNullableDateTime()
         {
             // When
@@ -286,7 +288,7 @@ namespace Odin.Tests.Parsing
             result.MethodParameters[0].Value.ShouldBe(new DateTime(1975,07,29));
         }
 
-        [Test]
+        [Fact]
         public void WithNullableDateTime_ArgumentIdentifierUnspecified()
         {
             // When
@@ -296,7 +298,7 @@ namespace Odin.Tests.Parsing
             result.MethodParameters[0].Value.ShouldBe(null);
         }
 
-        [Test]
+        [Fact]
         public void WithBooleanCustomParser()
         {
             // When
@@ -308,7 +310,7 @@ namespace Odin.Tests.Parsing
             result.MethodParameters[2].Value.ShouldBe("fredbob");
         }
 
-        [Test]
+        [Fact]
         public void WithBoolean_FalseCustomParser()
         {
             // When
@@ -320,7 +322,7 @@ namespace Odin.Tests.Parsing
             result.MethodParameters[2].Value.ShouldBe("fredbob");
         }
 
-        [Test]
+        [Fact]
         public void WithAliasedBooleanCustomParser()
         {
             // When
@@ -332,7 +334,7 @@ namespace Odin.Tests.Parsing
             result.MethodParameters[2].Value.ShouldBe("fredbob");
         }
 
-        [Test]
+        [Fact]
         public void WithAliasedBoolean_FalseCustomParser()
         {
             // When
@@ -345,7 +347,7 @@ namespace Odin.Tests.Parsing
             result.MethodParameters[2].Value.ShouldBe("fredbob");
         }
 
-        [Test]
+        [Fact]
         public void WithStringArray()
         {
             // When
@@ -356,7 +358,7 @@ namespace Odin.Tests.Parsing
             result.MethodParameters[1].Value.ShouldBe(42);
         }
 
-        [Test]
+        [Fact]
         public void WithBoolArray()
         {
             // When
@@ -367,7 +369,7 @@ namespace Odin.Tests.Parsing
             result.MethodParameters[1].Value.ShouldBe(42);
         }
 
-        [Test]
+        [Fact]
         public void WithNullableBoolArray()
         {
             // When
@@ -379,7 +381,7 @@ namespace Odin.Tests.Parsing
             result.MethodParameters[1].Value.ShouldBe(42);
         }
 
-        [Test]
+        [Fact]
         public void WithInt32Array()
         {
             // When
@@ -390,7 +392,7 @@ namespace Odin.Tests.Parsing
             result.MethodParameters[1].Value.ShouldBe(42);
         }
 
-        [Test]
+        [Fact]
         public void WithNullableInt32Array()
         {
             // When
@@ -401,7 +403,7 @@ namespace Odin.Tests.Parsing
             result.MethodParameters[1].Value.ShouldBe(42);
         }
 
-        [Test]
+        [Fact]
         public void WithInt64Array()
         {
             // When
@@ -412,7 +414,7 @@ namespace Odin.Tests.Parsing
             result.MethodParameters[1].Value.ShouldBe(42);
         }
 
-        [Test]
+        [Fact]
         public void WithNullableInt64Array()
         {
             // When
@@ -423,7 +425,7 @@ namespace Odin.Tests.Parsing
             result.MethodParameters[1].Value.ShouldBe(42);
         }
 
-        [Test]
+        [Fact]
         public void WithDateTimeArray()
         {
             // When
@@ -434,7 +436,7 @@ namespace Odin.Tests.Parsing
             result.MethodParameters[1].Value.ShouldBe(42);
         }
 
-        [Test]
+        [Fact]
         public void WithNullableDateTimeArray()
         {
             // When
@@ -446,7 +448,7 @@ namespace Odin.Tests.Parsing
         }
 
 
-        [Test]
+        [Fact]
         public void WithDecimalArray()
         {
             // When
@@ -457,7 +459,7 @@ namespace Odin.Tests.Parsing
             result.MethodParameters[1].Value.ShouldBe(42);
         }
 
-        [Test]
+        [Fact]
         public void WithNullableDecimalArray()
         {
             // When
@@ -468,7 +470,7 @@ namespace Odin.Tests.Parsing
             result.MethodParameters[1].Value.ShouldBe(42);
         }
 
-        [Test]
+        [Fact]
         public void WithDoubleArray()
         {
             // When
@@ -479,7 +481,7 @@ namespace Odin.Tests.Parsing
             result.MethodParameters[1].Value.ShouldBe(42);
         }
 
-        [Test]
+        [Fact]
         public void WithNullableDoubleArray()
         {
             // When
@@ -490,7 +492,7 @@ namespace Odin.Tests.Parsing
             result.MethodParameters[1].Value.ShouldBe(42);
         }
 
-        [Test]
+        [Fact]
         public void WithEnumArray()
         {
             // When

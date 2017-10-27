@@ -4,10 +4,11 @@ using Shouldly;
 
 namespace Odin.Tests.Validation
 {
-    [TestFixture]
+    using Xunit;
+
     public class ValidationTests
     {
-        [Test]
+        [Fact]
         public void WithMultipleDefaultActions()
         {
             // Given
@@ -22,7 +23,7 @@ namespace Odin.Tests.Validation
             results[0].Messages[0].ShouldBe("There is more than one default action: action1, action2.");
         }
 
-        [Test]
+        [Fact]
         public void SubCommandActionNamingConflict()
         {
             // Given
@@ -37,7 +38,7 @@ namespace Odin.Tests.Validation
             results[0].Messages[0].ShouldBe("There is more than one executable action named 'katas'.");
         }
 
-        [Test]
+        [Fact]
         public void ValidationIncludesResultsFromSubCommands()
         {
             // Given
@@ -54,7 +55,7 @@ namespace Odin.Tests.Validation
             results[1].Messages[0].ShouldBe("There is more than one default action: action1, action2.");
         }
 
-        [Test]
+        [Fact]
         public void DuplicatedParameterAliases()
         {
             // Given
@@ -68,7 +69,7 @@ namespace Odin.Tests.Validation
             results[0].Messages[0].ShouldBe("The alias '-p' is duplicated for action 'action1'.");
         }
 
-        [Test]
+        [Fact]
         public void CommandAndMethodParameterNameConflict()
         {
             // Given
@@ -82,7 +83,7 @@ namespace Odin.Tests.Validation
             results[0].Messages[0].ShouldBe("The common parameter name '--param1' conflicts with a parameter defined for action 'action1'.");
         }
 
-        [Test]
+        [Fact]
         public void CommonParameterAliasDuplication()
         {
             // Given
@@ -96,7 +97,7 @@ namespace Odin.Tests.Validation
             results[0].Messages[0].ShouldBe("The alias '-p' is duplicated amongst common parameters.");
         }
 
-        [Test]
+        [Fact]
         public void CommonParameterAndMethodParameterAliasConflict()
         {
             // Given

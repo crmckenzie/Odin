@@ -4,28 +4,17 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using NUnit.Framework;
-using Odin.Attributes;
+
 using Odin.Demo;
 using Shouldly;
 
 namespace Odin.Tests.Lib
 {
-    [Alias("foo")]
-    public class NeedsAnAliasCommand : Command
-    {
-        [Action]
-        [Alias("bar")]
-        public void NeedsAnAliasMethod([Alias("i")] string input)
-        {
-            this.Logger.Info(input);
-        }
-    }
+    using Xunit;
 
-    [TestFixture]
     public class AliasTests
     {
-        [SetUp]
-        public void BeforeEachTest()
+        public AliasTests()
         {
             this.Logger =new StringBuilderLogger();
             this.NeedsAnAlias = new NeedsAnAliasCommand();
@@ -41,7 +30,7 @@ namespace Odin.Tests.Lib
 
         public NeedsAnAliasCommand NeedsAnAlias { get; set; }
 
-        [Test]
+        [Fact]
         public void InvokeWithoutAliases()
         {
             // When
@@ -52,7 +41,7 @@ namespace Odin.Tests.Lib
             this.Logger.InfoBuilder.ToString().ShouldBe("hello world!");
         }
 
-        [Test]
+        [Fact]
         public void InvokeWithCommandAlias()
         {
             // When
@@ -64,7 +53,7 @@ namespace Odin.Tests.Lib
         }
 
 
-        [Test]
+        [Fact]
         public void InvokeWithMethodAlias()
         {
             // When
@@ -76,7 +65,7 @@ namespace Odin.Tests.Lib
         }
 
 
-        [Test]
+        [Fact]
         public void InvokeWithArgumentAliases()
         {
             // When
@@ -87,7 +76,7 @@ namespace Odin.Tests.Lib
             this.Logger.InfoBuilder.ToString().ShouldBe("hello world!");
         }
 
-        [Test]
+        [Fact]
         public void InvokeWithAllAliases()
         {
             // When

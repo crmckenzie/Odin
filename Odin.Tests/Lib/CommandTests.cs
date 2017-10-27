@@ -1,23 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Diagnostics;
-using System.Linq;
-using NSubstitute;
-using NSubstitute.ExceptionExtensions;
-using NUnit.Framework;
-using Odin.Configuration;
-using Odin.Exceptions;
-using Shouldly;
-
-namespace Odin.Tests
+﻿namespace Odin.Tests.Lib
 {
+    using System.Diagnostics;
+    using System.Linq;
 
-    [TestFixture]
+    using NSubstitute;
+
+    using Odin.Configuration;
+    using Odin.Exceptions;
+
+    using Shouldly;
+
+    using Xunit;
+
     public class CommandTests
     {
-        [SetUp]
-        public void BeforeEach()
+        public CommandTests()
         {
             this.SubCommand = Substitute.ForPartsOf<SubCommand>();
             this.Subject = Substitute.ForPartsOf<DefaultCommand>(this.SubCommand);
@@ -27,29 +24,29 @@ namespace Odin.Tests
 
         public DefaultCommand Subject { get; set; }
 
-        [Test]
+        [Fact]
         public void CanExecuteAMethodThatIsAnAction()
         {
             var args = new[] { "do-something" };
 
             var result = this.Subject.Execute(args);
 
-            Assert.That(result, Is.EqualTo(0));
+            result.ShouldBe(0);
             this.Subject.DidNotReceive().Help();
         }
 
-        [Test]
+        [Fact]
         public void ReturnsResultFromAction()
         {
             var args = new[] { "always-returns-minus2" };
 
             var result = this.Subject.Execute(args);
 
-            Assert.That(result, Is.EqualTo(-2));
+            result.ShouldBe(-2);
             this.Subject.Received().Help();
         }
 
-        [Test]
+        [Fact]
         public void BooleanActions_ReturningFalse()
         {
             var args = new[] { "always-returns-false" };
@@ -59,7 +56,7 @@ namespace Odin.Tests
             result.ShouldBe(-1);
         }
 
-        [Test]
+        [Fact]
         public void BooleanActions_ReturningTrue()
         {
             var args = new[] { "always-returns-true" };
@@ -69,13 +66,13 @@ namespace Odin.Tests
             result.ShouldBe(0);
         }
 
-        [Test]
+        [Fact]
         public void SubCommandUsesParentsLogger()
         {
             this.SubCommand.Logger.ShouldBe(this.Subject.Logger);
         }
 
-        [Test]
+        [Fact]
         public void ChangingConventionsRecalculatesSubCommandDictionary()
         {
             this.Subject.Use(new SlashColonConvention());
@@ -84,14 +81,14 @@ namespace Odin.Tests
             this.Subject.SubCommands.ElementAt(0).ShouldBe(this.SubCommand);
         }
 
-        [Test]
+        [Fact]
         public void GenerateInvocation_WhenArgumentsAreInvalid()
         {
             // When
             Assert.Throws<UnmappedParameterException>(() => this.Subject.GenerateInvocation("too", "many", "arguments", "passed"));
         }
 
-        [Test]
+        [Fact]
         public void GenerateInvocation_Execute()
         {
             // Given

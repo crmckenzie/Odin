@@ -1,8 +1,9 @@
-using System;
-using Odin.Attributes;
-
-namespace Odin.Tests
+namespace Odin.Tests.Lib
 {
+    using System;
+
+    using Odin.Attributes;
+
     public class ExecutionLifecycleCommand : Command
     {
         [Parameter]
@@ -14,12 +15,12 @@ namespace Odin.Tests
 
         protected override void OnBeforeExecute(MethodInvocation invocation)
         {
-            Before = DateTime.Now;
+            this.Before = DateTime.Now;
         }
 
         protected override int OnAfterExecute(MethodInvocation invocation, int exitCode)
         {
-            After = DateTime.Now;
+            this.After = DateTime.Now;
             return base.OnAfterExecute(invocation, exitCode);
         }
 

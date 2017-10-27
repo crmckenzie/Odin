@@ -1,15 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Odin.Attributes;
-using Odin.Demo;
-using Odin.Logging;
-
-namespace Odin.Tests
+﻿namespace Odin.Tests.Lib
 {
+    using System.ComponentModel;
+
+    using Odin.Attributes;
+
     [Description("Provides a component of testability for subcommands.")]
     public class SubCommand : Command
     {

@@ -8,12 +8,13 @@ using Shouldly;
 
 namespace Odin.Tests.Demo
 {
-    [TestFixture]
+    using Odin.Tests.Lib;
+
+    using Xunit;
+
     public class RootCommandRouteTests
     {
-
-        [SetUp]
-        public void BeforeEach()
+        public RootCommandRouteTests()
         {
             this.Logger = new StringBuilderLogger();
             this.Subject = new RootCommand();
@@ -26,7 +27,7 @@ namespace Odin.Tests.Demo
 
         #region FizzBuzzCommandRoute.FizzBuzz
 
-        [Test]
+        [Fact]
         public void Execute_FizzBuzz_UsingExplicitParameterName()
         {
             // Given
@@ -39,7 +40,7 @@ namespace Odin.Tests.Demo
             this.Logger.InfoBuilder.ToString().Trim().ShouldBe("Fizz");
         }
 
-        [Test]
+        [Fact]
         public void Execute_FizzBuzz_UsingParamterAlias()
         {
             // Given
@@ -53,7 +54,7 @@ namespace Odin.Tests.Demo
         }
 
 
-        [Test]
+        [Fact]
         public void Execute_FizzBuzz_UsingExplicitActionName()
         {
             // Given
@@ -66,7 +67,7 @@ namespace Odin.Tests.Demo
             this.Logger.InfoBuilder.ToString().Trim().ShouldBe("Fizz");
         }
 
-        [Test]
+        [Fact]
         public void Execute_FizzBuzz_UsingDefaultAction()
         {
             // Given
@@ -79,7 +80,7 @@ namespace Odin.Tests.Demo
             this.Logger.InfoBuilder.ToString().Trim().ShouldBe("Fizz");
         }
 
-        [Test]
+        [Fact]
         public void Execute_FizzBuzz_WithParsingError_FailsGracefully()
         {
             // Given

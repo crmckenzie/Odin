@@ -1,19 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using NUnit.Framework;
-using Odin.Configuration;
-using Shouldly;
-
-namespace Odin.Tests.Lib.Configuration
+﻿namespace Odin.Tests.Configuration
 {
-    [TestFixture]
+    using Odin.Configuration;
+
+    using Shouldly;
+
+    using Xunit;
+
     public class StringExtensionsTests
     {
+        [Theory]
 
-        [Test]
-        [TestCase("Foo", "foo")]
+        [InlineData("Foo", "foo")]
         public void HyphenCase(string input, string output)
         {
             input.HyphenCase().ShouldBe(output);

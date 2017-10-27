@@ -1,9 +1,9 @@
-﻿using System.ComponentModel;
-using Odin.Attributes;
-using Odin.Logging;
-
-namespace Odin.Tests
+﻿namespace Odin.Tests.Lib
 {
+    using System.ComponentModel;
+
+    using Odin.Attributes;
+
     [Description("This is the default command")]
     public class DefaultCommand : Command
     {
@@ -69,19 +69,19 @@ namespace Odin.Tests
         [Action]
         public virtual void WithRequiredStringArg(string argument)
         {
-            MethodArguments = new object[] {argument};
+            this.MethodArguments = new object[] {argument};
         }
 
         [Action]
         public void WithRequiredStringArgs(string argument1, string argument2)
         {
-            MethodArguments = new object[] { argument1, argument2 };
+            this.MethodArguments = new object[] { argument1, argument2 };
         }
 
         [Action]
         public void WithOptionalStringArg(string argument = "not-passed")
         {
-            MethodArguments = new object[] { argument };
+            this.MethodArguments = new object[] { argument };
         }
 
         [Action]
@@ -90,13 +90,13 @@ namespace Odin.Tests
             string argument2 = "value2-not-passed", 
             string argument3 = "value3-not-passed")
         {
-            MethodArguments = new object[] { argument1, argument2, argument3 };
+            this.MethodArguments = new object[] { argument1, argument2, argument3 };
         }
 
         [Action]
         public void WithSwitch(bool argument)
         {
-            MethodArguments = new object[] { argument };
+            this.MethodArguments = new object[] { argument };
         }
 
         [Action]

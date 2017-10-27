@@ -7,11 +7,11 @@ using Shouldly;
 
 namespace Odin.Tests.Help
 {
-    [TestFixture]
+    using Xunit;
+
     public class DefaultHelpWriterTests
     {
-        [SetUp]
-        public void BeforeEach()
+        public DefaultHelpWriterTests()
         {
             this.Subject = new DefaultHelpWriter()
             {
@@ -24,7 +24,7 @@ namespace Odin.Tests.Help
 
         public IHelpWriter Subject { get; set; }
 
-        [Test]
+        [Fact]
         public void DisplayRootCommandDescription()
         {
             // When
@@ -48,7 +48,7 @@ namespace Odin.Tests.Help
             lines[++i].ShouldBe("default action: default-action");
         }
 
-        [Test]
+        [Fact]
         public void DisplayDefaultAction()
         {
             // When
@@ -84,7 +84,7 @@ namespace Odin.Tests.Help
             lines[++i].ShouldBe("                        DescriptionAttribute.");
         }
 
-        [Test]
+        [Fact]
         public void EnumParamters()
         {
             // When
@@ -110,7 +110,7 @@ namespace Odin.Tests.Help
             lines[++i].ShouldBe("");
         }
 
-        [Test]
+        [Fact]
         public void BooleanParameters()
         {
             // When
@@ -135,7 +135,7 @@ namespace Odin.Tests.Help
             lines[++i].ShouldBe("");
         }
 
-        [Test]
+        [Fact]
         public void CommonParameters()
         {
             // When
@@ -160,7 +160,7 @@ namespace Odin.Tests.Help
 
         #region actions
 
-        [Test]
+        [Fact]
         public void HelpForAGivenAction()
         {
             // Given
@@ -196,7 +196,7 @@ namespace Odin.Tests.Help
             lines[i++].ShouldBe("                        actions");
         }
 
-        [Test]
+        [Fact]
         public void HelpForAGivenActionUsingAlias()
         {
             // Given
@@ -231,7 +231,7 @@ namespace Odin.Tests.Help
 
         #region subcommands
 
-        [Test]
+        [Fact]
         public void HelpDisplaysSubCommands()
         {
             // Given
@@ -261,7 +261,7 @@ namespace Odin.Tests.Help
             lines[++i].ShouldBe("\thelp <subcommand>");
         }
 
-        [Test]
+        [Fact]
         public void HelpInvokedAsSubCommandAction()
         {
             // Given
@@ -275,7 +275,7 @@ namespace Odin.Tests.Help
             var result = root.Execute("katas", "help");
 
             // Then
-            Assert.That(result, Is.EqualTo(0), logger.ErrorBuilder.ToString());
+            result.ShouldBe(0, logger.ErrorBuilder.ToString());
 
             var lines = logger.InfoBuilder.ToString()
                 .Split('\n')
@@ -290,7 +290,7 @@ namespace Odin.Tests.Help
             lines[++i].Trim().ShouldBe("default action: fizz-buzz");
         }
 
-        [Test]
+        [Fact]
         public void HelpForSubCommandUsingAlias()
         {
             // Given
@@ -317,7 +317,7 @@ namespace Odin.Tests.Help
             lines[++i].Trim().ShouldBe("default action: fizz-buzz");
         }
 
-        [Test]
+        [Fact]
         public void RootSubCommandSectionFooter()
         {
             // Given
@@ -331,7 +331,7 @@ namespace Odin.Tests.Help
             var result = root.Execute("help");
 
             // Then
-            Assert.That(result, Is.EqualTo(0), logger.ErrorBuilder.ToString());
+            result.ShouldBe(0, logger.ErrorBuilder.ToString());
 
             var lines = logger.InfoBuilder.ToString()
                 .Split('\n')
@@ -345,7 +345,7 @@ namespace Odin.Tests.Help
             lines[++i].Trim().ShouldBe("help <subcommand>");
         }
 
-        [Test]
+        [Fact]
         public void HelpInvokedAsActionOnParent()
         {
             // Given
@@ -359,7 +359,7 @@ namespace Odin.Tests.Help
             var result = root.Execute("help", "katas");
 
             // Then
-            Assert.That(result, Is.EqualTo(0), logger.ErrorBuilder.ToString());
+            result.ShouldBe(0, logger.ErrorBuilder.ToString());
 
             var lines = logger.InfoBuilder.ToString()
                 .Split('\n')
@@ -374,7 +374,7 @@ namespace Odin.Tests.Help
             lines[++i].Trim().ShouldBe("default action: fizz-buzz");
         }
 
-        [Test]
+        [Fact]
         public void HelpForSubSubCommands()
         {
             // Given
@@ -391,7 +391,7 @@ namespace Odin.Tests.Help
             var result = root.Execute("sub", "katas", "help");
 
             // Then
-            Assert.That(result, Is.EqualTo(0), logger.ErrorBuilder.ToString());
+            result.ShouldBe(0, logger.ErrorBuilder.ToString());
 
             var lines = logger.InfoBuilder.ToString()
                 .Split('\n')
@@ -404,7 +404,7 @@ namespace Odin.Tests.Help
             lines[++i].Trim().ShouldBe("This command is intended for demonstration purposes. It provides some katas");
         }
 
-        [Test]
+        [Fact]
         public void SubCommandSectionFooter()
         {
             // Given
@@ -421,7 +421,7 @@ namespace Odin.Tests.Help
             var result = root.Execute("sub", "help");
 
             // Then
-            Assert.That(result, Is.EqualTo(0), logger.ErrorBuilder.ToString());
+            result.ShouldBe(0, logger.ErrorBuilder.ToString());
 
             var lines = logger.InfoBuilder.ToString()
                 .Split('\n')

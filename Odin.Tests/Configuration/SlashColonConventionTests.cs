@@ -1,15 +1,17 @@
-using System;
-using NUnit.Framework;
-using Odin.Configuration;
-using Shouldly;
-
-namespace Odin.Tests.Lib.Configuration
+namespace Odin.Tests.Configuration
 {
-    [TestFixture]
+    using System;
+
+    using Odin.Configuration;
+    using Odin.Tests.Lib;
+
+    using Shouldly;
+
+    using Xunit;
+
     public class SlashColonConventionTests
     {
-        [SetUp]
-        public void BeforeEach()
+        public SlashColonConventionTests()
         {
             this.Logger = new StringBuilderLogger();
             this.SubCommand = new SubCommand();
@@ -28,7 +30,7 @@ namespace Odin.Tests.Lib.Configuration
 
         #region ActionExecution
 
-        [Test]
+        [Fact]
         public void OnlyActionMethodsAreInterpretedAsActions()
         {
             // Given
@@ -45,7 +47,7 @@ namespace Odin.Tests.Lib.Configuration
             result.MethodParameters[2].Value.ShouldBe(Type.Missing);
         }
 
-        [Test]
+        [Fact]
         public void CanExecuteAMethodThatIsAnAction()
         {
             // Given
@@ -60,7 +62,7 @@ namespace Odin.Tests.Lib.Configuration
             result.MethodParameters.ShouldAllBe(pv=> pv.Value == Type.Missing);
         }
 
-        [Test]
+        [Fact]
         public void ReturnsResultFromAction()
         {
             // Given
@@ -78,7 +80,7 @@ namespace Odin.Tests.Lib.Configuration
 
         #region Required arguments
 
-        [Test]
+        [Fact]
         public void WithRequiredStringArg()
         {
             var args = new[] { "WithRequiredStringArg", "/argument:value" };
@@ -92,7 +94,7 @@ namespace Odin.Tests.Lib.Configuration
             result.MethodParameters[0].Value.ShouldBe("value");
         }
 
-        [Test]
+        [Fact]
         public void WithMultipleRequiredStringArgs()
         {
             var args = new[] { "WithRequiredStringArgs", "/argument1:value1", "/argument2:value2"};
@@ -107,7 +109,7 @@ namespace Odin.Tests.Lib.Configuration
             result.MethodParameters[1].Value.ShouldBe("value2");
         }
 
-        [Test]
+        [Fact]
         public void CanMatchArgsByParameterOrder()
         {
             var args = new[] { "WithRequiredStringArgs", "value1", "value2" };
@@ -126,7 +128,7 @@ namespace Odin.Tests.Lib.Configuration
 
         #region Switches
 
-        [Test]
+        [Fact]
         public void SwitchWithValue()
         {
             var args = new[] { "WithSwitch", "/argument:true"};
@@ -139,7 +141,7 @@ namespace Odin.Tests.Lib.Configuration
             result.MethodParameters[0].Value.ShouldBe(true);
         }
 
-        [Test]
+        [Fact]
         public void SwitchWithoutValue()
         {
             var args = new[] { "WithSwitch", "/argument" };
@@ -152,7 +154,7 @@ namespace Odin.Tests.Lib.Configuration
             result.MethodParameters[0].Value.ShouldBe(true);
         }
 
-        [Test]
+        [Fact]
         public void NegativeSwitch()
         {
             var args = new[] { "WithSwitch", "/no-argument" };
@@ -165,7 +167,7 @@ namespace Odin.Tests.Lib.Configuration
             result.MethodParameters[0].Value.ShouldBe(false);
         }
 
-        [Test]
+        [Fact]
         public void SwitchNotGiven()
         {
             var args = new[] { "WithSwitch" };
@@ -182,7 +184,7 @@ namespace Odin.Tests.Lib.Configuration
 
         #region Optional arguments
 
-        [Test]
+        [Fact]
         public void WithOptionalStringArg_DoNotPassIt()
         {
             var args = new[] { "WithOptionalStringArg" };
@@ -195,7 +197,7 @@ namespace Odin.Tests.Lib.Configuration
             result.MethodParameters[0].Value.ShouldBe(Type.Missing);
         }
 
-        [Test]
+        [Fact]
         public void WithOptionalStringArg_PassIt()
         {
             var args = new[] { "WithOptionalStringArg", "/argument:value1"};
@@ -208,7 +210,7 @@ namespace Odin.Tests.Lib.Configuration
             result.MethodParameters[0].Value.ShouldBe("value1");
         }
 
-        [Test]
+        [Fact]
         public void WithOptionalStringArgs_PassThemAll()
         {
             var args = new[] { "WithOptionalStringArgs", "/argument1:value1", "/argument2:value2", "/argument3:value3"};
@@ -227,7 +229,7 @@ namespace Odin.Tests.Lib.Configuration
             result.MethodParameters[2].Value.ShouldBe("value3");
         }
 
-        [Test]
+        [Fact]
         public void WithOptionalStringArgs_PassHead()
         {
             var args = new[] { "WithOptionalStringArgs", "/argument1:value1"};
@@ -244,7 +246,7 @@ namespace Odin.Tests.Lib.Configuration
             result.MethodParameters[2].Value.ShouldBe(Type.Missing);
         }
 
-        [Test]
+        [Fact]
         public void WithOptionalStringArgs_PassBody()
         {
             var args = new[] { "WithOptionalStringArgs", "/argument2:value2"};
@@ -261,7 +263,7 @@ namespace Odin.Tests.Lib.Configuration
             result.MethodParameters[2].Value.ShouldBe(Type.Missing);
         }
 
-        [Test]
+        [Fact]
         public void WithOptionalStringArgs_PassNone()
         {
             var args = new[] { "WithOptionalStringArgs" };
@@ -278,7 +280,7 @@ namespace Odin.Tests.Lib.Configuration
             result.MethodParameters[2].Value.ShouldBe(Type.Missing);
         }
 
-        [Test]
+        [Fact]
         public void WithOptionalStringArgs_PassTail()
         {
             var args = new[] { "WithOptionalStringArgs", "/argument3:value3"};
@@ -299,7 +301,7 @@ namespace Odin.Tests.Lib.Configuration
 
         #region SubCommands
 
-        [Test]
+        [Fact]
         public void ExecuteSubCommand()
         {
             var args = new[] { "Sub" };

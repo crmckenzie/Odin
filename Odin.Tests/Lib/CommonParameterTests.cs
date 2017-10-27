@@ -4,39 +4,17 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using NUnit.Framework;
-using Odin.Attributes;
+
 using Odin.Configuration;
 using Shouldly;
 
 namespace Odin.Tests.Lib
 {
-    public class CommandWithCommonParmeters : Command
-    {   
-        [Parameter]
-        [Alias("t")]
-        public string Text { get; set; }
+    using Xunit;
 
-        [Action]
-        public void Display(string subject = null)
-        {
-            var text = subject ?? Text;
-
-            if (string.IsNullOrWhiteSpace(text))
-            {
-                Logger.Info("none");
-            }
-            else
-            {
-                Logger.Info(text);
-            }
-        }
-    }
-
-    [TestFixture]
     public class CommonParameterTests
     {
-        [SetUp]
-        public void BeforeEach()
+        public CommonParameterTests()
         {
             this.Logger = new StringBuilderLogger();
             this.Subject = new CommandWithCommonParmeters();
@@ -48,7 +26,7 @@ namespace Odin.Tests.Lib
         public StringBuilderLogger Logger{ get; set; }
 
 
-        [Test]
+        [Fact]
         public void ParameterNotSet()
         {
             // Given
@@ -60,7 +38,7 @@ namespace Odin.Tests.Lib
             this.Logger.InfoBuilder.ToString().ShouldBe("none");
         }
 
-        [Test]
+        [Fact]
         public void SetParameter()
         {
             Subject.Execute("display", "--text", "awesome!");
@@ -69,7 +47,7 @@ namespace Odin.Tests.Lib
             Logger.InfoBuilder.ToString().ShouldBe("awesome!");
         }
 
-        [Test]
+        [Fact]
         public void GetMethodInvocation_DoesNot_SetParameter()
         {
 
@@ -79,7 +57,7 @@ namespace Odin.Tests.Lib
             invocation.CommonParameters.ToDictionary(p => p.Name)["Text"].Value.ShouldBe("awesome!");
         }
 
-        [Test]
+        [Fact]
         public void SetParameterUsingAlias()
         {
             Subject.Execute("display", "-t", "awesome!");
@@ -88,7 +66,7 @@ namespace Odin.Tests.Lib
             this.Logger.InfoBuilder.ToString().ShouldBe("awesome!");
         }
 
-        [Test]
+        [Fact]
         public void WithMethodParameter()
         {
             Subject.Execute("display", "--text", "awesome!", "--subject", "fredbob");
@@ -97,7 +75,7 @@ namespace Odin.Tests.Lib
             Logger.InfoBuilder.ToString().ShouldBe("fredbob");
         }
 
-        [Test]
+        [Fact]
         public void WithMethodParameter_InvertOrder()
         {
             Subject.Execute("display",  "--subject", "fredbob", "--text", "awesome!");
