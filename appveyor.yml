@@ -13,15 +13,6 @@
       $env:AssemblyVersion = $Version.ToString()
       $env:PackageVersion = "{0}.{1}.{2}" -f $version.Major, $version.Minor, $version.Build
 
-  assembly_info:
-    patch: true
-    file: '**\AssemblyInfo.*'
-    assembly_version: '$(APPVEYOR_BUILD_VERSION)'
-    assembly_file_version: '$(APPVEYOR_BUILD_VERSION)'
-    assembly_informational_version: '$(APPVEYOR_BUILD_VERSION)'
-
-  configuration: Release
-
   nuget:
     account_feed: true
     project_feed: true
@@ -70,15 +61,6 @@
       $version = new-object System.Version $env:APPVEYOR_BUILD_VERSION
       $env:AssemblyVersion = $Version.ToString()
       $env:PackageVersion = "{0}.{1}.{2}-beta-{3}" -f $version.Major, $version.Minor, $version.Build, $version.Revision
-
-  assembly_info:
-    patch: true
-    file: '**\AssemblyInfo.*'
-    assembly_version: '$(APPVEYOR_BUILD_VERSION)'
-    assembly_file_version: '$(APPVEYOR_BUILD_VERSION)'
-    assembly_informational_version: '$(PackageVersion)'
-
-  configuration: Release
 
   nuget:
     account_feed: true
