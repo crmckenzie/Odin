@@ -119,8 +119,6 @@
 -
   version: 1.0.0.{build}
 
-  configuration: Release
-
   before_build:
   - dotnet restore
 
