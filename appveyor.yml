@@ -117,7 +117,7 @@
 # all other branches
 # compile, test
 -
-  version: 0.2.3.{build}
+  version: 1.0.0.{build}
 
   configuration: Release
 
@@ -126,9 +126,6 @@
 
   build_script:
   - ps: dotnet build -c Release
-
-  build:
-    verbosity: minimal
 
   notifications:
   - provider: Webhook
