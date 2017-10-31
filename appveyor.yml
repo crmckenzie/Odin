@@ -29,6 +29,9 @@
   before_build:
   - dotnet restore
 
+  build_script:
+  - ps: dotnet build
+
   build:
     verbosity: minimal
 
@@ -83,6 +86,9 @@
   before_build:
   - dotnet restore
 
+  build_script:
+  - ps: dotnet build
+  
   build:
     verbosity: minimal
 
@@ -115,6 +121,9 @@
 
   before_build:
   - dotnet restore
+
+  build_script:
+    - ps: dotnet build
 
   build:
     verbosity: minimal
