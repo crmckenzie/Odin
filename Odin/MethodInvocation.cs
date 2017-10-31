@@ -74,18 +74,12 @@ namespace Odin
         /// <summary>
         /// Gets the list of aliases applied to the action.
         /// </summary>
-        public string[] Aliases
-        {
-            get { return MethodInfo.GetCustomAttribute<AliasAttribute>()?.Aliases.ToArray() ?? new string[] {}; }
-        }
+        public string[] Aliases => MethodInfo.GetCustomAttribute<AliasAttribute>()?.Aliases.ToArray() ?? new string[] {};
 
         /// <summary>
         /// Gets the list of identifiers representing the action.
         /// </summary>
-        public string[] Identifiers
-        {
-            get { return Aliases.Concat(new string[] {this.Name}).ToArray(); }
-        }
+        public string[] Identifiers => Aliases.Concat(new string[] {this.Name}).ToArray();
 
         private Parameter FindByToken(string token)
         {
@@ -205,8 +199,7 @@ namespace Odin
                 throw new ArgumentOutOfRangeException(
                     $"'{parserAttribute.ParserType.FullName}' is not an implementation of '{typeof (IParser).FullName}.'");
 
-            var types = new[] {typeof (Parameter)};
-            var constructor = parserAttribute.ParserType.GetConstructor(types);
+            var constructor = parserAttribute.ParserType.GetConstructor(typeof(Parameter));
             if (constructor == null)
             {
                 throw new TypeInitializationException(

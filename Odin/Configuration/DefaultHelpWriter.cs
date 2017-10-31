@@ -121,7 +121,7 @@ namespace Odin.Configuration
             var defaultAction = command.GetDefaultAction();
             if (defaultAction == null) return;
 
-            builder.AppendLine("");
+            builder.AppendLine(string.Empty);
             builder.Append("default action: ");
             builder.AppendLine(defaultAction.Name);
         }
@@ -130,7 +130,7 @@ namespace Odin.Configuration
         {
             var builder =new System.Text.StringBuilder();
 
-            var defaultDescription = command.IsRoot() ? "" : command.Name;
+            var defaultDescription = command.IsRoot() ? string.Empty : command.Name;
             var attribute = command.GetType().GetCustomAttribute<DescriptionAttribute>(inherit: true);
 
             if (attribute == null)
@@ -196,7 +196,7 @@ namespace Odin.Configuration
                 .Paginate(this.DescriptionWidth)
                 .ToList()
                 ;
-            var first = descriptions.FirstOrDefault() ?? "";
+            var first = descriptions.FirstOrDefault() ?? string.Empty;
             builder.AppendLine($"{name}{spacer}{first}");
 
             var theRest = descriptions.Skip(1);
@@ -205,7 +205,7 @@ namespace Odin.Configuration
                 spacer = new string(' ', this.IdentifierWidth + this.SpacerWidth);
                 builder.AppendLine($"{spacer}{descriptionLine}");
             }
-            builder.AppendLine("");
+            builder.AppendLine(string.Empty);
         }
 
         private void WriteParameters(MethodInvocation action, StringBuilder builder)
@@ -228,7 +228,7 @@ namespace Odin.Configuration
                 .ToList()
                 ;
 
-            var first = descriptions.FirstOrDefault() ?? "";
+            var first = descriptions.FirstOrDefault() ?? string.Empty;
             var line = $"{indent}{name}{spacer}{first}";
             builder.AppendLine(line);
 
@@ -238,7 +238,7 @@ namespace Odin.Configuration
                 spacer = new string(' ', this.IdentifierWidth + this.SpacerWidth);
                 builder.AppendLine($"{spacer}{descriptionLine}");
             }
-            builder.AppendLine("");
+            builder.AppendLine(string.Empty);
         }
 
         private string GetDescription(MethodInvocation method)
@@ -269,7 +269,7 @@ namespace Odin.Configuration
                 builder.AppendLine(line);
             }
 
-            if (parameter.ParameterType.IsEnum)
+            if (parameter.ParameterType.IsEnum())
             {
                 var values = System.Enum.GetNames(parameter.ParameterType);
                 var line = $"valid values: {string.Join(", ", values)}";
@@ -334,7 +334,7 @@ namespace Odin.Configuration
                     .ToArray()
                     ;
 
-                var first = descriptions.FirstOrDefault() ?? "";
+                var first = descriptions.FirstOrDefault() ?? string.Empty;
                 var theRest = descriptions.Skip(1);
                 var spacer = new string(' ', this.SpacerWidth);
                 var name = subCommand.Name.PadRight(this.IdentifierWidth);
@@ -371,7 +371,8 @@ namespace Odin.Configuration
 
         private static string GetHelpActionName(Command command)
         {
-            var helpActionName = command.Conventions.GetActionName(command.GetType().GetMethod("Help"));
+            var helpMethod = command.GetType().GetMethod("Help");
+            var helpActionName = command.Conventions.GetActionName(helpMethod);
             return helpActionName;
         }
 

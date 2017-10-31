@@ -4,25 +4,25 @@ namespace Odin.Demo
 {
     public static class FizzBuzzGame
     {
-        public static void Play(Logger logger, int input)
+        public static void Play(ILogger logger, int input)
         {
             if (input % 3 == 0 && input % 5 == 0)
             {
-                Logger.Info("FizzBuzz");
+                logger.Info("FizzBuzz");
             }
             else if (input % 3 == 0)
             {
-                Logger.Info("Fizz");
+                logger.Info("Fizz");
             }
             else if (input % 5 == 0)
             {
-                Logger.Info("Buzz");
+                logger.Info("Buzz");
             }
             else
             {
-                Logger.Info(input.ToString());
+                logger.Info(input.ToString());
             }
-            Logger.Info("\n");
+            logger.Info("\n");
         }
     }
 }

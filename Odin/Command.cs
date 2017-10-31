@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Data;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -133,18 +132,12 @@ namespace Odin
         /// <summary>
         /// Gets the aliases applied to the command.
         /// </summary>
-        public virtual string[] Aliases
-        {
-            get { return this.GetType().GetCustomAttribute<AliasAttribute>()?.Aliases.ToArray() ?? new string[] { }; }
-        }
+        public virtual string[] Aliases => GetType().GetCustomAttribute<AliasAttribute>()?.Aliases.ToArray() ?? new string[] { };
 
         /// <summary>
         /// Gets all of the identifiers applied to the command.
         /// </summary>
-        public string[] Identifiers
-        {
-            get { return Aliases.Concat(new string[] {this.Name}).ToArray(); }
-        }
+        public string[] Identifiers => Aliases.Concat(new string[] {this.Name}).ToArray();
 
         /// <summary>
         /// True if the token matches the command, otherwise false.

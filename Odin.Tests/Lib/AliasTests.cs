@@ -5,18 +5,19 @@ using System.Text;
 using System.Threading.Tasks;
 using NUnit.Framework;
 
-using Odin.Demo;
 using Shouldly;
 
 namespace Odin.Tests.Lib
 {
+    using Odin.Demo;
+
     using Xunit;
 
     public class AliasTests
     {
         public AliasTests()
         {
-            this.Logger =new StringBuilderLogger();
+            this.Logger = new StringBuilderLogger();
             this.NeedsAnAlias = new NeedsAnAliasCommand();
             this.Root = new RootCommand()
                 .Use(this.Logger)
