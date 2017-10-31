@@ -10,6 +10,7 @@
   init:
   - ps: |
       $version = new-object System.Version $env:APPVEYOR_BUILD_VERSION
+      $env:AssemblyVersion = $Version.ToString()
       $env:PackageVersion = "{0}.{1}.{2}" -f $version.Major, $version.Minor, $version.Build
 
   assembly_info:
@@ -30,13 +31,13 @@
   - dotnet restore
 
   build_script:
-  - ps: dotnet build
+  - ps: dotnet build -c Release /p:AssemblyVersion=$($env:AssemblyVersion) /p:ProductVersion=$($env:AssemblyVersion)
 
   build:
     verbosity: minimal
 
   after_build:
-  - ps: dotnet pack .\Odin\Odin.csproj /p:PackageVersion="$env:PackageVersion"
+  - ps: dotnet pack .\Odin\Odin.csproj /p:PackageVersion="$($env:PackageVersion)"
 
   artifacts:
   - path: 'Odin-Commands*.nupkg'
@@ -67,6 +68,7 @@
   init:
   - ps: |
       $version = new-object System.Version $env:APPVEYOR_BUILD_VERSION
+      $env:AssemblyVersion = $Version.ToString()
       $env:PackageVersion = "{0}.{1}.{2}-beta-{3}" -f $version.Major, $version.Minor, $version.Build, $version.Revision
 
   assembly_info:
@@ -87,8 +89,8 @@
   - dotnet restore
 
   build_script:
-  - ps: dotnet build
-  
+  - ps: dotnet build -c Release /p:AssemblyVersion=$($env:AssemblyVersion) /p:ProductVersion=$($env:AssemblyVersion)
+
   build:
     verbosity: minimal
 
@@ -123,7 +125,7 @@
   - dotnet restore
 
   build_script:
-    - ps: dotnet build
+  - ps: dotnet build -c Release
 
   build:
     verbosity: minimal
