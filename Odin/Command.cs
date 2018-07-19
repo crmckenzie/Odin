@@ -149,7 +149,7 @@ namespace Odin
             return token == Name || Aliases.Contains(token);
         }
 
-        private List<Command> _subCommands;
+        private readonly List<Command> _subCommands;
 
         /// <summary>
         /// Gets the subcommands registered with the current command.
@@ -201,13 +201,13 @@ namespace Odin
         /// <returns>0 if successful.</returns>
         public int Execute(params string[] args)
         {
-            if (this.DisplayHelpWhenArgsAreEmpty && !args.Any())
-            {
-                this.Help();
-                return 0;
-            }
+            if (ShouldExit(args))
+                return Exit(displayHelp: true);
 
-            var result = -1;
+            const int commandFailed = -1;
+            const int commandSucceeded = 0;
+
+            var exitCode = commandFailed;
 
             MethodInvocation invocation;
             try
@@ -218,20 +218,33 @@ namespace Odin
             {
                 this.Logger.Error($"Could not interpret the command. You sent [{args.Join(", ")}]");
                 this.Help();
-                return result;
+                return exitCode;
             }
 
             if (invocation?.CanInvoke() == true)
             {
-                result =  invocation.Invoke();
+                exitCode =  invocation.Invoke();
+                if (exitCode == commandSucceeded)
+                {
+                    return commandSucceeded;
+                }
             }
-
-            if (result == 0)
-                return result;
 
             this.Logger.Error("Unrecognized command sequence: {0}\n", string.Join(" ", args));
             this.Help();
-            return result;
+            return exitCode;
+        }
+
+        private int Exit(bool displayHelp = false)
+        {
+            if (displayHelp)
+                this.Help();
+            return 0;
+        }
+
+        private bool ShouldExit(string[] args)
+        {
+            return this.DisplayHelpWhenArgsAreEmpty && !args.Any();
         }
 
         /// <summary>
@@ -245,24 +258,8 @@ namespace Odin
             try
             {
                 var token = tokens.FirstOrDefault();
-                var subCommand = GetSubCommandByToken(token);
-                if (subCommand != null)
-                {
-                    var theRest = tokens.Skip(1).ToArray();
-                    return subCommand.GenerateInvocation(theRest);
-                }
-
-                var action = GetActionByToken(token);
-                var toSkip = 1;
-                if (action == null)
-                {
-                    toSkip = 0;
-                    action = GetDefaultAction();
-                }
-
-                var args = tokens.Skip(toSkip).ToArray();
-                action?.SetParameterValues(args);
-                return action;
+                var invocation = GetSubCommandByToken(tokens, token);
+                return invocation.Found ? invocation.SubCommand : GetAction(tokens, token);
             }
             catch (ParameterConversionException pce)
             {
@@ -271,14 +268,33 @@ namespace Odin
             }
         }
 
+        private MethodInvocation GetAction(string[] tokens, string token)
+        {
+            var action = GetActionByToken(token);
+            var toSkip = 1;
+            if (action == null)
+            {
+                toSkip = 0;
+                action = GetDefaultAction();
+            }
+
+            var args = tokens.Skip(toSkip).ToArray();
+            action?.SetParameterValues(args);
+            return action;
+        }
+
+        private (bool Found, MethodInvocation SubCommand) GetSubCommandByToken(string[] tokens, string token)
+        {
+            var subCommand = SubCommands.FirstOrDefault(cmd => cmd.IsIdentifiedBy(token));
+            if (subCommand == null) return (Found: false, SubCommand: null);
+
+            var theRest = tokens.Skip(1).ToArray();
+            return (Found: true, SubCommand: subCommand.GenerateInvocation(theRest));
+        }
+
         private MethodInvocation GetActionByToken(string token)
         {
             return _actions.FirstOrDefault(action => action.Identifiers.Contains(token));
-        }
-
-        private Command GetSubCommandByToken(string token)
-        {
-            return SubCommands.FirstOrDefault(cmd => cmd.IsIdentifiedBy(token));
         }
 
         /// <summary>
@@ -322,7 +338,6 @@ namespace Odin
             if (messages.Any())
                 yield return new ValidationResult(this.Name, messages);
 
-
             var validationResults = this.SubCommands.SelectMany(cmd => cmd.Validate());
             foreach (var validationResult in validationResults)
             {
@@ -332,57 +347,119 @@ namespace Odin
 
         private IEnumerable<string> GetValidationMessages()
         {
+            var validationErrors = new List<string>();
+
+            var defaultActionResults = ValidateDefaultActions();
+            validationErrors.AddRange(defaultActionResults);
+
+            var executableActionResults = ValidateExecutableActions();
+            validationErrors.AddRange(executableActionResults);
+
+            var actionResults = ValidateActions();
+            validationErrors.AddRange(actionResults);
+
+            var commonParameterResults = ValidateCommonParameters();
+            validationErrors.AddRange(commonParameterResults);
+
+            return validationErrors;
+        }
+
+        private List<string> ValidateDefaultActions()
+        {
+            var defaultActionMessages = new List<string>();
             var defaultActions = this.Actions.Where(row => row.IsDefault).ToArray();
-            if (defaultActions.Count() > 1)
-            {
-                var actionNames = defaultActions.Select(row => row.Name).Join(", ");
-                yield return $"There is more than one default action: {actionNames}.";
-            }
+            if (defaultActions.Count() <= 1) return defaultActionMessages;
 
-            var actionIdentifiers = this.Actions.SelectMany(action => action.Identifiers);
-            var subCommandIdentifiers = this.SubCommands.SelectMany(cmd => cmd.Identifiers);
-            var matchingNames = actionIdentifiers.Intersect(subCommandIdentifiers);
+            var actionNames = defaultActions
+                .Select(row => row.Name)
+                .Join(", ")
+                ;
 
-            foreach (var matchingName in matchingNames)
-            {
-                yield return $"There is more than one executable action named '{matchingName}'.";
-            }
+            defaultActionMessages.Add($"There is more than one default action: {actionNames}.");
 
+            return defaultActionMessages;
+        }
+
+        private IEnumerable<string> ValidateExecutableActions()
+        {
+            var actions = GetDuplicateExecutableActions();
+            var messages = actions.Select(matchingName => $"There is more than one executable action named '{matchingName}'.");
+            return messages;
+        }
+
+        private IEnumerable<string> ValidateCommonParameters()
+        {
+            var aliases = GetDuplicatedCommonParameterAliases();
+            var validationResults = aliases.Select(item => $"The alias '{item.Key}' is duplicated amongst common parameters.");
+            return validationResults;
+        }
+
+        private List<string> ValidateActions()
+        {
+            var results = new List<string>();
             foreach (var action in this._actions)
             {
-                var aliases = action.MethodParameters.SelectMany(row => row.Aliases);
-                var duplicates = aliases.GroupBy((s) => s).Where(row => row.Count() > 1);
-                foreach (var dup in duplicates)
-                {
-                    yield return $"The alias '{dup.Key}' is duplicated for action '{action.Name}'.";
-                }
+                var validationMessages = ValidateActionAliases(action);
+                results.AddRange(validationMessages);
 
                 foreach (var parameter in action.MethodParameters)
                 {
                     foreach (var commonParameter in CommonParameters)
                     {
-                        if (commonParameter.LongOptionName == parameter.LongOptionName)
+                        if (HasNamingConflict(commonParameter, parameter))
                         {
-                            yield return $"The common parameter name '{parameter.LongOptionName}' conflicts with a parameter defined for action '{action.Name}'.";
+                            results.Add(
+                                $"The common parameter name '{parameter.LongOptionName}' conflicts with a parameter defined for action '{action.Name}'.");
                         }
 
-                        foreach (var alias in commonParameter.Aliases.Where(alias => parameter.Aliases.Contains(alias)))
-                        {
-                            yield return
-                                $"The alias '{alias}' for common parameter '{commonParameter.LongOptionName}' is duplicated for parameter '{parameter.LongOptionName}' on action '{action.Name}'."
-                                ;
-                        }
+                        var aliasNamingConflicts = HasNamingConflictForAliases(commonParameter, parameter)
+                            .Select(alias =>
+                                $"The alias '{alias}' for common parameter '{commonParameter.LongOptionName}' is duplicated for parameter '{parameter.LongOptionName}' on action '{action.Name}'.");
+                        results.AddRange(aliasNamingConflicts);
                     }
                 }
             }
 
+            return results;
+        }
+
+        private static IEnumerable<string> ValidateActionAliases(MethodInvocation action)
+        {
+            var aliases = GetDuplicateAliases(action);
+            var validationMessages = aliases.Select(dup => $"The alias '{dup.Key}' is duplicated for action '{action.Name}'.");
+            return validationMessages;
+        }
+
+        private IEnumerable<IGrouping<string, string>> GetDuplicatedCommonParameterAliases()
+        {
             var commonParameterAliases = this.CommonParameters.SelectMany(row => row.Aliases);
             var commonParameterDuplicates = commonParameterAliases.GroupBy((s) => s).Where(row => row.Count() > 1);
-            foreach (var dup in commonParameterDuplicates)
-            {
-                yield return $"The alias '{dup.Key}' is duplicated amongst common parameters.";
-            }
+            return commonParameterDuplicates;
+        }
 
+        private static IEnumerable<string> HasNamingConflictForAliases(CommonParameter commonParameter, MethodParameter parameter)
+        {
+            return commonParameter.Aliases.Where(alias => parameter.Aliases.Contains(alias));
+        }
+
+        private static bool HasNamingConflict(CommonParameter commonParameter, MethodParameter parameter)
+        {
+            return commonParameter.LongOptionName == parameter.LongOptionName;
+        }
+
+        private static IEnumerable<IGrouping<string, string>> GetDuplicateAliases(MethodInvocation action)
+        {
+            var aliases = action.MethodParameters.SelectMany(row => row.Aliases);
+            var duplicates = aliases.GroupBy((s) => s).Where(row => row.Count() > 1);
+            return duplicates;
+        }
+
+        private IEnumerable<string> GetDuplicateExecutableActions()
+        {
+            var actionIdentifiers = this.Actions.SelectMany(action => action.Identifiers);
+            var subCommandIdentifiers = this.SubCommands.SelectMany(cmd => cmd.Identifiers);
+            var matchingNames = actionIdentifiers.Intersect(subCommandIdentifiers);
+            return matchingNames;
         }
     }
 }
