@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Odin
+﻿namespace Odin
 {
     using System;
     using System.Collections.Generic;
@@ -10,7 +6,7 @@ namespace Odin
     using System.Linq;
     using System.Reflection;
 
-    public static class ReflectionExtensions
+    internal static class ReflectionExtensions
     {
         public static ConstructorInfo GetConstructor(this Type self, params Type[] types)
         {

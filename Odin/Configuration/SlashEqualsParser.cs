@@ -24,11 +24,11 @@ namespace Odin.Configuration
         /// Returns a <see cref="ParseResult"/> given a position in a list of tokens.
         /// </summary>
         /// <param name="tokens"></param>
-        /// <param name="i"></param>
+        /// <param name="tokenIndex"></param>
         /// <returns></returns>
-        public ParseResult Parse(string[] tokens, int i)
+        public ParseResult Parse(string[] tokens, int tokenIndex)
         {
-            var token = tokens[i];
+            var token = tokens[tokenIndex];
             if (IsNameValuePair(token))
             {
                 var value = token.Split('=').Skip(1).First();

@@ -10,26 +10,26 @@ namespace Odin
 {
     /// <summary>
     /// Represents an action parameter and its value.
-    /// </summary>
-    public class MethodParameter : Parameter
+    /// </summary>C:\Users\chmckenz\src\odin\Odin\ActionParameter.cs
+    public class ActionParameter : Parameter
     {
         private readonly ParameterInfo _parameterInfo;
 
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="methodInvocation"></param>
+        /// <param name="action"></param>
         /// <param name="parameterInfo"></param>
-        public MethodParameter(MethodInvocation methodInvocation, ParameterInfo parameterInfo)
+        public ActionParameter(Action action, ParameterInfo parameterInfo)
         {
-            MethodInvocation = methodInvocation;
+            Action = action;
             _parameterInfo = parameterInfo;
 
             ConfigureDefaultValue();
         }
-        private MethodInvocation MethodInvocation { get; }
+        private Action Action { get; }
 
-        public override IConventions Conventions => MethodInvocation.Conventions;
+        public override IConventions Conventions => Action.Conventions;
 
         /// <summary>
         /// Gets the description of the Parameter

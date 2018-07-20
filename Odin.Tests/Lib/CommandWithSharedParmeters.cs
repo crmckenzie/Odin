@@ -2,7 +2,7 @@
 {
     using Odin.Attributes;
 
-    public class CommandWithCommonParmeters : Command
+    public class CommandWithSharedParmeters : Command
     {   
         [Parameter]
         [Alias("t")]

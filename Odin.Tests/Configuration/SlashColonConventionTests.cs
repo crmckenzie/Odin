@@ -37,14 +37,14 @@ namespace Odin.Tests.Configuration
             var args = new[] { "NotAnAction" };
 
             // When
-            var result = this.Subject.GenerateInvocation(args);
+            var result = this.Subject.GetAction(args);
 
             // Then
             result.ShouldNotBeNull();
             result.Name.ShouldBe("DoSomething");
-            result.MethodParameters[0].Value.ShouldBe("NotAnAction");
-            result.MethodParameters[1].Value.ShouldBe(Type.Missing);
-            result.MethodParameters[2].Value.ShouldBe(Type.Missing);
+            result.Parameters[0].Value.ShouldBe("NotAnAction");
+            result.Parameters[1].Value.ShouldBe(Type.Missing);
+            result.Parameters[2].Value.ShouldBe(Type.Missing);
         }
 
         [Fact]
@@ -54,12 +54,12 @@ namespace Odin.Tests.Configuration
             var args = new[] { "DoSomething" };
 
             // When
-            var result = this.Subject.GenerateInvocation(args);
+            var result = this.Subject.GetAction(args);
 
             // Then
             result.ShouldNotBeNull();
-            result.MethodParameters.Count.ShouldBe(3);
-            result.MethodParameters.ShouldAllBe(pv=> pv.Value == Type.Missing);
+            result.Parameters.Count.ShouldBe(3);
+            result.Parameters.ShouldAllBe(pv=> pv.Value == Type.Missing);
         }
 
         [Fact]
@@ -69,11 +69,11 @@ namespace Odin.Tests.Configuration
             var args = new[] { "AlwaysReturnsMinus2" };
 
             // When
-            var result = this.Subject.GenerateInvocation(args);
+            var result = this.Subject.GetAction(args);
 
             // Then
             result.ShouldNotBeNull();
-            result.MethodParameters.Count.ShouldBe(0);
+            result.Parameters.Count.ShouldBe(0);
         }
 
         #endregion
@@ -86,12 +86,12 @@ namespace Odin.Tests.Configuration
             var args = new[] { "WithRequiredStringArg", "/argument:value" };
 
 
-            var result = this.Subject.GenerateInvocation(args);
+            var result = this.Subject.GetAction(args);
 
             result.ShouldNotBeNull();
-            result.MethodParameters.Count.ShouldBe(1);
-            result.MethodParameters[0].Name.ShouldBe("argument");
-            result.MethodParameters[0].Value.ShouldBe("value");
+            result.Parameters.Count.ShouldBe(1);
+            result.Parameters[0].Name.ShouldBe("argument");
+            result.Parameters[0].Value.ShouldBe("value");
         }
 
         [Fact]
@@ -99,14 +99,14 @@ namespace Odin.Tests.Configuration
         {
             var args = new[] { "WithRequiredStringArgs", "/argument1:value1", "/argument2:value2"};
 
-            var result = this.Subject.GenerateInvocation(args);
+            var result = this.Subject.GetAction(args);
 
             result.ShouldNotBeNull();
-            result.MethodParameters.Count.ShouldBe(2);
-            result.MethodParameters[0].Name.ShouldBe("argument1");
-            result.MethodParameters[0].Value.ShouldBe("value1");
-            result.MethodParameters[1].Name.ShouldBe("argument2");
-            result.MethodParameters[1].Value.ShouldBe("value2");
+            result.Parameters.Count.ShouldBe(2);
+            result.Parameters[0].Name.ShouldBe("argument1");
+            result.Parameters[0].Value.ShouldBe("value1");
+            result.Parameters[1].Name.ShouldBe("argument2");
+            result.Parameters[1].Value.ShouldBe("value2");
         }
 
         [Fact]
@@ -114,14 +114,14 @@ namespace Odin.Tests.Configuration
         {
             var args = new[] { "WithRequiredStringArgs", "value1", "value2" };
 
-            var result = this.Subject.GenerateInvocation(args);
+            var result = this.Subject.GetAction(args);
 
             result.ShouldNotBeNull();
-            result.MethodParameters.Count.ShouldBe(2);
-            result.MethodParameters[0].Name.ShouldBe("argument1");
-            result.MethodParameters[0].Value.ShouldBe("value1");
-            result.MethodParameters[1].Name.ShouldBe("argument2");
-            result.MethodParameters[1].Value.ShouldBe("value2");
+            result.Parameters.Count.ShouldBe(2);
+            result.Parameters[0].Name.ShouldBe("argument1");
+            result.Parameters[0].Value.ShouldBe("value1");
+            result.Parameters[1].Name.ShouldBe("argument2");
+            result.Parameters[1].Value.ShouldBe("value2");
         }
 
         #endregion
@@ -133,12 +133,12 @@ namespace Odin.Tests.Configuration
         {
             var args = new[] { "WithSwitch", "/argument:true"};
 
-            var result = this.Subject.GenerateInvocation(args);
+            var result = this.Subject.GetAction(args);
 
             result.ShouldNotBeNull();
-            result.MethodParameters.Count.ShouldBe(1);
-            result.MethodParameters[0].Name.ShouldBe("argument");
-            result.MethodParameters[0].Value.ShouldBe(true);
+            result.Parameters.Count.ShouldBe(1);
+            result.Parameters[0].Name.ShouldBe("argument");
+            result.Parameters[0].Value.ShouldBe(true);
         }
 
         [Fact]
@@ -146,12 +146,12 @@ namespace Odin.Tests.Configuration
         {
             var args = new[] { "WithSwitch", "/argument" };
 
-            var result = this.Subject.GenerateInvocation(args);
+            var result = this.Subject.GetAction(args);
 
             result.ShouldNotBeNull();
-            result.MethodParameters.Count.ShouldBe(1);
-            result.MethodParameters[0].Name.ShouldBe("argument");
-            result.MethodParameters[0].Value.ShouldBe(true);
+            result.Parameters.Count.ShouldBe(1);
+            result.Parameters[0].Name.ShouldBe("argument");
+            result.Parameters[0].Value.ShouldBe(true);
         }
 
         [Fact]
@@ -159,12 +159,12 @@ namespace Odin.Tests.Configuration
         {
             var args = new[] { "WithSwitch", "/no-argument" };
 
-            var result = this.Subject.GenerateInvocation(args);
+            var result = this.Subject.GetAction(args);
 
             result.ShouldNotBeNull();
-            result.MethodParameters.Count.ShouldBe(1);
-            result.MethodParameters[0].Name.ShouldBe("argument");
-            result.MethodParameters[0].Value.ShouldBe(false);
+            result.Parameters.Count.ShouldBe(1);
+            result.Parameters[0].Name.ShouldBe("argument");
+            result.Parameters[0].Value.ShouldBe(false);
         }
 
         [Fact]
@@ -172,12 +172,12 @@ namespace Odin.Tests.Configuration
         {
             var args = new[] { "WithSwitch" };
 
-            var result = this.Subject.GenerateInvocation(args);
+            var result = this.Subject.GetAction(args);
 
             result.ShouldNotBeNull();
-            result.MethodParameters.Count.ShouldBe(1);
-            result.MethodParameters[0].Name.ShouldBe("argument");
-            result.MethodParameters[0].Value.ShouldBe(false);
+            result.Parameters.Count.ShouldBe(1);
+            result.Parameters[0].Name.ShouldBe("argument");
+            result.Parameters[0].Value.ShouldBe(false);
         }
 
         #endregion
@@ -189,12 +189,12 @@ namespace Odin.Tests.Configuration
         {
             var args = new[] { "WithOptionalStringArg" };
 
-            var result = this.Subject.GenerateInvocation(args);
+            var result = this.Subject.GetAction(args);
 
             result.ShouldNotBeNull();
-            result.MethodParameters.Count.ShouldBe(1);
-            result.MethodParameters[0].Name.ShouldBe("argument");
-            result.MethodParameters[0].Value.ShouldBe(Type.Missing);
+            result.Parameters.Count.ShouldBe(1);
+            result.Parameters[0].Name.ShouldBe("argument");
+            result.Parameters[0].Value.ShouldBe(Type.Missing);
         }
 
         [Fact]
@@ -202,12 +202,12 @@ namespace Odin.Tests.Configuration
         {
             var args = new[] { "WithOptionalStringArg", "/argument:value1"};
 
-            var result = this.Subject.GenerateInvocation(args);
+            var result = this.Subject.GetAction(args);
 
             result.ShouldNotBeNull();
-            result.MethodParameters.Count.ShouldBe(1);
-            result.MethodParameters[0].Name.ShouldBe("argument");
-            result.MethodParameters[0].Value.ShouldBe("value1");
+            result.Parameters.Count.ShouldBe(1);
+            result.Parameters[0].Name.ShouldBe("argument");
+            result.Parameters[0].Value.ShouldBe("value1");
         }
 
         [Fact]
@@ -217,16 +217,16 @@ namespace Odin.Tests.Configuration
 
             this.Subject.Execute(args);
 
-            var result = this.Subject.GenerateInvocation(args);
+            var result = this.Subject.GetAction(args);
 
             result.ShouldNotBeNull();
-            result.MethodParameters.Count.ShouldBe(3);
-            result.MethodParameters[0].Name.ShouldBe("argument1");
-            result.MethodParameters[0].Value.ShouldBe("value1");
-            result.MethodParameters[1].Name.ShouldBe("argument2");
-            result.MethodParameters[1].Value.ShouldBe("value2");
-            result.MethodParameters[2].Name.ShouldBe("argument3");
-            result.MethodParameters[2].Value.ShouldBe("value3");
+            result.Parameters.Count.ShouldBe(3);
+            result.Parameters[0].Name.ShouldBe("argument1");
+            result.Parameters[0].Value.ShouldBe("value1");
+            result.Parameters[1].Name.ShouldBe("argument2");
+            result.Parameters[1].Value.ShouldBe("value2");
+            result.Parameters[2].Name.ShouldBe("argument3");
+            result.Parameters[2].Value.ShouldBe("value3");
         }
 
         [Fact]
@@ -234,16 +234,16 @@ namespace Odin.Tests.Configuration
         {
             var args = new[] { "WithOptionalStringArgs", "/argument1:value1"};
 
-            var result = this.Subject.GenerateInvocation(args);
+            var result = this.Subject.GetAction(args);
 
             result.ShouldNotBeNull();
-            result.MethodParameters.Count.ShouldBe(3);
-            result.MethodParameters[0].Name.ShouldBe("argument1");
-            result.MethodParameters[0].Value.ShouldBe("value1");
-            result.MethodParameters[1].Name.ShouldBe("argument2");
-            result.MethodParameters[1].Value.ShouldBe(Type.Missing);
-            result.MethodParameters[2].Name.ShouldBe("argument3");
-            result.MethodParameters[2].Value.ShouldBe(Type.Missing);
+            result.Parameters.Count.ShouldBe(3);
+            result.Parameters[0].Name.ShouldBe("argument1");
+            result.Parameters[0].Value.ShouldBe("value1");
+            result.Parameters[1].Name.ShouldBe("argument2");
+            result.Parameters[1].Value.ShouldBe(Type.Missing);
+            result.Parameters[2].Name.ShouldBe("argument3");
+            result.Parameters[2].Value.ShouldBe(Type.Missing);
         }
 
         [Fact]
@@ -251,16 +251,16 @@ namespace Odin.Tests.Configuration
         {
             var args = new[] { "WithOptionalStringArgs", "/argument2:value2"};
 
-            var result = this.Subject.GenerateInvocation(args);
+            var result = this.Subject.GetAction(args);
 
             result.ShouldNotBeNull();
-            result.MethodParameters.Count.ShouldBe(3);
-            result.MethodParameters[0].Name.ShouldBe("argument1");
-            result.MethodParameters[0].Value.ShouldBe(Type.Missing);
-            result.MethodParameters[1].Name.ShouldBe("argument2");
-            result.MethodParameters[1].Value.ShouldBe("value2");
-            result.MethodParameters[2].Name.ShouldBe("argument3");
-            result.MethodParameters[2].Value.ShouldBe(Type.Missing);
+            result.Parameters.Count.ShouldBe(3);
+            result.Parameters[0].Name.ShouldBe("argument1");
+            result.Parameters[0].Value.ShouldBe(Type.Missing);
+            result.Parameters[1].Name.ShouldBe("argument2");
+            result.Parameters[1].Value.ShouldBe("value2");
+            result.Parameters[2].Name.ShouldBe("argument3");
+            result.Parameters[2].Value.ShouldBe(Type.Missing);
         }
 
         [Fact]
@@ -268,16 +268,16 @@ namespace Odin.Tests.Configuration
         {
             var args = new[] { "WithOptionalStringArgs" };
 
-            var result = this.Subject.GenerateInvocation(args);
+            var result = this.Subject.GetAction(args);
 
             result.ShouldNotBeNull();
-            result.MethodParameters.Count.ShouldBe(3);
-            result.MethodParameters[0].Name.ShouldBe("argument1");
-            result.MethodParameters[0].Value.ShouldBe(Type.Missing);
-            result.MethodParameters[1].Name.ShouldBe("argument2");
-            result.MethodParameters[1].Value.ShouldBe(Type.Missing);
-            result.MethodParameters[2].Name.ShouldBe("argument3");
-            result.MethodParameters[2].Value.ShouldBe(Type.Missing);
+            result.Parameters.Count.ShouldBe(3);
+            result.Parameters[0].Name.ShouldBe("argument1");
+            result.Parameters[0].Value.ShouldBe(Type.Missing);
+            result.Parameters[1].Name.ShouldBe("argument2");
+            result.Parameters[1].Value.ShouldBe(Type.Missing);
+            result.Parameters[2].Name.ShouldBe("argument3");
+            result.Parameters[2].Value.ShouldBe(Type.Missing);
         }
 
         [Fact]
@@ -285,16 +285,16 @@ namespace Odin.Tests.Configuration
         {
             var args = new[] { "WithOptionalStringArgs", "/argument3:value3"};
 
-            var result = this.Subject.GenerateInvocation(args);
+            var result = this.Subject.GetAction(args);
 
             result.ShouldNotBeNull();
-            result.MethodParameters.Count.ShouldBe(3);
-            result.MethodParameters[0].Name.ShouldBe("argument1");
-            result.MethodParameters[0].Value.ShouldBe(Type.Missing);
-            result.MethodParameters[1].Name.ShouldBe("argument2");
-            result.MethodParameters[1].Value.ShouldBe(Type.Missing);
-            result.MethodParameters[2].Name.ShouldBe("argument3");
-            result.MethodParameters[2].Value.ShouldBe("value3");
+            result.Parameters.Count.ShouldBe(3);
+            result.Parameters[0].Name.ShouldBe("argument1");
+            result.Parameters[0].Value.ShouldBe(Type.Missing);
+            result.Parameters[1].Name.ShouldBe("argument2");
+            result.Parameters[1].Value.ShouldBe(Type.Missing);
+            result.Parameters[2].Name.ShouldBe("argument3");
+            result.Parameters[2].Value.ShouldBe("value3");
         }
 
         #endregion
@@ -306,11 +306,11 @@ namespace Odin.Tests.Configuration
         {
             var args = new[] { "Sub" };
 
-            var result = this.Subject.GenerateInvocation(args);
+            var result = this.Subject.GetAction(args);
 
             result.ShouldNotBeNull();
             result.Command.ShouldBe(this.SubCommand);
-            result.MethodParameters.Count.ShouldBe(0);
+            result.Parameters.Count.ShouldBe(0);
         }
 
         #endregion

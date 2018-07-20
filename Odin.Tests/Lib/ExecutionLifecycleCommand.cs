@@ -13,12 +13,12 @@ namespace Odin.Tests.Lib
         [Parameter]
         public DateTime After { get; set; }
 
-        protected override void OnBeforeExecute(MethodInvocation invocation)
+        protected override void OnBeforeExecute(Odin.Action invocation)
         {
             this.Before = DateTime.Now;
         }
 
-        protected override int OnAfterExecute(MethodInvocation invocation, int exitCode)
+        protected override int OnAfterExecute(Odin.Action invocation, int exitCode)
         {
             this.After = DateTime.Now;
             return base.OnAfterExecute(invocation, exitCode);

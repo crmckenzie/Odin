@@ -2,11 +2,10 @@ using Odin.Attributes;
 
 namespace Odin.Tests.Validation
 {
-    public class CommandWithCommonParameterAndMethodParameterAliasConflict : Command
+    public class CommandWithSharedParameterAndActionParameterNameConflict : Command
     {
         [Parameter]
-        [Alias("p")]
-        public string CommonParameter { get; set; }
+        public string Param1 { get; set; }
 
         [Action]
         public void Action1([Alias("p")] string param1)

@@ -1,27 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using NUnit.Framework;
-
-using Odin.Configuration;
+﻿using System.Linq;
 using Shouldly;
 
 namespace Odin.Tests.Lib
 {
     using Xunit;
 
-    public class CommonParameterTests
+    public class SharedParameterTests
     {
-        public CommonParameterTests()
+        public SharedParameterTests()
         {
             this.Logger = new StringBuilderLogger();
-            this.Subject = new CommandWithCommonParmeters();
+            this.Subject = new CommandWithSharedParmeters();
             this.Subject.Use(this.Logger);
         }
 
-        public CommandWithCommonParmeters Subject { get; set; }
+        public CommandWithSharedParmeters Subject { get; set; }
 
         public StringBuilderLogger Logger{ get; set; }
 
@@ -48,13 +41,13 @@ namespace Odin.Tests.Lib
         }
 
         [Fact]
-        public void GetMethodInvocation_DoesNot_SetParameter()
+        public void GetAction_DoesNot_SetParameter()
         {
 
-            var invocation = Subject.GenerateInvocation("display", "--text", "awesome!");
+            var invocation = Subject.GetAction("display", "--text", "awesome!");
             Subject.Text.ShouldBe(null);
 
-            invocation.CommonParameters.ToDictionary(p => p.Name)["Text"].Value.ShouldBe("awesome!");
+            invocation.SharedParameters.ToDictionary(p => p.Name)["Text"].Value.ShouldBe("awesome!");
         }
 
         [Fact]
@@ -67,7 +60,7 @@ namespace Odin.Tests.Lib
         }
 
         [Fact]
-        public void WithMethodParameter()
+        public void WithActionParameter()
         {
             Subject.Execute("display", "--text", "awesome!", "--subject", "fredbob");
 
@@ -76,7 +69,7 @@ namespace Odin.Tests.Lib
         }
 
         [Fact]
-        public void WithMethodParameter_InvertOrder()
+        public void WithActionParameter_InvertOrder()
         {
             Subject.Execute("display",  "--subject", "fredbob", "--text", "awesome!");
 

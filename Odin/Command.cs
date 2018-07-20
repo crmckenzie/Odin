@@ -59,19 +59,19 @@ namespace Odin
                 .GetType()
                 .GetMethods()
                 .Where(m => m.GetCustomAttribute<ActionAttribute>() != null)
-                .Select(row => new MethodInvocation(this, row))
+                .Select(row => new Action(this, row))
                 .ToList()
                 ;
 
-            this.CommonParameters  = this.GetType().GetProperties()
+            this.SharedParameters = this.GetType().GetProperties()
                 .Where(row => row.GetCustomAttribute<ParameterAttribute>() != null)
-                .Select(row => new CommonParameter(this, row))
+                .Select(row => new SharedParameter(this, row))
                 .ToList()
                 .AsReadOnly()
                 ;
         }
 
-        internal ReadOnlyCollection<CommonParameter> CommonParameters { get; set; }
+        internal ReadOnlyCollection<SharedParameter> SharedParameters { get; set; }
 
         /// <summary>
         /// Sets the logger to be used with the command. Only the logger applied to the root command is used.
@@ -111,7 +111,7 @@ namespace Odin
         /// </summary>
         public virtual ILogger Logger => IsRoot() ? _logger : Parent.Logger;
 
-        private  IConventions _conventions;
+        private IConventions _conventions;
         private IHelpWriter _helpWriter;
 
         /// <summary>
@@ -122,7 +122,7 @@ namespace Odin
         /// <summary>
         /// Gets the conventions for the command tree.
         /// </summary>
-        public IConventions Conventions => IsRoot() ? _conventions : Parent.Conventions ;
+        public IConventions Conventions => IsRoot() ? _conventions : Parent.Conventions;
 
         /// <summary>
         /// Gets the conventional name of the command.
@@ -137,7 +137,7 @@ namespace Odin
         /// <summary>
         /// Gets all of the identifiers applied to the command.
         /// </summary>
-        public string[] Identifiers => Aliases.Concat(new string[] {this.Name}).ToArray();
+        public string[] Identifiers => Aliases.Concat(new string[] { this.Name }).ToArray();
 
         /// <summary>
         /// True if the token matches the command, otherwise false.
@@ -156,12 +156,12 @@ namespace Odin
         /// </summary>
         public IReadOnlyCollection<Command> SubCommands => this._subCommands.AsReadOnly();
 
-        private List<MethodInvocation> _actions;
+        private List<Action> _actions;
 
         /// <summary>
         /// Gets the actions registered with the current command.
         /// </summary>
-        public IReadOnlyCollection<MethodInvocation> Actions => this._actions.AsReadOnly();
+        public IReadOnlyCollection<Action> Actions => this._actions.AsReadOnly();
 
         /// <summary>
         /// Adds a command to the command tree.
@@ -179,7 +179,7 @@ namespace Odin
         /// Called after arguments are parsed but before the invocation is executed.
         /// </summary>
         /// <param name="invocation"></param>
-        protected internal virtual void OnBeforeExecute(MethodInvocation invocation)
+        protected internal virtual void OnBeforeExecute(Action invocation)
         {
         }
 
@@ -189,7 +189,7 @@ namespace Odin
         /// <param name="invocation"></param>
         /// <param name="exitCode"></param>
         /// <returns></returns>
-        protected internal virtual int OnAfterExecute(MethodInvocation invocation, int exitCode)
+        protected internal virtual int OnAfterExecute(Action invocation, int exitCode)
         {
             return exitCode;
         }
@@ -209,10 +209,10 @@ namespace Odin
 
             var exitCode = commandFailed;
 
-            MethodInvocation invocation;
+            Action invocation;
             try
             {
-                invocation = this.GenerateInvocation(args);
+                invocation = this.GetAction(args);
             }
             catch (UnmappedParameterException)
             {
@@ -223,7 +223,7 @@ namespace Odin
 
             if (invocation?.CanInvoke() == true)
             {
-                exitCode =  invocation.Invoke();
+                exitCode = invocation.Invoke();
                 if (exitCode == commandSucceeded)
                 {
                     return commandSucceeded;
@@ -253,7 +253,7 @@ namespace Odin
         /// <param name="tokens"></param>
         /// <returns></returns>
         /// <remarks>Useful in testing your command structure.</remarks>
-        public MethodInvocation GenerateInvocation(params string[] tokens)
+        public Action GetAction(params string[] tokens)
         {
             try
             {
@@ -268,31 +268,27 @@ namespace Odin
             }
         }
 
-        private MethodInvocation GetAction(string[] tokens, string token)
+        private Action GetAction(string[] tokens, string token)
         {
             var action = GetActionByToken(token);
-            var toSkip = 1;
-            if (action == null)
-            {
-                toSkip = 0;
-                action = GetDefaultAction();
-            }
+            var tokensProcessed = action == null ? 0 : 1;
+            action = action ?? GetDefaultAction();
 
-            var args = tokens.Skip(toSkip).ToArray();
+            var args = tokens.Skip(tokensProcessed).ToArray();
             action?.SetParameterValues(args);
             return action;
         }
 
-        private (bool Found, MethodInvocation SubCommand) GetSubCommandByToken(string[] tokens, string token)
+        private (bool Found, Action SubCommand) GetSubCommandByToken(string[] tokens, string token)
         {
             var subCommand = SubCommands.FirstOrDefault(cmd => cmd.IsIdentifiedBy(token));
             if (subCommand == null) return (Found: false, SubCommand: null);
 
             var theRest = tokens.Skip(1).ToArray();
-            return (Found: true, SubCommand: subCommand.GenerateInvocation(theRest));
+            return (Found: true, SubCommand: subCommand.GetAction(theRest));
         }
 
-        private MethodInvocation GetActionByToken(string token)
+        private Action GetActionByToken(string token)
         {
             return _actions.FirstOrDefault(action => action.Identifiers.Contains(token));
         }
@@ -301,7 +297,7 @@ namespace Odin
         /// Returns the default action for the command.
         /// </summary>
         /// <returns></returns>
-        public MethodInvocation GetDefaultAction()
+        public Action GetDefaultAction()
         {
             return this.Actions.FirstOrDefault(row => row.IsDefault);
         }
@@ -358,64 +354,64 @@ namespace Odin
             var actionResults = ValidateActions();
             validationErrors.AddRange(actionResults);
 
-            var commonParameterResults = ValidateCommonParameters();
+            var commonParameterResults = ValidateSharedParameters();
             validationErrors.AddRange(commonParameterResults);
 
             return validationErrors;
         }
 
-        private List<string> ValidateDefaultActions()
+        private IEnumerable<string> ValidateDefaultActions()
         {
-            var defaultActionMessages = new List<string>();
             var defaultActions = this.Actions.Where(row => row.IsDefault).ToArray();
-            if (defaultActions.Count() <= 1) return defaultActionMessages;
+            if (defaultActions.Count() <= 1)
+                return Enumerable.Empty<string>();
 
             var actionNames = defaultActions
                 .Select(row => row.Name)
                 .Join(", ")
                 ;
 
-            defaultActionMessages.Add($"There is more than one default action: {actionNames}.");
-
-            return defaultActionMessages;
+            return new[]
+            {
+                $"There is more than one default action: {actionNames}."
+            };
         }
 
         private IEnumerable<string> ValidateExecutableActions()
         {
-            var actions = GetDuplicateExecutableActions();
+            var actions = GetDuplicateActionNames();
             var messages = actions.Select(matchingName => $"There is more than one executable action named '{matchingName}'.");
             return messages;
         }
 
-        private IEnumerable<string> ValidateCommonParameters()
+        private IEnumerable<string> ValidateSharedParameters()
         {
-            var aliases = GetDuplicatedCommonParameterAliases();
-            var validationResults = aliases.Select(item => $"The alias '{item.Key}' is duplicated amongst common parameters.");
+            var aliases = GetDuplicatedSharedParameterAliases();
+            var validationResults = aliases.Select(item => $"The alias '{item.Key}' is duplicated amongst shared parameters.");
             return validationResults;
         }
 
-        private List<string> ValidateActions()
+        private IEnumerable<string> ValidateActions()
         {
             var results = new List<string>();
             foreach (var action in this._actions)
             {
-                var validationMessages = ValidateActionAliases(action);
+                var validationMessages = action.ValidateAliases();
                 results.AddRange(validationMessages);
 
-                foreach (var parameter in action.MethodParameters)
+                foreach (var parameter in action.Parameters)
                 {
-                    foreach (var commonParameter in CommonParameters)
+                    foreach (var sharedParameter in SharedParameters)
                     {
-                        if (HasNamingConflict(commonParameter, parameter))
+                        if (sharedParameter.HasNamingConflict(parameter))
                         {
-                            results.Add(
-                                $"The common parameter name '{parameter.LongOptionName}' conflicts with a parameter defined for action '{action.Name}'.");
+                            results.Add($"The shared parameter name '{parameter.LongOptionName}' conflicts with a parameter defined for action '{action.Name}'.");
                         }
 
-                        var aliasNamingConflicts = HasNamingConflictForAliases(commonParameter, parameter)
+                        var conflicts = sharedParameter.GetNamingConflictForAliases(parameter)
                             .Select(alias =>
-                                $"The alias '{alias}' for common parameter '{commonParameter.LongOptionName}' is duplicated for parameter '{parameter.LongOptionName}' on action '{action.Name}'.");
-                        results.AddRange(aliasNamingConflicts);
+                                $"The alias '{alias}' for shared parameter '{sharedParameter.LongOptionName}' is duplicated for parameter '{parameter.LongOptionName}' on action '{action.Name}'.");
+                        results.AddRange(conflicts);
                     }
                 }
             }
@@ -423,38 +419,14 @@ namespace Odin
             return results;
         }
 
-        private static IEnumerable<string> ValidateActionAliases(MethodInvocation action)
+        private IEnumerable<IGrouping<string, string>> GetDuplicatedSharedParameterAliases()
         {
-            var aliases = GetDuplicateAliases(action);
-            var validationMessages = aliases.Select(dup => $"The alias '{dup.Key}' is duplicated for action '{action.Name}'.");
-            return validationMessages;
-        }
-
-        private IEnumerable<IGrouping<string, string>> GetDuplicatedCommonParameterAliases()
-        {
-            var commonParameterAliases = this.CommonParameters.SelectMany(row => row.Aliases);
-            var commonParameterDuplicates = commonParameterAliases.GroupBy((s) => s).Where(row => row.Count() > 1);
-            return commonParameterDuplicates;
-        }
-
-        private static IEnumerable<string> HasNamingConflictForAliases(CommonParameter commonParameter, MethodParameter parameter)
-        {
-            return commonParameter.Aliases.Where(alias => parameter.Aliases.Contains(alias));
-        }
-
-        private static bool HasNamingConflict(CommonParameter commonParameter, MethodParameter parameter)
-        {
-            return commonParameter.LongOptionName == parameter.LongOptionName;
-        }
-
-        private static IEnumerable<IGrouping<string, string>> GetDuplicateAliases(MethodInvocation action)
-        {
-            var aliases = action.MethodParameters.SelectMany(row => row.Aliases);
+            var aliases = this.SharedParameters.SelectMany(row => row.Aliases);
             var duplicates = aliases.GroupBy((s) => s).Where(row => row.Count() > 1);
             return duplicates;
         }
 
-        private IEnumerable<string> GetDuplicateExecutableActions()
+        private IEnumerable<string> GetDuplicateActionNames()
         {
             var actionIdentifiers = this.Actions.SelectMany(action => action.Identifiers);
             var subCommandIdentifiers = this.SubCommands.SelectMany(cmd => cmd.Identifiers);

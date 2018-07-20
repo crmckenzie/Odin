@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using System.Reflection;
 using Odin.Attributes;
 using Odin.Configuration;
@@ -9,7 +11,7 @@ namespace Odin
     /// <summary>
     /// Metadata data for a parameter that is shared across all of the actions of a <see cref="Command">Command</see>
     /// </summary>
-    public class CommonParameter : Parameter
+    public class SharedParameter : Parameter
     {
         private readonly Command _command;
         private readonly PropertyInfo _propertyInfo;
@@ -17,7 +19,7 @@ namespace Odin
         /// <summary>
         /// Metadata data for a parameter that is shared across all of the actions of a <see cref="Command">Command</see>
         /// </summary>
-        public CommonParameter(Command command, PropertyInfo propertyInfo)
+        public SharedParameter(Command command, PropertyInfo propertyInfo)
         {
             _command = command;
             _propertyInfo = propertyInfo;
@@ -38,18 +40,6 @@ namespace Odin
         }
 
         /// <summary>
-        /// Gets or sets the value of the parameter.
-        /// </summary>
-        public override object Value
-        {
-            get { return base.Value; }
-            set
-            {
-                base.Value = value;
-            }
-        }
-
-        /// <summary>
         /// Gets the default value of the parameter.
         /// </summary>
         /// <remarks>This is always retrieved from the Command property that the parameter refers to.</remarks>
@@ -59,7 +49,7 @@ namespace Odin
         /// True if the parameter has a default value, otherwise false.
         /// </summary>
         /// <remarks>
-        /// Always true in the case of Common Parameters
+        /// Always true in the case of Shared Parameters
         /// </remarks>
         public override bool HasDefaultValue => true;
 
@@ -80,6 +70,16 @@ namespace Odin
         /// Gets the <see cref="AliasAttribute"/> associated with this parameter.
         /// </summary>
         protected override AliasAttribute AliasAttribute => _propertyInfo.GetCustomAttribute<AliasAttribute>();
+
+        internal IEnumerable<string> GetNamingConflictForAliases(ActionParameter parameter)
+        {
+            return this.Aliases.Where(alias => parameter.Aliases.Contains(alias));
+        }
+
+        internal bool HasNamingConflict(ActionParameter parameter)
+        {
+            return this.LongOptionName == parameter.LongOptionName;
+        }
 
         internal void WriteToCommand()
         {

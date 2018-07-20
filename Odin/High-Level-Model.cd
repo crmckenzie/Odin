@@ -1,36 +1,46 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ClassDiagram MajorVersion="1" MinorVersion="1">
-  <Class Name="Odin.MethodInvocation">
-    <Position X="3.75" Y="0.75" Width="2.25" />
-    <TypeIdentifier>
-      <HashCode>BAAAAQAAAAAICAAAIAAgBASQAAAIAAAAAAAAAAAgAAg=</HashCode>
-      <FileName>MethodInvocation.cs</FileName>
-    </TypeIdentifier>
-    <ShowAsCollectionAssociation>
-      <Property Name="ParameterValues" />
-    </ShowAsCollectionAssociation>
-  </Class>
   <Class Name="Odin.Command">
     <Position X="0.5" Y="0.5" Width="2.25" />
     <Compartments>
       <Compartment Name="Fields" Collapsed="true" />
+      <Compartment Name="Methods" Collapsed="true" />
     </Compartments>
     <TypeIdentifier>
-      <HashCode>AAAAAEMAIAIsQAQAoAAEYAwAIAAEAAAAAUAAAQAgAAA=</HashCode>
+      <HashCode>AAAQIAECIALoACRAoIEIQA4AIACGBAAkJUAAgAIgAEA=</HashCode>
       <FileName>Command.cs</FileName>
     </TypeIdentifier>
-    <ShowAsCollectionAssociation>
-      <Property Name="SubCommands" />
-    </ShowAsCollectionAssociation>
   </Class>
-  <Class Name="Odin.ParameterValue">
-    <Position X="6.75" Y="0.75" Width="2.25" />
+  <Class Name="Odin.Action">
+    <Position X="3.5" Y="0.5" Width="1.5" />
     <Compartments>
-      <Compartment Name="Fields" Collapsed="true" />
+      <Compartment Name="Methods" Collapsed="true" />
     </Compartments>
     <TypeIdentifier>
-      <HashCode>ADAAAAACCBBCACBgIAQBAAQAAAQkAAAAAAAgAAAwAAA=</HashCode>
-      <FileName>ParameterValue.cs</FileName>
+      <HashCode>AAAAARACAAgICAAAAAEABASAAAAIAAAAgAAAAAKgAEg=</HashCode>
+      <FileName>Action.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Odin.ActionParameter">
+    <Position X="5.75" Y="0.5" Width="1.5" />
+    <Compartments>
+      <Compartment Name="Fields" Collapsed="true" />
+      <Compartment Name="Methods" Collapsed="true" />
+    </Compartments>
+    <TypeIdentifier>
+      <HashCode>AAAAAIAAAABgAAAgAAAEAAQDACBAAAAAIAAAAAAgAAQ=</HashCode>
+      <FileName>ActionParameter.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Odin.SharedParameter">
+    <Position X="8" Y="0.5" Width="1.5" />
+    <Compartments>
+      <Compartment Name="Fields" Collapsed="true" />
+      <Compartment Name="Methods" Collapsed="true" />
+    </Compartments>
+    <TypeIdentifier>
+      <HashCode>AAAAQIAAABBgAAAAAAAAAAQBACBAAAAAAIAAABAgAAA=</HashCode>
+      <FileName>SharedParameter.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Font Name="Segoe UI" Size="9" />

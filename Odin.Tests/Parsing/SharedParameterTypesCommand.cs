@@ -3,7 +3,7 @@ using Odin.Attributes;
 
 namespace Odin.Tests.Parsing
 {
-    public class CommonParameterTypesCommand : Command
+    public class SharedParameterTypesCommand : Command
     {
         [Parameter]
         public bool Boolean { get; set; }

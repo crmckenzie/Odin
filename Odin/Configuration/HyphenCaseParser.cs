@@ -24,20 +24,20 @@ namespace Odin.Configuration
         /// Returns a <see cref="ParseResult"/> given a position in a list of tokens.
         /// </summary>
         /// <param name="tokens"></param>
-        /// <param name="i"></param>
+        /// <param name="tokenIndex"></param>
         /// <returns></returns>
-        public ParseResult Parse(string[] tokens, int i)
+        public ParseResult Parse(string[] tokens, int tokenIndex)
         {
-            var token = tokens[i];
+            var token = tokens[tokenIndex];
 
             if (ShouldParseArray(_parameter, token))
             {
                 return ParseArray(_parameter, tokens);
             }
 
-            if (ShouldParseNameValuePair(_parameter, tokens, i))
+            if (ShouldParseNameValuePair(_parameter, tokens, tokenIndex))
             {
-                return ParseNameValuePair(_parameter, tokens, i);
+                return ParseNameValuePair(_parameter, tokens, tokenIndex);
             }
 
             if (_parameter.IsBoolean())
@@ -49,7 +49,7 @@ namespace Odin.Configuration
                 };
             }
 
-            if (ArgIsIdentifier(tokens, i + 1))
+            if (ArgIsIdentifier(tokens, tokenIndex + 1))
             {
                 return new ParseResult()
                 {

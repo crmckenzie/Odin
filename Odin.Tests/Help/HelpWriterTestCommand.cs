@@ -10,8 +10,8 @@ You can use this package to easily create command line applications that automat
     {
         [Parameter]
         [Alias("c")]
-        [Description(@"Common parameters are displayed after all of the actions")]
-        public string Common1 { get; set; }
+        [Description(@"Shared parameters are displayed after all of the actions")]
+        public string Shared { get; set; }
 
         [Action(IsDefault = true)]
         [Alias("default")]

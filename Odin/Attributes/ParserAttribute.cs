@@ -4,12 +4,12 @@ using Odin.Parsing;
 namespace Odin.Attributes
 {
     /// <summary>
-    /// Used to specify that a <see cref="MethodParameter">Parameter</see> is parsed using a
+    /// Used to specify that a <see cref="ActionParameter">Parameter</see> is parsed using a
     /// custom parser.
     /// </summary>
     /// <remarks>
     /// Parser types are expected to implement <see cref="IParser"/> and to provide a constructor
-    /// that accepts a <see cref="MethodParameter"/> instance.
+    /// that accepts a <see cref="ActionParameter"/> instance.
     /// </remarks>
     [AttributeUsage(AttributeTargets.Parameter 
         | AttributeTargets.GenericParameter 
@@ -22,12 +22,12 @@ namespace Odin.Attributes
         public Type ParserType { get; }
 
         /// <summary>
-        /// Used to specify that a <see cref="MethodParameter">Parameter</see> is parsed using a
+        /// Used to specify that a <see cref="ActionParameter">Parameter</see> is parsed using a
         /// custom parser.
         /// </summary>
         /// <remarks>
         /// Parser types are expected to implement <see cref="IParser"/> and to provide a constructor
-        /// that accepts a <see cref="MethodParameter"/> instance.
+        /// that accepts a <see cref="ActionParameter"/> instance.
         /// </remarks>
         public ParserAttribute(System.Type parserType)
         {

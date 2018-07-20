@@ -136,7 +136,7 @@ namespace Odin.Tests.Help
         }
 
         [Fact]
-        public void CommonParameters()
+        public void SharedParameters()
         {
             // When
             var cmd = new HelpWriterTestCommand();
@@ -147,14 +147,14 @@ namespace Odin.Tests.Help
             var lines = result
                 .Split('\n')
                 .Select(row => row.Replace("\r", "").TrimEnd())
-                .SkipUntil(row => row.StartsWith("COMMON PARAMETERS"))
+                .SkipUntil(row => row.StartsWith("SHARED PARAMETERS"))
                 .ToArray()
                 ;
             int i = 0;
-            lines[i++].ShouldBe("COMMON PARAMETERS");
-            lines[i++].ShouldBe("    --common1           default value:");
+            lines[i++].ShouldBe("SHARED PARAMETERS");
+            lines[i++].ShouldBe("    --shared            default value:");
             lines[i++].ShouldBe("                        aliases: -c");
-            lines[i++].ShouldBe("                        Common parameters are displayed after all of the");
+            lines[i++].ShouldBe("                        Shared parameters are displayed after all of the");
             lines[i++].ShouldBe("                        actions");
         }
 
@@ -189,10 +189,10 @@ namespace Odin.Tests.Help
             lines[i++].ShouldBe("");
             lines[i++].ShouldBe("");
             lines[i++].ShouldBe("");
-            lines[i++].ShouldBe("COMMON PARAMETERS");
-            lines[i++].ShouldBe("    --common1           default value:");
+            lines[i++].ShouldBe("SHARED PARAMETERS");
+            lines[i++].ShouldBe("    --shared            default value:");
             lines[i++].ShouldBe("                        aliases: -c");
-            lines[i++].ShouldBe("                        Common parameters are displayed after all of the");
+            lines[i++].ShouldBe("                        Shared parameters are displayed after all of the");
             lines[i++].ShouldBe("                        actions");
         }
 

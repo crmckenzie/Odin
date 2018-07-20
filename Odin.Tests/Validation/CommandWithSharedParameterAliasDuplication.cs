@@ -2,7 +2,7 @@ using Odin.Attributes;
 
 namespace Odin.Tests.Validation
 {
-    public class CommandWithCommonParameterAliasDuplication : Command
+    public class CommandWithSharedParameterAliasDuplication : Command
     {
         [Parameter]
         [Alias("p")]

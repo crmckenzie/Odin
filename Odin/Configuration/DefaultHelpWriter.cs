@@ -84,7 +84,7 @@ namespace Odin.Configuration
             if (action != null)
             {
                 WriteActionHelp(action, builder);
-                WriteCommonParameters(command, builder);
+                WriteSharedParameters(command, builder);
                 return;
             }
 
@@ -160,33 +160,33 @@ namespace Odin.Configuration
                 WriteActionHelp(method, builder); 
             }
 
-            WriteCommonParameters(command, builder);
+            WriteSharedParameters(command, builder);
 
             WriteActionFooter(command, builder);
         }
 
-        private void WriteCommonParameters(Command command, StringBuilder builder)
+        private void WriteSharedParameters(Command command, StringBuilder builder)
         {
-            if (!command.CommonParameters.Any())
+            if (!command.SharedParameters.Any())
                 return;
 
             builder.AppendLine()
-                .AppendLine("COMMON PARAMETERS")
+                .AppendLine("SHARED PARAMETERS")
                 ;
-            foreach (var param in command.CommonParameters)
+            foreach (var param in command.SharedParameters)
             {
                 WriteParameter(builder, param);
             }
         }
 
 
-        private void WriteActionHelp(MethodInvocation action, StringBuilder builder)
+        private void WriteActionHelp(Action action, StringBuilder builder)
         {
             WriteActionHeader(action, builder);
             WriteParameters(action, builder);
         }
 
-        private void WriteActionHeader(MethodInvocation action, StringBuilder builder)
+        private void WriteActionHeader(Action action, StringBuilder builder)
         {
             var name = (action.IsDefault ? $"{action.Name}*" : action.Name)
                 .PadRight(this.IdentifierWidth, ' ');
@@ -208,9 +208,9 @@ namespace Odin.Configuration
             builder.AppendLine(string.Empty);
         }
 
-        private void WriteParameters(MethodInvocation action, StringBuilder builder)
+        private void WriteParameters(Action action, StringBuilder builder)
         {
-            foreach (var parameter in action.MethodParameters)
+            foreach (var parameter in action.Parameters)
             {
                 WriteParameter(builder, parameter);
             }
@@ -241,7 +241,7 @@ namespace Odin.Configuration
             builder.AppendLine(string.Empty);
         }
 
-        private string GetDescription(MethodInvocation method)
+        private string GetDescription(Action method)
         {
             var builder = new System.Text.StringBuilder();
             if (method.Aliases.Any())

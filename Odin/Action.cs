@@ -14,32 +14,32 @@ namespace Odin
     /// <summary>
     /// Represents an action to be executed.
     /// </summary>
-    public class MethodInvocation
+    public class Action
     {
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="command"></param>
         /// <param name="methodInfo"></param>
-        public MethodInvocation(Command command, MethodInfo methodInfo)
+        public Action(Command command, MethodInfo methodInfo)
         {
             Command = command;
             MethodInfo = methodInfo;
 
             IsDefault = methodInfo.GetCustomAttribute<ActionAttribute>().IsDefault;
 
-            MethodParameters = MethodInfo
+            Parameters = MethodInfo
                 .GetParameters()
-                .Select(row => new MethodParameter(this, row))
+                .Select(row => new ActionParameter(this, row))
                 .ToList()
                 .AsReadOnly()
                 ;
         }
 
         /// <summary>
-        /// Gets the list of <see cref="CommonParameter"/>'s available to the MethodInvocation.
+        /// Gets the list of <see cref="SharedParameter"/>'s available to the Action.
         /// </summary>
-        public ReadOnlyCollection<CommonParameter> CommonParameters => Command.CommonParameters;
+        public ReadOnlyCollection<SharedParameter> SharedParameters => Command.SharedParameters;
 
         /// <summary>
         /// Gets whether or not this action is the default one for its Command.
@@ -67,9 +67,9 @@ namespace Odin
         public string Name => Conventions.GetActionName(MethodInfo);
 
         /// <summary>
-        /// Gets the collection of <see cref="MethodParameter"/>'s available to the MethodInvocation.
+        /// Gets the collection of <see cref="ActionParameter"/>'s available to the Action.
         /// </summary>
-        public ReadOnlyCollection<MethodParameter> MethodParameters { get; }
+        public ReadOnlyCollection<ActionParameter> Parameters { get; }
 
         /// <summary>
         /// Gets the list of aliases applied to the action.
@@ -83,22 +83,22 @@ namespace Odin
 
         private Parameter FindByToken(string token)
         {
-            Parameter result = MethodParameters
+            var result = Parameters.Cast<Parameter>()
                 .FirstOrDefault(p => p.IsIdentifiedBy(token))
                 ;
 
             if (result == null)
             {
-                result = CommonParameters.FirstOrDefault(p => p.IsIdentifiedBy(token));
+                result = SharedParameters.FirstOrDefault(p => p.IsIdentifiedBy(token));
             }
             return result;
         }
 
-        private MethodParameter FindByIndex(int i)
+        private ActionParameter FindByIndex(int i)
         {
-            if (i >= MethodParameters.Count)
+            if (i >= Parameters.Count)
                 return null;
-            return MethodParameters
+            return Parameters
                 .OrderBy(p => p.Position)
                 .ToArray()[i]
                 ;
@@ -110,7 +110,7 @@ namespace Odin
         /// <returns></returns>
         public bool CanInvoke()
         {
-            return MethodParameters.All(row => row.IsValueSet());
+            return Parameters.All(row => row.IsValueSet());
         }
 
         /// <summary>
@@ -119,53 +119,60 @@ namespace Odin
         /// <returns>0 for success.</returns>
         public int Invoke()
         {
-            var args = MethodParameters
-                .OrderBy(map => map.Position)
-                .Select(row => row.Value)
-                .ToArray()
-                ;
-
-            this.CommonParameters.ToList().ForEach(cp => cp.WriteToCommand());
-
+            this.SharedParameters.ToList().ForEach(cp => cp.WriteToCommand());
             this.Command.OnBeforeExecute(this);
 
-            var result = MethodInfo.Invoke(Command, args);
-            int exitCode = 0;
-            if (result is int)
-            {
-                exitCode =  (int) result;
-            }
-
-            if (result is bool)
-            {
-                exitCode =  (bool) result ? 0 : -1;
-            }
+            var result = InvokeMethod();
+            var exitCode = ConvertToExitCode(result);
 
             return this.Command.OnAfterExecute(this, exitCode);
         }
 
+        private static int ConvertToExitCode(object result)
+        {
+            switch (result)
+            {
+                case int i:
+                    return i;
+                case bool _:
+                    return (bool) result ? 0 : -1;
+                default:
+                    return 0;
+            }
+        }
+
+        private object InvokeMethod()
+        {
+            var args = Parameters
+                    .OrderBy(map => map.Position)
+                    .Select(row => row.Value)
+                    .ToArray()
+                ;
+            var result = MethodInfo.Invoke(Command, args);
+            return result;
+        }
+
         internal void SetParameterValues(string[] tokens)
         {
-            var i = 0;
-            while (i < tokens.Length)
+            var tokenIndex = 0;
+            while (tokenIndex < tokens.Length)
             {
-                var token = tokens[i];
-                var parameter = FindParameter(token, i);
+                var token = tokens[tokenIndex];
+                var parameter = FindParameter(token, tokenIndex);
                 if (parameter == null)
                     throw new UnmappedParameterException($"Unable to map parameter '{token}' to action '{Name}'");
 
                 try
                 {
-                    var parser = CreateParser(parameter);
-                    var result = parser.Parse(tokens, i);
+                    var result = parameter.Parse(tokens, tokenIndex);
                     if (result.TokensProcessed <= 0)
                     {
-                        i++;
+                        tokenIndex++;
                         continue;
                     }
 
                     parameter.Value = result.Value;
-                    i += result.TokensProcessed;
+                    tokenIndex += result.TokensProcessed;
                 }
                 catch (UnmappedParameterException)
                 {
@@ -173,7 +180,7 @@ namespace Odin
                 }
                 catch (Exception e)
                 {
-                    throw new ParameterConversionException(parameter, tokens[i], e);
+                    throw new ParameterConversionException(parameter, tokens[tokenIndex], e);
                 }
             }
         }
@@ -183,33 +190,21 @@ namespace Odin
             var parameter = FindByToken(token);
             if (parameter != null) return parameter;
 
-            if (Conventions.IsParameterName(token)) return null;
-            return FindByIndex(i);
+            return Conventions.IsParameterName(token) ? null : FindByIndex(i);
         }
 
-        private IParser CreateParser(Parameter parameter)
+        internal IEnumerable<IGrouping<string, string>> GetDuplicateAliases()
         {
-            return parameter.HasCustomParser() ? CreateCustomParser(parameter) : Conventions.CreateParser(parameter);
+            var aliases = this.Parameters.SelectMany(row => row.Aliases);
+            var duplicates = aliases.GroupBy((s) => s).Where(row => row.Count() > 1);
+            return duplicates;
         }
 
-        private IParser CreateCustomParser(Parameter parameter)
+        internal IEnumerable<string> ValidateAliases()
         {
-            var parserAttribute = parameter.ParserAttribute;
-            if (!parserAttribute.ParserType.Implements<IParser>())
-                throw new ArgumentOutOfRangeException(
-                    $"'{parserAttribute.ParserType.FullName}' is not an implementation of '{typeof (IParser).FullName}.'");
-
-            var constructor = parserAttribute.ParserType.GetConstructor(typeof(Parameter));
-            if (constructor == null)
-            {
-                throw new TypeInitializationException(
-                    "Could not find a constructor with the signature (ParameterValue).", null);
-            }
-
-            var parameters = new[] {parameter};
-            var instance = constructor.Invoke(parameters);
-            var typedInstance = (IParser) instance;
-            return typedInstance;
+            var aliases = this.GetDuplicateAliases();
+            var validationMessages = aliases.Select(dup => $"The alias '{dup.Key}' is duplicated for action '{this.Name}'.");
+            return validationMessages;
         }
     }
 }

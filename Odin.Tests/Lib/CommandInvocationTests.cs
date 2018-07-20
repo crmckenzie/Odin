@@ -35,14 +35,14 @@
             var args = new[] { "NotAnAction" };
 
             // When
-            var result = this.Subject.GenerateInvocation(args);
+            var result = this.Subject.GetAction(args);
 
             // Then
             result.ShouldNotBeNull();
             result.Name.ShouldBe("do-something");
-            result.MethodParameters[0].Value.ShouldBe("NotAnAction");
-            result.MethodParameters[1].Value.ShouldBe(Type.Missing);
-            result.MethodParameters[2].Value.ShouldBe(Type.Missing);
+            result.Parameters[0].Value.ShouldBe("NotAnAction");
+            result.Parameters[1].Value.ShouldBe(Type.Missing);
+            result.Parameters[2].Value.ShouldBe(Type.Missing);
         }
 
         [Fact]
@@ -52,12 +52,12 @@
             var args = new[] { "do-something" };
 
             // When
-            var result = this.Subject.GenerateInvocation(args);
+            var result = this.Subject.GetAction(args);
 
             // Then
             result.ShouldNotBeNull();
-            result.MethodParameters.Count.ShouldBe(3);
-            result.MethodParameters.ShouldAllBe(pv=> pv.Value == Type.Missing);
+            result.Parameters.Count.ShouldBe(3);
+            result.Parameters.ShouldAllBe(pv=> pv.Value == Type.Missing);
         }
 
         [Fact]
@@ -67,11 +67,11 @@
             var args = new[] { "always-returns-minus2" };
 
             // When
-            var result = this.Subject.GenerateInvocation(args);
+            var result = this.Subject.GetAction(args);
 
             // Then
             result.ShouldNotBeNull();
-            result.MethodParameters.Count.ShouldBe(0);
+            result.Parameters.Count.ShouldBe(0);
         }
 
         [Fact]
@@ -116,12 +116,12 @@
         {
             var args = new[] { "with-required-string-arg", "--argument", "value" };
 
-            var result =this.Subject.GenerateInvocation(args);
+            var result =this.Subject.GetAction(args);
 
             result.ShouldNotBeNull();
-            result.MethodParameters.Count.ShouldBe(1);
-            result.MethodParameters[0].Name.ShouldBe("argument");
-            result.MethodParameters[0].Value.ShouldBe("value");
+            result.Parameters.Count.ShouldBe(1);
+            result.Parameters[0].Name.ShouldBe("argument");
+            result.Parameters[0].Value.ShouldBe("value");
         }
 
         [Fact]
@@ -129,14 +129,14 @@
         {
             var args = new[] { "with-required-string-args", "--argument1", "value1", "--argument2", "value2" };
 
-            var result = this.Subject.GenerateInvocation(args);
+            var result = this.Subject.GetAction(args);
 
             result.ShouldNotBeNull();
-            result.MethodParameters.Count.ShouldBe(2);
-            result.MethodParameters[0].Name.ShouldBe("argument1");
-            result.MethodParameters[0].Value.ShouldBe("value1");
-            result.MethodParameters[1].Name.ShouldBe("argument2");
-            result.MethodParameters[1].Value.ShouldBe("value2");
+            result.Parameters.Count.ShouldBe(2);
+            result.Parameters[0].Name.ShouldBe("argument1");
+            result.Parameters[0].Value.ShouldBe("value1");
+            result.Parameters[1].Name.ShouldBe("argument2");
+            result.Parameters[1].Value.ShouldBe("value2");
         }
 
         [Fact]
@@ -144,14 +144,14 @@
         {
             var args = new[] { "with-required-string-args", "value1", "value2" };
 
-            var result = this.Subject.GenerateInvocation(args);
+            var result = this.Subject.GetAction(args);
 
             result.ShouldNotBeNull();
-            result.MethodParameters.Count.ShouldBe(2);
-            result.MethodParameters[0].Name.ShouldBe("argument1");
-            result.MethodParameters[0].Value.ShouldBe("value1");
-            result.MethodParameters[1].Name.ShouldBe("argument2");
-            result.MethodParameters[1].Value.ShouldBe("value2");
+            result.Parameters.Count.ShouldBe(2);
+            result.Parameters[0].Name.ShouldBe("argument1");
+            result.Parameters[0].Value.ShouldBe("value1");
+            result.Parameters[1].Name.ShouldBe("argument2");
+            result.Parameters[1].Value.ShouldBe("value2");
         }
 
         #endregion
@@ -163,12 +163,12 @@
         {
             var args = new[] { "with-switch", "--argument", "true" };
 
-            var result = this.Subject.GenerateInvocation(args);
+            var result = this.Subject.GetAction(args);
 
             result.ShouldNotBeNull();
-            result.MethodParameters.Count.ShouldBe(1);
-            result.MethodParameters[0].Name.ShouldBe("argument");
-            result.MethodParameters[0].Value.ShouldBe(true);
+            result.Parameters.Count.ShouldBe(1);
+            result.Parameters[0].Name.ShouldBe("argument");
+            result.Parameters[0].Value.ShouldBe(true);
         }
 
         [Fact]
@@ -176,12 +176,12 @@
         {
             var args = new[] { "with-switch", "--argument"};
 
-            var result = this.Subject.GenerateInvocation(args);
+            var result = this.Subject.GetAction(args);
 
             result.ShouldNotBeNull();
-            result.MethodParameters.Count.ShouldBe(1);
-            result.MethodParameters[0].Name.ShouldBe("argument");
-            result.MethodParameters[0].Value.ShouldBe(true);
+            result.Parameters.Count.ShouldBe(1);
+            result.Parameters[0].Name.ShouldBe("argument");
+            result.Parameters[0].Value.ShouldBe(true);
         }
 
         [Fact]
@@ -189,12 +189,12 @@
         {
             var args = new[] { "with-switch"};
 
-            var result = this.Subject.GenerateInvocation(args);
+            var result = this.Subject.GetAction(args);
 
             result.ShouldNotBeNull();
-            result.MethodParameters.Count.ShouldBe(1);
-            result.MethodParameters[0].Name.ShouldBe("argument");
-            result.MethodParameters[0].Value.ShouldBe(false);
+            result.Parameters.Count.ShouldBe(1);
+            result.Parameters[0].Name.ShouldBe("argument");
+            result.Parameters[0].Value.ShouldBe(false);
         }
 
         #endregion
@@ -206,12 +206,12 @@
         {
             var args = new[] { "with-optional-string-arg" };
 
-            var result = this.Subject.GenerateInvocation(args);
+            var result = this.Subject.GetAction(args);
 
             result.ShouldNotBeNull();
-            result.MethodParameters.Count.ShouldBe(1);
-            result.MethodParameters[0].Name.ShouldBe("argument");
-            result.MethodParameters[0].Value.ShouldBe(Type.Missing);
+            result.Parameters.Count.ShouldBe(1);
+            result.Parameters[0].Name.ShouldBe("argument");
+            result.Parameters[0].Value.ShouldBe(Type.Missing);
         }
 
         [Fact]
@@ -219,12 +219,12 @@
         {
             var args = new[] { "with-optional-string-arg", "--argument", "value1" };
 
-            var result = this.Subject.GenerateInvocation(args);
+            var result = this.Subject.GetAction(args);
 
             result.ShouldNotBeNull();
-            result.MethodParameters.Count.ShouldBe(1);
-            result.MethodParameters[0].Name.ShouldBe("argument");
-            result.MethodParameters[0].Value.ShouldBe("value1");
+            result.Parameters.Count.ShouldBe(1);
+            result.Parameters[0].Name.ShouldBe("argument");
+            result.Parameters[0].Value.ShouldBe("value1");
         }
 
         [Fact]
@@ -234,16 +234,16 @@
 
             this.Subject.Execute(args);
 
-            var result = this.Subject.GenerateInvocation(args);
+            var result = this.Subject.GetAction(args);
 
             result.ShouldNotBeNull();
-            result.MethodParameters.Count.ShouldBe(3);
-            result.MethodParameters[0].Name.ShouldBe("argument1");
-            result.MethodParameters[0].Value.ShouldBe("value1");
-            result.MethodParameters[1].Name.ShouldBe("argument2");
-            result.MethodParameters[1].Value.ShouldBe("value2");
-            result.MethodParameters[2].Name.ShouldBe("argument3");
-            result.MethodParameters[2].Value.ShouldBe("value3");
+            result.Parameters.Count.ShouldBe(3);
+            result.Parameters[0].Name.ShouldBe("argument1");
+            result.Parameters[0].Value.ShouldBe("value1");
+            result.Parameters[1].Name.ShouldBe("argument2");
+            result.Parameters[1].Value.ShouldBe("value2");
+            result.Parameters[2].Name.ShouldBe("argument3");
+            result.Parameters[2].Value.ShouldBe("value3");
         }
 
         [Fact]
@@ -251,16 +251,16 @@
         {
             var args = new[] { "with-optional-string-args", "--argument1", "value1" };
 
-            var result = this.Subject.GenerateInvocation(args);
+            var result = this.Subject.GetAction(args);
 
             result.ShouldNotBeNull();
-            result.MethodParameters.Count.ShouldBe(3);
-            result.MethodParameters[0].Name.ShouldBe("argument1");
-            result.MethodParameters[0].Value.ShouldBe("value1");
-            result.MethodParameters[1].Name.ShouldBe("argument2");
-            result.MethodParameters[1].Value.ShouldBe(Type.Missing);
-            result.MethodParameters[2].Name.ShouldBe("argument3");
-            result.MethodParameters[2].Value.ShouldBe(Type.Missing);
+            result.Parameters.Count.ShouldBe(3);
+            result.Parameters[0].Name.ShouldBe("argument1");
+            result.Parameters[0].Value.ShouldBe("value1");
+            result.Parameters[1].Name.ShouldBe("argument2");
+            result.Parameters[1].Value.ShouldBe(Type.Missing);
+            result.Parameters[2].Name.ShouldBe("argument3");
+            result.Parameters[2].Value.ShouldBe(Type.Missing);
         }
 
         [Fact]
@@ -268,16 +268,16 @@
         {
             var args = new[] { "with-optional-string-args", "--argument2", "value2" };
 
-            var result = this.Subject.GenerateInvocation(args);
+            var result = this.Subject.GetAction(args);
 
             result.ShouldNotBeNull();
-            result.MethodParameters.Count.ShouldBe(3);
-            result.MethodParameters[0].Name.ShouldBe("argument1");
-            result.MethodParameters[0].Value.ShouldBe(Type.Missing);
-            result.MethodParameters[1].Name.ShouldBe("argument2");
-            result.MethodParameters[1].Value.ShouldBe("value2");
-            result.MethodParameters[2].Name.ShouldBe("argument3");
-            result.MethodParameters[2].Value.ShouldBe(Type.Missing);
+            result.Parameters.Count.ShouldBe(3);
+            result.Parameters[0].Name.ShouldBe("argument1");
+            result.Parameters[0].Value.ShouldBe(Type.Missing);
+            result.Parameters[1].Name.ShouldBe("argument2");
+            result.Parameters[1].Value.ShouldBe("value2");
+            result.Parameters[2].Name.ShouldBe("argument3");
+            result.Parameters[2].Value.ShouldBe(Type.Missing);
         }
 
         [Fact]
@@ -285,16 +285,16 @@
         {
             var args = new[] { "with-optional-string-args" };
 
-            var result = this.Subject.GenerateInvocation(args);
+            var result = this.Subject.GetAction(args);
 
             result.ShouldNotBeNull();
-            result.MethodParameters.Count.ShouldBe(3);
-            result.MethodParameters[0].Name.ShouldBe("argument1");
-            result.MethodParameters[0].Value.ShouldBe(Type.Missing);
-            result.MethodParameters[1].Name.ShouldBe("argument2");
-            result.MethodParameters[1].Value.ShouldBe(Type.Missing);
-            result.MethodParameters[2].Name.ShouldBe("argument3");
-            result.MethodParameters[2].Value.ShouldBe(Type.Missing);
+            result.Parameters.Count.ShouldBe(3);
+            result.Parameters[0].Name.ShouldBe("argument1");
+            result.Parameters[0].Value.ShouldBe(Type.Missing);
+            result.Parameters[1].Name.ShouldBe("argument2");
+            result.Parameters[1].Value.ShouldBe(Type.Missing);
+            result.Parameters[2].Name.ShouldBe("argument3");
+            result.Parameters[2].Value.ShouldBe(Type.Missing);
         }
 
         [Fact]
@@ -302,16 +302,16 @@
         {
             var args = new[] { "with-optional-string-args", "--argument3", "value3" };
 
-            var result = this.Subject.GenerateInvocation(args);
+            var result = this.Subject.GetAction(args);
 
             result.ShouldNotBeNull();
-            result.MethodParameters.Count.ShouldBe(3);
-            result.MethodParameters[0].Name.ShouldBe("argument1");
-            result.MethodParameters[0].Value.ShouldBe(Type.Missing);
-            result.MethodParameters[1].Name.ShouldBe("argument2");
-            result.MethodParameters[1].Value.ShouldBe(Type.Missing);
-            result.MethodParameters[2].Name.ShouldBe("argument3");
-            result.MethodParameters[2].Value.ShouldBe("value3");
+            result.Parameters.Count.ShouldBe(3);
+            result.Parameters[0].Name.ShouldBe("argument1");
+            result.Parameters[0].Value.ShouldBe(Type.Missing);
+            result.Parameters[1].Name.ShouldBe("argument2");
+            result.Parameters[1].Value.ShouldBe(Type.Missing);
+            result.Parameters[2].Name.ShouldBe("argument3");
+            result.Parameters[2].Value.ShouldBe("value3");
         }
 
         #endregion
@@ -323,11 +323,11 @@
         {
             var args = new[] { "sub" };
 
-            var result = this.Subject.GenerateInvocation(args);
+            var result = this.Subject.GetAction(args);
 
             result.ShouldNotBeNull();
             result.Command.ShouldBe(this.SubCommand);
-            result.MethodParameters.Count.ShouldBe(0);
+            result.Parameters.Count.ShouldBe(0);
         }
 
         #endregion

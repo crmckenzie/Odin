@@ -8,7 +8,7 @@ namespace Odin.Attributes
 {
     /// <summary>
     /// Identifies aliases for <see cref="Command">Commands</see>, 
-    /// <see cref="ActionAttribute">Actions</see>, or <see cref="MethodParameter">Parameters.</see>
+    /// <see cref="ActionAttribute">Actions</see>, or <see cref="ActionParameter">Parameters.</see>
     /// </summary>
     [AttributeUsage(
         AttributeTargets.Parameter | 

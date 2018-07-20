@@ -85,7 +85,7 @@
         public void GenerateInvocation_WhenArgumentsAreInvalid()
         {
             // When
-            Assert.Throws<UnmappedParameterException>(() => this.Subject.GenerateInvocation("too", "many", "arguments", "passed"));
+            Assert.Throws<UnmappedParameterException>(() => this.Subject.GetAction("too", "many", "arguments", "passed"));
         }
 
         [Fact]
