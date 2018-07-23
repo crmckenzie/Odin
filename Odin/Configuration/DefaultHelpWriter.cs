@@ -128,21 +128,10 @@ namespace Odin.Configuration
 
         private string GetDescription(Command command)
         {
-            var builder =new System.Text.StringBuilder();
-
             var defaultDescription = command.IsRoot() ? string.Empty : command.Name;
             var attribute = command.GetType().GetCustomAttribute<DescriptionAttribute>(inherit: true);
 
-            if (attribute == null)
-            {
-                builder.Append(defaultDescription);
-            }
-            else
-            {
-                builder.Append(attribute.Description);
-            }
-
-            return builder.ToString();
+           return attribute?.Description ?? defaultDescription;
         }
 
         #endregion

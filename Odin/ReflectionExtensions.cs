@@ -28,15 +28,10 @@
             return self.GetTypeInfo().GetConstructors(flags);
         }
 
-        public static T GetCustomAttribute<T>(this Type self) where T : Attribute
-        {
-            return self.GetTypeInfo().GetCustomAttribute<T>();
-        }
-
-        public static T GetCustomAttribute<T>(this Type self, bool inherit) where T : Attribute
-        {
-            return self.GetTypeInfo().GetCustomAttribute<T>(inherit);
-        }
+        //public static T GetCustomAttribute<T>(this Type self) where T : Attribute
+        //{
+        //    return self.GetTypeInfo().GetCustomAttribute<T>();
+        //}
 
         public static FieldInfo[] GetFields(this Type self)
         {
@@ -77,7 +72,8 @@
                     }
                     catch (Exception)
                     {
-                        Debug.WriteLine(String.Format("NBuilder warning: {0} threw an exception when attempting to read its current value", memberInfo.Name));
+                        Debug.WriteLine(
+                            $"Error: {memberInfo.Name} threw an exception when attempting to read its current value");
                     }
                     break;
             }
