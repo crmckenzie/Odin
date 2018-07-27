@@ -18,7 +18,7 @@ namespace Odin.Configuration
         /// <returns>
         /// E.g., "FredBob" becomes "fred-bob" 
         /// </returns>
-        public static string HyphenCase(this string input)
+        public static string KebabCase(this string input)
         {
             var result = Regex.Replace(input, ".[A-Z]", m => m.Value[0] + "-" + m.Value[1]).ToLower();
             return result;

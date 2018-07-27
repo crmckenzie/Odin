@@ -27,7 +27,7 @@ namespace Odin
         /// </summary>
         protected Command()
         {
-            _conventions = new HyphenCaseConvention();
+            _conventions = new KebabCaseConvention();
             _helpWriter = new DefaultHelpWriter();
 
             _subCommands = new List<Command>();

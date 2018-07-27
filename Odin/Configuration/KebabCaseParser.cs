@@ -7,7 +7,7 @@ namespace Odin.Configuration
     /// <summary>
     /// Provides parsing capabilities for hyphen-cased parameters.
     /// </summary>
-    public class HyphenCaseParser : IParser
+    public class KebabCaseParser : IParser
     {
         private readonly Parameter _parameter;
 
@@ -15,7 +15,7 @@ namespace Odin.Configuration
         /// Constructor
         /// </summary>
         /// <param name="parameter"></param>
-        public HyphenCaseParser(Parameter parameter)
+        public KebabCaseParser(Parameter parameter)
         {
             this._parameter = parameter;
         }

@@ -15,7 +15,7 @@ namespace Odin.Configuration
     /// Long option names begin with --
     /// Short option names begin with -
     /// </remarks>
-    public class HyphenCaseConvention : IConventions
+    public class KebabCaseConvention : IConventions
     {
         /// <summary>
         /// Returns the hyphen-cased name of the command.
@@ -25,7 +25,7 @@ namespace Odin.Configuration
         public string GetCommandName(Command command)
         {
             var name = command.GetType().Name;
-            var hyphenCased = name.Replace("Command", "").HyphenCase();
+            var hyphenCased = name.Replace("Command", "").KebabCase();
             return hyphenCased;
         }
 
@@ -36,7 +36,7 @@ namespace Odin.Configuration
         /// <returns></returns>
         public string GetLongOptionName(string parameterName)
         {
-            return $"--{parameterName.HyphenCase()}";
+            return $"--{parameterName.KebabCase()}";
         }
 
         /// <summary>
@@ -46,7 +46,7 @@ namespace Odin.Configuration
         /// <returns></returns>
         public string GetActionName(string actionName)
         {
-            return actionName.HyphenCase();
+            return actionName.KebabCase();
         }
 
         /// <summary>
@@ -77,7 +77,7 @@ namespace Odin.Configuration
         /// <returns></returns>
         public string GetNegatedLongOptionName(string parameterName)
         {
-            return $"--no-{parameterName.HyphenCase()}";
+            return $"--no-{parameterName.KebabCase()}";
         }
 
         /// <summary>
@@ -87,7 +87,7 @@ namespace Odin.Configuration
         /// <returns></returns>
         public IParser CreateParser(Parameter parameter)
         {
-            return new HyphenCaseParser(parameter);
+            return new KebabCaseParser(parameter);
         }
 
         /// <summary>

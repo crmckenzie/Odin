@@ -11,9 +11,10 @@
         [Theory]
 
         [InlineData("Foo", "foo")]
-        public void HyphenCase(string input, string output)
+        [InlineData("FooBar", "foo-bar")]
+        public void KebabCase(string input, string output)
         {
-            input.HyphenCase().ShouldBe(output);
+            input.KebabCase().ShouldBe(output);
         }
 
     }
