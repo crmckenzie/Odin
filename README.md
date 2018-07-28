@@ -25,7 +25,99 @@ In ASP .NET MVC, urls are routed to the appropriate controller and action by con
 In addition, little manual wiring is required because ASP .NET MVC can discover and instantiate the controller easily at runtime.
 I wondered if it would be possible to use a combination of reflection and convention to create a command-line application in C#.
 
+## A Simple Example
+
+```csharp
+public class FizzBuzzCommand : Command
+{
+    [Action(IsDefault = true)]
+    public void Play(int input)
+    {
+        if (input % 3 == 0 && input % 5 == 0)
+        {
+            Logger.Info("FizzBuzz");
+        }
+        else if (input % 3 == 0)
+        {
+            Logger.Info("Fizz");
+        }
+        else if (input % 5 == 0)
+        {
+            Logger.Info("Buzz");
+        }
+        else
+        {
+            Logger.Info(input.ToString());
+        }
+        Logger.Info("\n");
+    }
+}
+
+class Program
+{
+    static void Main(string[] args)
+    {
+        var root = new FizzBuzzCommand();
+        var result = root.Execute(args);
+        Environment.Exit(result);
+    }
+}
+```
+
+### Invocations
+
+With the above code, will attempt to map arguments to the appropriate method.
+In order to expose a method to the CLI it must be marked with the `Action` attribute.
+"play" maps to the `FizzBuzzCommand.Play`.
+
+
+```cmd
+FizzBuzz.exe play --input 5
+Buzz
+```
+
+It is not necessary to explicitly label the arguments in the command-line invocation.
+Odin will interpret arguments as ordered parameters if the parameter names are not specified.
+
+```cmd
+FizzBuzz.exe play 5
+Buzz
+```
+
+If the `Action` is marked as the `Default` action, it will not be necessary to specify the action name.
+A `Command` implementation can only have 1 default action.
+
+```cmd
+FizzBuzz.exe 5
+Buzz
+```
+
+
+
+### Help Text
+
+```cmd
+default action: play
+
+ACTIONS
+help
+
+    --action-name       default value:
+                        The name of the action to provide help for.
+
+play*
+
+    --input
+
+
+To get help for actions
+        help <action>
+
+```
+
 ### Show Me The Code
+
+
 
 #### Setup Code
 
