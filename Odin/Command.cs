@@ -6,8 +6,9 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using Odin.Attributes;
-using Odin.Configuration;
+using Odin.Conventions;
 using Odin.Exceptions;
+using Odin.Help;
 using Odin.Logging;
 
 namespace Odin
@@ -209,10 +210,10 @@ namespace Odin
 
             var exitCode = commandFailed;
 
-            Action invocation;
+            Action action;
             try
             {
-                invocation = this.GetAction(args);
+                action = this.GetAction(args);
             }
             catch (UnmappedParameterException)
             {
@@ -221,9 +222,9 @@ namespace Odin
                 return exitCode;
             }
 
-            if (invocation?.CanInvoke() == true)
+            if (action?.CanInvoke() == true)
             {
-                exitCode = invocation.Invoke();
+                exitCode = action.Invoke();
                 if (exitCode == commandSucceeded)
                 {
                     return commandSucceeded;

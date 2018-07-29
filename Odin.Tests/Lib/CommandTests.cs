@@ -1,11 +1,11 @@
-﻿namespace Odin.Tests.Lib
+﻿using Odin.Conventions;
+
+namespace Odin.Tests.Lib
 {
     using System.Diagnostics;
     using System.Linq;
 
     using NSubstitute;
-
-    using Odin.Configuration;
     using Odin.Exceptions;
 
     using Shouldly;

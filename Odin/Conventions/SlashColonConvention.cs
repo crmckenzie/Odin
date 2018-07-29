@@ -1,9 +1,6 @@
-using System.Reflection;
-using System.Threading;
-using Odin.Attributes;
 using Odin.Parsing;
 
-namespace Odin.Configuration
+namespace Odin.Conventions
 {
     /// <summary>
     /// Convention implementation for args of the form /name:value

@@ -1,6 +1,4 @@
-﻿using Odin.Configuration;
-
-namespace Odin.Parsing
+﻿namespace Odin.Parsing
 {
     /// <summary>
     /// Interface for parsers.

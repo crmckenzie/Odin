@@ -3,7 +3,7 @@ using System.ComponentModel;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using Odin.Attributes;
-using Odin.Configuration;
+using Odin.Conventions;
 using Odin.Parsing;
 
 namespace Odin

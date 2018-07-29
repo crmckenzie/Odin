@@ -44,8 +44,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Samples\Odin.Demo\Odin.Demo.csproj" />
     <ProjectReference Include="..\Odin\Odin.csproj" />
+    <ProjectReference Include="..\Samples\Books\Books.csproj" />
   </ItemGroup>
 
 </Project>

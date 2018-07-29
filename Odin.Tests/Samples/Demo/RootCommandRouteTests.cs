@@ -1,17 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using NUnit.Framework;
-using Odin.Demo;
+﻿using Odin.Tests.Lib;
 using Shouldly;
+using Xunit;
 
-namespace Odin.Tests.Demo
+namespace Odin.Tests.Samples.Demo
 {
-    using Odin.Tests.Lib;
-
-    using Xunit;
-
     public class RootCommandRouteTests
     {
         public RootCommandRouteTests()
@@ -25,7 +17,6 @@ namespace Odin.Tests.Demo
 
         public RootCommand Subject { get; set; }
 
-        #region FizzBuzzCommandRoute.FizzBuzz
 
         [Fact]
         public void Execute_FizzBuzz_UsingExplicitParameterName()
@@ -92,7 +83,6 @@ namespace Odin.Tests.Demo
             result.ShouldBe(-1, this.Logger.InfoBuilder.ToString());
         }
 
-        #endregion
 
     }
 }

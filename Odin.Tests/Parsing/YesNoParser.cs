@@ -1,5 +1,4 @@
-﻿using Odin.Configuration;
-using Odin.Parsing;
+﻿using Odin.Parsing;
 
 namespace Odin.Tests.Parsing
 {

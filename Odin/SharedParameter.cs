@@ -4,7 +4,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
 using Odin.Attributes;
-using Odin.Configuration;
+using Odin.Conventions;
 
 namespace Odin
 {

@@ -5,7 +5,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
 using Odin.Attributes;
-using Odin.Configuration;
+using Odin.Conventions;
 using Odin.Exceptions;
 using Odin.Parsing;
 

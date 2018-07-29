@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using NUnit.Framework;
-using Odin.Configuration;
+using Odin.Conventions;
 using Shouldly;
 
 namespace Odin.Tests.Lib

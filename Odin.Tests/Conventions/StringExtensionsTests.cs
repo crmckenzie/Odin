@@ -1,11 +1,9 @@
-﻿namespace Odin.Tests.Configuration
+﻿using Odin.Conventions;
+using Shouldly;
+using Xunit;
+
+namespace Odin.Tests.Conventions
 {
-    using Odin.Configuration;
-
-    using Shouldly;
-
-    using Xunit;
-
     public class StringExtensionsTests
     {
         [Theory]

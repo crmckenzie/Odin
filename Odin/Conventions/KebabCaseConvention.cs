@@ -1,10 +1,6 @@
-using System;
-using System.Linq;
-using System.Reflection;
-using Odin.Attributes;
 using Odin.Parsing;
 
-namespace Odin.Configuration
+namespace Odin.Conventions
 {
     /// <summary>
     /// Provides a convention for hyphen-case command-line argument styles.

@@ -2,7 +2,7 @@ using System;
 using System.Linq;
 using Odin.Parsing;
 
-namespace Odin.Configuration
+namespace Odin.Conventions
 {
     /// <summary>
     /// Provides parsing capabilities for hyphen-cased parameters.
@@ -49,7 +49,7 @@ namespace Odin.Configuration
                 };
             }
 
-            if (ArgIsIdentifier(tokens, tokenIndex + 1))
+            if (ArgIsIdentifier(tokens, tokenIndex))
             {
                 return new ParseResult()
                 {

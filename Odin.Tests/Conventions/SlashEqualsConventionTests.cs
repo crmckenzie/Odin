@@ -1,14 +1,11 @@
-namespace Odin.Tests.Configuration
+using System;
+using Odin.Conventions;
+using Odin.Tests.Lib;
+using Shouldly;
+using Xunit;
+
+namespace Odin.Tests.Conventions
 {
-    using System;
-
-    using Odin.Configuration;
-    using Odin.Tests.Lib;
-
-    using Shouldly;
-
-    using Xunit;
-
     public class SlashEqualsConventionTests
     {
         public SlashEqualsConventionTests()
@@ -84,7 +81,6 @@ namespace Odin.Tests.Configuration
         public void WithRequiredStringArg()
         {
             var args = new[] { "WithRequiredStringArg", "/argument=value" };
-
 
             var result = this.Subject.GetAction(args);
 

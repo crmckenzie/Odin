@@ -1,7 +1,7 @@
 using System;
 using System.Linq;
 using Odin.Attributes;
-using Odin.Configuration;
+using Odin.Conventions;
 using Odin.Parsing;
 
 namespace Odin

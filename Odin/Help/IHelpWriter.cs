@@ -1,4 +1,4 @@
-﻿namespace Odin.Configuration
+﻿namespace Odin.Help
 {
     /// <summary>
     /// Provides a point of customization for writing out help documentation.

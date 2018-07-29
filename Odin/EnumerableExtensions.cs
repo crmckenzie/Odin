@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Odin.Configuration
+namespace Odin
 {
     /// <summary>
     /// Extension methods for <see cref="IEnumerable{T}"/>

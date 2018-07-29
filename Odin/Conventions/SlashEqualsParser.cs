@@ -2,12 +2,12 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using Odin.Parsing;
 
-namespace Odin.Configuration
+namespace Odin.Conventions
 {
     /// <summary>
-    /// Parser implementation for arguments of the form /name:value
+    /// Parser implementation for args of the form /name=value
     /// </summary>
-    public class SlashColonParser : IParser
+    public class SlashEqualsParser : IParser
     {
         private readonly Parameter _parameter;
 
@@ -15,19 +15,9 @@ namespace Odin.Configuration
         /// Constructor
         /// </summary>
         /// <param name="parameter"></param>
-        public SlashColonParser(Parameter parameter)
+        public SlashEqualsParser(Parameter parameter)
         {
             _parameter = parameter;
-        }
-
-        private static bool IsArgumentName(string token)
-        {
-            return Regex.IsMatch(token, @"/\w+");
-        }
-
-        private static bool IsNameValuePair(string token)
-        {
-            return Regex.IsMatch(token, @"/\w+:\w+");
         }
 
         /// <summary>
@@ -41,7 +31,7 @@ namespace Odin.Configuration
             var token = tokens[tokenIndex];
             if (IsNameValuePair(token))
             {
-                var value = token.Split(':').Skip(1).First();
+                var value = token.Split('=').Skip(1).First();
                 return new ParseResult()
                 {
                     Value = _parameter.Coerce(value),
@@ -65,12 +55,21 @@ namespace Odin.Configuration
                     TokensProcessed = 1,
                 };
             }
-
             return new ParseResult()
             {
                 Value = _parameter.Coerce(token),
                 TokensProcessed = 1,
             };
         }
+        private static bool IsArgumentName(string token)
+        {
+            return Regex.IsMatch(token, @"/\w+");
+        }
+
+        private static bool IsNameValuePair(string token)
+        {
+            return Regex.IsMatch(token, @"/\w+=\w+");
+        }
+
     }
 }

@@ -1,8 +1,7 @@
-using Odin.Attributes;
-using System;
 using Odin;
+using Odin.Attributes;
 
-namespace Fizzbuzz
+namespace FizzBuzz
 {
     public class FizzBuzzCommand : Command
     {

@@ -1,14 +1,11 @@
-namespace Odin.Tests.Configuration
+using System;
+using Odin.Conventions;
+using Odin.Tests.Lib;
+using Shouldly;
+using Xunit;
+
+namespace Odin.Tests.Conventions
 {
-    using System;
-
-    using Odin.Configuration;
-    using Odin.Tests.Lib;
-
-    using Shouldly;
-
-    using Xunit;
-
     public class SlashColonConventionTests
     {
         public SlashColonConventionTests()

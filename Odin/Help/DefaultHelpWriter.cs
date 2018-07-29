@@ -1,12 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using System.Threading.Tasks;
+using Odin.Conventions;
 
-namespace Odin.Configuration
+namespace Odin.Help
 {
     /// <summary>
     /// Displays help for a command or action.

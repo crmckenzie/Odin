@@ -1,9 +1,8 @@
-﻿namespace Odin.Tests.Lib
+﻿using Odin.Tests.Samples.Demo;
+
+namespace Odin.Tests.Lib
 {
     using System;
-
-    using Odin.Demo;
-
     using Shouldly;
 
     using Xunit;

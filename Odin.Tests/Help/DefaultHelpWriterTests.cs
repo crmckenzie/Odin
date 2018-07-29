@@ -1,9 +1,9 @@
 ﻿using System.Linq;
 using NUnit.Framework;
-using Odin.Configuration;
-using Odin.Demo;
+using Odin.Help;
 using Odin.Tests.Lib;
 using Shouldly;
+using KatasCommand = Odin.Tests.Samples.Demo.KatasCommand;
 
 namespace Odin.Tests.Help
 {

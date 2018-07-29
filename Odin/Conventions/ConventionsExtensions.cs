@@ -1,6 +1,6 @@
 using System.Reflection;
 
-namespace Odin.Configuration
+namespace Odin.Conventions
 {
     /// <summary>
     /// Provides extension methods related to the <see cref="IConventions"/> interface.
