@@ -1,5 +1,4 @@
 ﻿using System.Linq;
-using NUnit.Framework;
 using Odin.Help;
 using Odin.Tests.Lib;
 using Shouldly;
@@ -150,7 +149,7 @@ namespace Odin.Tests.Help
                 .SkipUntil(row => row.StartsWith("SHARED PARAMETERS"))
                 .ToArray()
                 ;
-            int i = 0;
+            var i = 0;
             lines[i++].ShouldBe("SHARED PARAMETERS");
             lines[i++].ShouldBe("    --shared            default value:");
             lines[i++].ShouldBe("                        aliases: -c");

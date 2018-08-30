@@ -1,6 +1,6 @@
-﻿namespace Odin.Tests.Lib
+﻿using Odin.Attributes;
+namespace Odin.Tests.Lib
 {
-    using Odin.Attributes;
 
     public class CommandWithSharedParmeters : Command
     {   

@@ -104,13 +104,13 @@ namespace Odin
         /// <summary>
         /// Gets the parent of the command.
         /// </summary>
-        public Command Parent { get; private set; }
+        internal Command Parent { get; private set; }
 
         private ILogger _logger = new ConsoleLogger();
         /// <summary>
         /// Gets the logger for the command tree.
         /// </summary>
-        public virtual ILogger Logger => IsRoot() ? _logger : Parent.Logger;
+        protected internal virtual ILogger Logger => IsRoot() ? _logger : Parent.Logger;
 
         private IConventions _conventions;
         private IHelpWriter _helpWriter;
@@ -118,12 +118,12 @@ namespace Odin
         /// <summary>
         /// Gets the helpwriter for the command tree.
         /// </summary>
-        public IHelpWriter HelpWriter => IsRoot() ? _helpWriter : Parent.HelpWriter;
+        internal IHelpWriter HelpWriter => IsRoot() ? _helpWriter : Parent.HelpWriter;
 
         /// <summary>
         /// Gets the conventions for the command tree.
         /// </summary>
-        public IConventions Conventions => IsRoot() ? _conventions : Parent.Conventions;
+        internal IConventions Conventions => IsRoot() ? _conventions : Parent.Conventions;
 
         /// <summary>
         /// Gets the conventional name of the command.
@@ -133,19 +133,19 @@ namespace Odin
         /// <summary>
         /// Gets the aliases applied to the command.
         /// </summary>
-        public virtual string[] Aliases => GetType().GetCustomAttribute<AliasAttribute>()?.Aliases.ToArray() ?? new string[] { };
+        internal virtual string[] Aliases => GetType().GetCustomAttribute<AliasAttribute>()?.Aliases.ToArray() ?? new string[] { };
 
         /// <summary>
         /// Gets all of the identifiers applied to the command.
         /// </summary>
-        public string[] Identifiers => Aliases.Concat(new string[] { this.Name }).ToArray();
+        internal string[] Identifiers => Aliases.Concat(new string[] { this.Name }).ToArray();
 
         /// <summary>
         /// True if the token matches the command, otherwise false.
         /// </summary>
         /// <param name="token"></param>
         /// <returns></returns>
-        public virtual bool IsIdentifiedBy(string token)
+        internal virtual bool IsIdentifiedBy(string token)
         {
             return token == Name || Aliases.Contains(token);
         }
@@ -162,7 +162,7 @@ namespace Odin
         /// <summary>
         /// Gets the actions registered with the current command.
         /// </summary>
-        public IReadOnlyCollection<Action> Actions => this._actions.AsReadOnly();
+        internal IReadOnlyCollection<Action> Actions => this._actions.AsReadOnly();
 
         /// <summary>
         /// Adds a command to the command tree.
@@ -208,8 +208,6 @@ namespace Odin
             const int commandFailed = -1;
             const int commandSucceeded = 0;
 
-            var exitCode = commandFailed;
-
             Action action;
             try
             {
@@ -217,23 +215,28 @@ namespace Odin
             }
             catch (UnmappedParameterException)
             {
-                this.Logger.Error($"Could not interpret the command. You sent [{args.Join(", ")}]");
-                this.Help();
-                return exitCode;
+                HandleCommandError($"Could not interpret the command. You sent [{args.Join(", ")}]");
+                return commandFailed;
             }
 
-            if (action?.CanInvoke() == true)
+            if (action?.CanInvoke() != true)
             {
-                exitCode = action.Invoke();
-                if (exitCode == commandSucceeded)
-                {
-                    return commandSucceeded;
-                }
+                HandleCommandError($"Unrecognized command sequence: {string.Join(" ", args)}\n");
+                return commandFailed;
             }
 
-            this.Logger.Error("Unrecognized command sequence: {0}\n", string.Join(" ", args));
-            this.Help();
+            var exitCode = action.Invoke();
+            if (exitCode != commandSucceeded)
+            {
+                HandleCommandError($"Command Failed: {string.Join(" ", args)}");
+            }
             return exitCode;
+        }
+
+        private void HandleCommandError(string errorMessage)
+        {
+            this.Logger.Error(errorMessage);
+            this.Help();
         }
 
         private int Exit(bool displayHelp = false)
@@ -298,7 +301,7 @@ namespace Odin
         /// Returns the default action for the command.
         /// </summary>
         /// <returns></returns>
-        public Action GetDefaultAction()
+        internal Action GetDefaultAction()
         {
             return this.Actions.FirstOrDefault(row => row.IsDefault);
         }
@@ -344,27 +347,23 @@ namespace Odin
 
         private IEnumerable<string> GetValidationMessages()
         {
-            var validationErrors = new List<string>();
 
             var defaultActionResults = ValidateDefaultActions();
-            validationErrors.AddRange(defaultActionResults);
-
             var executableActionResults = ValidateExecutableActions();
-            validationErrors.AddRange(executableActionResults);
-
             var actionResults = ValidateActions();
-            validationErrors.AddRange(actionResults);
-
             var commonParameterResults = ValidateSharedParameters();
-            validationErrors.AddRange(commonParameterResults);
 
-            return validationErrors;
+            return defaultActionResults
+                    .Concat(executableActionResults)
+                    .Concat(actionResults)
+                    .Concat(commonParameterResults)
+                ;
         }
 
         private IEnumerable<string> ValidateDefaultActions()
         {
             var defaultActions = this.Actions.Where(row => row.IsDefault).ToArray();
-            if (defaultActions.Count() <= 1)
+            if (defaultActions.Length <= 1)
                 return Enumerable.Empty<string>();
 
             var actionNames = defaultActions
@@ -394,30 +393,7 @@ namespace Odin
 
         private IEnumerable<string> ValidateActions()
         {
-            var results = new List<string>();
-            foreach (var action in this._actions)
-            {
-                var validationMessages = action.ValidateAliases();
-                results.AddRange(validationMessages);
-
-                foreach (var parameter in action.Parameters)
-                {
-                    foreach (var sharedParameter in SharedParameters)
-                    {
-                        if (sharedParameter.HasNamingConflict(parameter))
-                        {
-                            results.Add($"The shared parameter name '{parameter.LongOptionName}' conflicts with a parameter defined for action '{action.Name}'.");
-                        }
-
-                        var conflicts = sharedParameter.GetNamingConflictForAliases(parameter)
-                            .Select(alias =>
-                                $"The alias '{alias}' for shared parameter '{sharedParameter.LongOptionName}' is duplicated for parameter '{parameter.LongOptionName}' on action '{action.Name}'.");
-                        results.AddRange(conflicts);
-                    }
-                }
-            }
-
-            return results;
+            return this._actions.SelectMany(a => a.GetValidationMessages());
         }
 
         private IEnumerable<IGrouping<string, string>> GetDuplicatedSharedParameterAliases()

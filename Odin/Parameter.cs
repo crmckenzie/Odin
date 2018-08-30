@@ -84,7 +84,7 @@ namespace Odin
                 if (AliasAttribute == null)
                     return new string[] { };
 
-                return AliasAttribute.Aliases.Select(a => Conventions.GetShortOptionName(a)).ToArray();
+                return Conventions.GetShortOptionNames(AliasAttribute);
             }
         }
 
@@ -97,11 +97,12 @@ namespace Odin
         {
             if (Conventions.IsMatchingParameter(this, token))
                 return true;
+
             if (Aliases.Contains(token))
                 return true;
 
-            if (IsBoolean() && Conventions.IsNegatedLongOptionName(this.Name, token))
-                return true;
+            if (IsBoolean())
+                return Conventions.IsNegatedLongOptionName(this.Name, token);
 
             return false;
         }
@@ -174,5 +175,6 @@ namespace Odin
             var parser = CreateParser();
             return parser.Parse(tokens, tokenIndex);
         }
+
     }
 }

@@ -11,7 +11,7 @@
         [Action(IsDefault = true)]
         public virtual void DoSomething()
         {
-            this.Logger.Info("Do something!");
+            this.Logger.Info("Do some SubCommand stuff!");
         }
     }
 }

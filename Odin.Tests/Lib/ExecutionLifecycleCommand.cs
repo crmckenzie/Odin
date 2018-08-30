@@ -1,8 +1,9 @@
+using System;
+
+using Odin.Attributes;
+
 namespace Odin.Tests.Lib
 {
-    using System;
-
-    using Odin.Attributes;
 
     public class ExecutionLifecycleCommand : Command
     {

@@ -87,11 +87,10 @@ namespace Odin
                 .FirstOrDefault(p => p.IsIdentifiedBy(token))
                 ;
 
-            if (result == null)
-            {
-                result = SharedParameters.FirstOrDefault(p => p.IsIdentifiedBy(token));
-            }
-            return result;
+            if (result != null)
+                return result;
+
+            return SharedParameters.FirstOrDefault(p => p.IsIdentifiedBy(token));
         }
 
         private ActionParameter FindByIndex(int i)
@@ -154,33 +153,23 @@ namespace Odin
 
         internal void SetParameterValues(string[] tokens)
         {
-            var tokenIndex = 0;
-            while (tokenIndex < tokens.Length)
+            var index = 0;
+            while (index < tokens.Length)
             {
-                var token = tokens[tokenIndex];
-                var parameter = FindParameter(token, tokenIndex);
+                var token = tokens[index];
+                var parameter = FindParameter(token, index);
                 if (parameter == null)
-                    throw new UnmappedParameterException($"Unable to map parameter '{token}' to action '{Name}'");
+                    throw new UnmappedParameterException(token, Name);
 
                 try
                 {
-                    var result = parameter.Parse(tokens, tokenIndex);
-                    if (result.TokensProcessed <= 0)
-                    {
-                        tokenIndex++;
-                        continue;
-                    }
-
+                    var result = parameter.Parse(tokens, index);
                     parameter.Value = result.Value;
-                    tokenIndex += result.TokensProcessed;
-                }
-                catch (UnmappedParameterException)
-                {
-                    throw;
+                    index += result.TokensProcessed;
                 }
                 catch (Exception e)
                 {
-                    throw new ParameterConversionException(parameter, tokens[tokenIndex], e);
+                    throw new ParameterConversionException(parameter, token, e);
                 }
             }
         }
@@ -205,6 +194,35 @@ namespace Odin
             var aliases = this.GetDuplicateAliases();
             var validationMessages = aliases.Select(dup => $"The alias '{dup.Key}' is duplicated for action '{this.Name}'.");
             return validationMessages;
+        }
+
+        internal IEnumerable<ParameterAnalysis> GetParameterAnalysis()
+        {
+            var query = from parameter in Parameters
+                from shared in SharedParameters
+                select new ParameterAnalysis
+                {
+                    Action = this,
+                    Parameter = parameter,
+                    SharedParameter = shared,
+                    HasNamingConflict = shared.HasNamingConflict(parameter),
+                    NamingConflictsForAliases = shared.GetNamingConflictForAliases(parameter)
+                };
+
+            return query;
+        }
+
+        internal IEnumerable<string> GetValidationMessages()
+        {
+            var results = ValidateAliases().ToList();
+            foreach (var row in GetParameterAnalysis())
+            {
+                if (row.HasNamingConflict)
+                    results.Add($"The shared parameter name '{row.Parameter.LongOptionName}' conflicts with a parameter defined for action '{Name}'.");
+                results.AddRange(row.GetNamingConflictsMessages());
+            }
+
+            return results;
         }
     }
 }

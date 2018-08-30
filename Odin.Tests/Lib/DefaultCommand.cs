@@ -1,8 +1,8 @@
-﻿namespace Odin.Tests.Lib
-{
-    using System.ComponentModel;
+﻿using System.ComponentModel;
+using Odin.Attributes;
 
-    using Odin.Attributes;
+namespace Odin.Tests.Lib
+{
 
     [Description("This is the default command")]
     public class DefaultCommand : Command
@@ -22,7 +22,8 @@
 
         public void NotAnAction()
         {
-            
+            // this method is here to demonstrate that Odin only inteprets
+            // commands for actions decorated with the `[Action]` attribute.
         }
 
         [Action(IsDefault = true)]

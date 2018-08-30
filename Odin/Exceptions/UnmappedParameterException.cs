@@ -16,5 +16,11 @@ namespace Odin.Exceptions
         {
             
         }
+
+        public UnmappedParameterException(string token, string name) : 
+            base($"Unable to map parameter '{token}' to action '{name}'")
+        {
+
+        }
     }
 }

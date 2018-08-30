@@ -19,13 +19,11 @@ namespace Odin.Tests.Conventions
                 ;
         }
 
-        private StringBuilderLogger Logger { get; set; }
+        private StringBuilderLogger Logger { get; }
 
-        private SubCommand SubCommand { get; set; }
+        private SubCommand SubCommand { get; }
 
         public DefaultCommand Subject { get; set; }
-
-        #region ActionExecution
 
         [Fact]
         public void OnlyActionMethodsAreInterpretedAsActions()
@@ -73,9 +71,6 @@ namespace Odin.Tests.Conventions
             result.Parameters.Count.ShouldBe(0);
         }
 
-        #endregion
-
-        #region Required arguments
 
         [Fact]
         public void WithRequiredStringArg()
@@ -120,9 +115,6 @@ namespace Odin.Tests.Conventions
             result.Parameters[1].Value.ShouldBe("value2");
         }
 
-        #endregion
-
-        #region Switches
 
         [Fact]
         public void SwitchWithValue()
@@ -176,9 +168,6 @@ namespace Odin.Tests.Conventions
             result.Parameters[0].Value.ShouldBe(false);
         }
 
-        #endregion
-
-        #region Optional arguments
 
         [Fact]
         public void WithOptionalStringArg_DoNotPassIt()
@@ -293,10 +282,6 @@ namespace Odin.Tests.Conventions
             result.Parameters[2].Value.ShouldBe("value3");
         }
 
-        #endregion
-
-        #region SubCommands
-
         [Fact]
         public void ExecuteSubCommand()
         {
@@ -309,6 +294,5 @@ namespace Odin.Tests.Conventions
             result.Parameters.Count.ShouldBe(0);
         }
 
-        #endregion
     }
 }

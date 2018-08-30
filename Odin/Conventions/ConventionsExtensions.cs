@@ -1,4 +1,6 @@
+using System.Linq;
 using System.Reflection;
+using Odin.Attributes;
 
 namespace Odin.Conventions
 {
@@ -7,6 +9,16 @@ namespace Odin.Conventions
     /// </summary>
     public static class ConventionsExtensions
     {
+
+
+        public static string[] GetShortOptionNames(this IConventions conventions, AliasAttribute aliasAttribute)
+        {
+            return aliasAttribute
+                .Aliases
+                .Select(conventions.GetShortOptionName)
+                .ToArray();
+        }
+
         /// <summary>
         /// Returns the formatted action name for a given method.
         /// </summary>

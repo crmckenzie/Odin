@@ -19,9 +19,9 @@ namespace Odin.Tests.Conventions
                 ;
         }
 
-        private StringBuilderLogger Logger { get; set; }
+        private StringBuilderLogger Logger { get; }
 
-        private SubCommand SubCommand { get; set; }
+        private SubCommand SubCommand { get; }
 
         public DefaultCommand Subject { get; set; }
 

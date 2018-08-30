@@ -88,7 +88,9 @@ namespace Odin.Conventions
 
         private ParseResult ParseArray(Parameter parameter, string[] tokens)
         {
-            var tokensToParse = tokens.Skip(1).TakeUntil(_parameter.Conventions.IsParameterName);
+            var tokensToParse = tokens
+                .Skip(1)
+                .TakeUntil(_parameter.Conventions.IsParameterName);
 
             var elementType = parameter.ParameterType.GetElementType();
 

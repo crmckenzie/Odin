@@ -1,24 +1,28 @@
 ﻿using Odin.Conventions;
+using System.Linq;
+using NSubstitute;
+using Odin.Exceptions;
+using Odin.Logging;
+using Shouldly;
+using Xunit;
 
 namespace Odin.Tests.Lib
 {
-    using System.Diagnostics;
-    using System.Linq;
 
-    using NSubstitute;
-    using Odin.Exceptions;
-
-    using Shouldly;
-
-    using Xunit;
 
     public class CommandTests
     {
         public CommandTests()
         {
             this.SubCommand = Substitute.ForPartsOf<SubCommand>();
-            this.Subject = Substitute.ForPartsOf<DefaultCommand>(this.SubCommand);
+            this.Subject = Substitute.ForPartsOf<DefaultCommand>(this.SubCommand)
+                ;
+
+            this.Logger = new StringBuilderLogger();
+            this.Subject.Use(this.Logger);
         }
+
+        public StringBuilderLogger Logger { get; set; }
 
         public SubCommand SubCommand { get; set; }
 
@@ -69,7 +73,8 @@ namespace Odin.Tests.Lib
         [Fact]
         public void SubCommandUsesParentsLogger()
         {
-            this.SubCommand.Logger.ShouldBe(this.Subject.Logger);
+            this.Subject.Execute("sub-proxy");
+            this.Logger.InfoBuilder.ToString().ShouldBe("Do some SubCommand stuff!");
         }
 
         [Fact]
@@ -92,8 +97,6 @@ namespace Odin.Tests.Lib
         public void GenerateInvocation_Execute()
         {
             // Given
-            var logger = new StringBuilderLogger();
-            this.Subject.Logger.Returns(logger);
 
             // When
             var result = this.Subject.Execute("too", "many", "arguments", "passed");
@@ -102,10 +105,10 @@ namespace Odin.Tests.Lib
             result.ShouldBe(-1);
 
 
-            var info = logger.InfoBuilder.ToString();
+            var info = Logger.InfoBuilder.ToString();
             info.ShouldStartWith("This is the default command");
 
-            var error = logger.ErrorBuilder.ToString();
+            var error = Logger.ErrorBuilder.ToString();
             error.ShouldStartWith("Could not interpret the command.");
         }
     }
