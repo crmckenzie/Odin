@@ -79,7 +79,11 @@ namespace Odin.Help
 
         private void WriteCommandHelp(Command command, StringBuilder builder, string actionName = "")
         {
-            var action = command.Actions.FirstOrDefault(row => row.Identifiers.Contains(actionName));
+            // TODO
+            // Real Truth--build a help model
+            // change interface of help writer to accept help model
+            //
+            var action = command.GetActionByToken(actionName);
             if (action != null)
             {
                 WriteActionHelp(action, builder);
@@ -87,7 +91,7 @@ namespace Odin.Help
                 return;
             }
 
-            var subCommand = command.SubCommands.FirstOrDefault(row => row.Identifiers.Contains(actionName));
+            var subCommand = command.GetSubCommandByToken(actionName);
             if (subCommand!= null)
             {
                 WriteCommandHelp(subCommand, builder);

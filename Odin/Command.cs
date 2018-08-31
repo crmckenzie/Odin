@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -208,29 +207,39 @@ namespace Odin
             const int commandFailed = -1;
             const int commandSucceeded = 0;
 
-            Action action;
             try
             {
-                action = this.GetAction(args);
+                var action = this.GetAction(args);
+                var exitCode = action.Invoke();
+                if (exitCode != commandSucceeded)
+                {
+                    HandleCommandError($"Command Failed: {string.Join(" ", args)}");
+                }
+
+                return exitCode;
+
+            }
+            catch (UnresolvableActionException)
+            {
+                HandleCommandError($"Could not interpret the command. You sent [{args.Join(", ")}]");
+                return commandFailed;
             }
             catch (UnmappedParameterException)
             {
                 HandleCommandError($"Could not interpret the command. You sent [{args.Join(", ")}]");
                 return commandFailed;
             }
-
-            if (action?.CanInvoke() != true)
+            catch (ParameterMisMatchException)
             {
                 HandleCommandError($"Unrecognized command sequence: {string.Join(" ", args)}\n");
                 return commandFailed;
             }
-
-            var exitCode = action.Invoke();
-            if (exitCode != commandSucceeded)
+            catch (ParameterConversionException pce)
             {
-                HandleCommandError($"Command Failed: {string.Join(" ", args)}");
+                HandleCommandError(pce.Message);
+                return commandFailed;
             }
-            return exitCode;
+
         }
 
         private void HandleCommandError(string errorMessage)
@@ -259,17 +268,9 @@ namespace Odin
         /// <remarks>Useful in testing your command structure.</remarks>
         public Action GetAction(params string[] tokens)
         {
-            try
-            {
                 var token = tokens.FirstOrDefault();
-                var invocation = GetSubCommandByToken(tokens, token);
-                return invocation.Found ? invocation.SubCommand : GetAction(tokens, token);
-            }
-            catch (ParameterConversionException pce)
-            {
-                this.Logger.Error(pce.Message);
-                return null;
-            }
+                var subCommandAction = GetSubCommandActionByToken(tokens, token);
+                return subCommandAction.Found ? subCommandAction.SubCommand : GetAction(tokens, token);
         }
 
         private Action GetAction(string[] tokens, string token)
@@ -278,21 +279,32 @@ namespace Odin
             var tokensProcessed = action == null ? 0 : 1;
             action = action ?? GetDefaultAction();
 
+            if (action == null)
+            {
+                throw new UnresolvableActionException();
+            }
+
             var args = tokens.Skip(tokensProcessed).ToArray();
-            action?.SetParameterValues(args);
+            action.SetParameterValues(args);
             return action;
         }
 
-        private (bool Found, Action SubCommand) GetSubCommandByToken(string[] tokens, string token)
+        internal (bool Found, Action SubCommand) GetSubCommandActionByToken(string[] tokens, string token)
         {
             var subCommand = SubCommands.FirstOrDefault(cmd => cmd.IsIdentifiedBy(token));
             if (subCommand == null) return (Found: false, SubCommand: null);
 
             var theRest = tokens.Skip(1).ToArray();
-            return (Found: true, SubCommand: subCommand.GetAction(theRest));
+            var action = subCommand.GetAction(theRest);
+            return (Found: action != null, SubCommand: subCommand.GetAction(theRest));
         }
 
-        private Action GetActionByToken(string token)
+        internal Command GetSubCommandByToken(string token)
+        {
+            return SubCommands.FirstOrDefault(cmd => cmd.IsIdentifiedBy(token));
+        }
+
+        internal Action GetActionByToken(string token)
         {
             return _actions.FirstOrDefault(action => action.Identifiers.Contains(token));
         }

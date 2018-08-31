@@ -36,6 +36,8 @@ namespace Odin.Tests.Conventions
             // When
             var result = this.Subject.GetAction(args);
 
+            var exitCode = this.Subject.Execute(args);
+
             // Then
             result.ShouldNotBeNull();
             result.Name.ShouldBe("DoSomething");

@@ -107,7 +107,7 @@ namespace Odin
         /// True if the action is invokable. Otherwise false.
         /// </summary>
         /// <returns></returns>
-        public bool CanInvoke()
+        private bool CanInvoke()
         {
             return Parameters.All(row => row.IsValueSet());
         }
@@ -116,8 +116,13 @@ namespace Odin
         /// Invokes the action with the parsed parameters.
         /// </summary>
         /// <returns>0 for success.</returns>
-        public int Invoke()
+        internal int Invoke()
         {
+            if (!CanInvoke())
+            {
+                throw new ParameterMisMatchException($"Unable to supply required parameters to \n");
+            }
+
             this.SharedParameters.ToList().ForEach(cp => cp.WriteToCommand());
             this.Command.OnBeforeExecute(this);
 
