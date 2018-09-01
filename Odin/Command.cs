@@ -24,6 +24,10 @@ namespace Odin
     /// </remarks>
     public abstract class Command
     {
+        const int CommandSucceeded = 0;
+        const int CommandFailed = -1;
+
+
         /// <summary>
         /// Base class an Odin command.
         /// </summary>
@@ -206,16 +210,15 @@ namespace Odin
 
             try
             {
-                const int commandSucceeded = 0;
 
-                if (this.ShouldExit(args))
+                if (this.DisplayHelpWhenArgsAreEmpty && args.Empty())
                     return this.Exit(displayHelp: true);
 
                 var action = this.GetAction(args);
-                var exitCode = action.Invoke();
-                if (exitCode != commandSucceeded)
+                var exitCode = action.Execute();
+                if (exitCode != CommandSucceeded)
                 {
-                    this.HandleCommandError($"Command Failed: {string.Join(" ", args)}");
+                    this.LogErrorAndDisplayHelp($"Command Failed: {string.Join(" ", args)}");
                 }
 
                 return exitCode;
@@ -223,27 +226,26 @@ namespace Odin
             }
             catch (UnresolvableActionException)
             {
-                this.HandleCommandError($"Could not find a matching command. You sent [{args.Join(", ")}].");
+                this.LogErrorAndDisplayHelp($"Could not find a matching command. You sent [{args.Join(", ")}].");
             }
             catch (UnmappedParameterException)
             {
-                this.HandleCommandError($"Could not interpret the command. You sent [{args.Join(", ")}].");
+                this.LogErrorAndDisplayHelp($"Could not interpret the command. You sent [{args.Join(", ")}].");
             }
-            catch (ParameterMisMatchException)
+            catch (ParameterMismatchException)
             {
-                this.HandleCommandError($"Unrecognized command sequence: {string.Join(" ", args)}\n");
+                this.LogErrorAndDisplayHelp($"Unrecognized command sequence: {args.Join(" ")}\n");
             }
             catch (ParameterConversionException pce)
             {
-                this.HandleCommandError(pce.Message);
+                this.LogErrorAndDisplayHelp(pce.Message);
             }
 
-            const int commandFailed = -1;
-            return commandFailed;
+            return CommandFailed;
 
         }
 
-        private void HandleCommandError(string errorMessage)
+        private void LogErrorAndDisplayHelp(string errorMessage)
         {
             this.Logger.Error(errorMessage);
             this.Help();
@@ -254,11 +256,6 @@ namespace Odin
             if (displayHelp)
                 this.Help();
             return 0;
-        }
-
-        private bool ShouldExit(string[] args)
-        {
-            return this.DisplayHelpWhenArgsAreEmpty && !args.Any();
         }
 
         /// <summary>

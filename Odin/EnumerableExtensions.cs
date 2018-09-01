@@ -9,6 +9,12 @@ namespace Odin
     /// </summary>
     public static class EnumerableExtensions
     {
+
+        internal static bool Empty<T>(this IEnumerable<T> source)
+        {
+            return !source.Any();
+        }
+
         /// <summary>
         /// Skip items in a list until a condition is met.
         /// </summary>

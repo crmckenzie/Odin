@@ -121,11 +121,11 @@ namespace Odin
         /// Invokes the action with the parsed parameters.
         /// </summary>
         /// <returns>0 for success.</returns>
-        internal int Invoke()
+        internal int Execute()
         {
             if (!AllParametersHaveAValue())
             {
-                throw new ParameterMisMatchException($"Unable to supply required parameters to \n");
+                throw new ParameterMismatchException($"Unable to supply required parameters to \n");
             }
 
             this.SharedParameters.ToList().ForEach(cp => cp.WriteValueToCommand());

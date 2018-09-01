@@ -2,9 +2,9 @@ using System;
 
 namespace Odin
 {
-    internal class ParameterMisMatchException : Exception
+    internal class ParameterMismatchException : Exception
     {
-        public ParameterMisMatchException(string message) : base(message)
+        public ParameterMismatchException(string message) : base(message)
         {
         }
     }
