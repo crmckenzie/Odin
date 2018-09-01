@@ -48,69 +48,7 @@ namespace Odin
         /// </summary>
         public bool DisplayHelpWhenArgsAreEmpty { get; set; }
 
-        /// <summary>
-        /// Sets the convention to be used with the command. Only conventions applied to the root command are used.
-        /// </summary>
-        /// <param name="conventions"></param>
-        /// <returns></returns>
-        public Command Use(IConventions conventions)
-        {
-            _conventions = conventions;
-            return this;
-        }
-
-        private void InitializeActions()
-        {
-            this._actions = this
-                .GetType()
-                .GetMethods()
-                .Where(m => m.GetCustomAttribute<ActionAttribute>() != null)
-                .Select(row => new Action(this, row))
-                .ToList()
-                ;
-
-            this.SharedParameters = this.GetType().GetProperties()
-                .Where(row => row.GetCustomAttribute<ParameterAttribute>() != null)
-                .Select(row => new SharedParameter(this, row))
-                .ToList()
-                .AsReadOnly()
-                ;
-        }
-
         internal ReadOnlyCollection<SharedParameter> SharedParameters { get; set; }
-
-        /// <summary>
-        /// Sets the logger to be used with the command. Only the logger applied to the root command is used.
-        /// </summary>
-        /// <param name="logger"></param>
-        /// <returns></returns>
-        public Command Use(ILogger logger)
-        {
-            _logger = logger ?? new ConsoleLogger();
-            return this;
-        }
-
-        /// <summary>
-        /// Sets the helpwriter to be used with the command. Only the helpwriter applied to the root command is used.
-        /// </summary>
-        /// <param name="helpWriter"></param>
-        /// <returns></returns>
-        public Command Use(IHelpWriter helpWriter)
-        {
-            _helpWriter = helpWriter;
-            return this;
-        }
-
-        private void SetParent(Command parent)
-        {
-            this.Parent = parent;
-        }
-
-        /// <summary>
-        /// Gets the parent of the command.
-        /// </summary>
-        internal Command Parent { get; private set; }
-
         private ILogger _logger = new ConsoleLogger();
         /// <summary>
         /// Gets the logger for the command tree.
@@ -168,6 +106,68 @@ namespace Odin
         /// Gets the actions registered with the current command.
         /// </summary>
         internal IReadOnlyCollection<Action> Actions => this._actions.AsReadOnly();
+
+
+        /// <summary>
+        /// Sets the convention to be used with the command. Only conventions applied to the root command are used.
+        /// </summary>
+        /// <param name="conventions"></param>
+        /// <returns></returns>
+        public Command Use(IConventions conventions)
+        {
+            _conventions = conventions;
+            return this;
+        }
+
+        /// <summary>
+        /// Sets the logger to be used with the command. Only the logger applied to the root command is used.
+        /// </summary>
+        /// <param name="logger"></param>
+        /// <returns></returns>
+        public Command Use(ILogger logger)
+        {
+            _logger = logger ?? new ConsoleLogger();
+            return this;
+        }
+
+        /// <summary>
+        /// Sets the helpwriter to be used with the command. Only the helpwriter applied to the root command is used.
+        /// </summary>
+        /// <param name="helpWriter"></param>
+        /// <returns></returns>
+        public Command Use(IHelpWriter helpWriter)
+        {
+            _helpWriter = helpWriter;
+            return this;
+        }
+
+        private void InitializeActions()
+        {
+            this._actions = this
+                .GetType()
+                .GetMethods()
+                .Where(m => m.GetCustomAttribute<ActionAttribute>() != null)
+                .Select(row => new Action(this, row))
+                .ToList()
+                ;
+
+            this.SharedParameters = this.GetType().GetProperties()
+                .Where(row => row.GetCustomAttribute<ParameterAttribute>() != null)
+                .Select(row => new SharedParameter(this, row))
+                .ToList()
+                .AsReadOnly()
+                ;
+        }
+
+        private void SetParent(Command parent)
+        {
+            this.Parent = parent;
+        }
+
+        /// <summary>
+        /// Gets the parent of the command.
+        /// </summary>
+        internal Command Parent { get; private set; }
 
         /// <summary>
         /// Adds a command to the command tree.
