@@ -41,16 +41,6 @@ namespace Odin.Tests.Lib
         }
 
         [Fact]
-        public void GetAction_DoesNot_SetParameter()
-        {
-
-            var invocation = Subject.GetAction("display", "--text", "awesome!");
-            Subject.Text.ShouldBe(null);
-
-            invocation.SharedParameters.ToDictionary(p => p.Name)["Text"].Value.ShouldBe("awesome!");
-        }
-
-        [Fact]
         public void SetParameterUsingAlias()
         {
             Subject.Execute("display", "-t", "awesome!");

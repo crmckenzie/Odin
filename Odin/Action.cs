@@ -39,7 +39,7 @@ namespace Odin
         /// <summary>
         /// Gets the list of <see cref="SharedParameter"/>'s available to the Action.
         /// </summary>
-        public ReadOnlyCollection<SharedParameter> SharedParameters => Command.SharedParameters;
+        private ReadOnlyCollection<SharedParameter> SharedParameters => Command.SharedParameters;
 
         /// <summary>
         /// Gets whether or not this action is the default one for its Command.
