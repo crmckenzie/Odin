@@ -35,12 +35,6 @@ namespace Odin
                 .AsReadOnly()
                 ;
         }
-
-        /// <summary>
-        /// Gets the list of <see cref="SharedParameter"/>'s available to the Action.
-        /// </summary>
-        private ReadOnlyCollection<SharedParameter> SharedParameters => Command.SharedParameters;
-
         /// <summary>
         /// Gets whether or not this action is the default one for its Command.
         /// </summary>
@@ -86,6 +80,11 @@ namespace Odin
         /// Gets the list of identifiers representing the action.
         /// </summary>
         public string[] Identifiers => Aliases.Concat(new[] {this.Name}).ToArray();
+
+        /// <summary>
+        /// Gets the list of <see cref="SharedParameter"/>'s available to the Action.
+        /// </summary>
+        private ReadOnlyCollection<SharedParameter> SharedParameters => Command.SharedParameters;
 
         private Parameter FindByToken(string token)
         {

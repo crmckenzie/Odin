@@ -1,4 +1,6 @@
 ﻿using System.ComponentModel;
+using System.Diagnostics;
+using System.Reflection;
 using Odin.Attributes;
 
 namespace Odin.Tests.Lib
@@ -39,24 +41,37 @@ namespace Odin.Tests.Lib
             [Description("Ut enim ad minim veniam")]
             string argument3 = "value3-not-passed")
         {
-            this.MethodArguments = new object[] {argument1, argument2, argument3};
+            this.LogMethodCall(argument1, argument2, argument3);
         }
+
+        private void LogMethodCall(params object[] arguments)
+        {
+            var stackTrace = new StackTrace();
+            var methodBase = stackTrace.GetFrame(1).GetMethod();
+            this.MethodCalled = methodBase.Name;
+            this.MethodArguments = arguments;
+        }
+
+        public string MethodCalled { get; set; }
 
         [Action]
         public virtual int AlwaysReturnsMinus2()
         {
+            this.LogMethodCall();
             return -2;
         }
 
         [Action]
         public virtual bool AlwaysReturnsTrue()
         {
+            this.LogMethodCall();
             return true;
         }
 
         [Action]
         public virtual bool AlwaysReturnsFalse()
         {
+            this.LogMethodCall();
             return false;
         }
 
@@ -64,25 +79,25 @@ namespace Odin.Tests.Lib
         [Action]
         public virtual void SomeOtherControllerAction()
         {
-            
+            this.LogMethodCall();
         }
 
         [Action]
         public virtual void WithRequiredStringArg(string argument)
         {
-            this.MethodArguments = new object[] {argument};
+            this.LogMethodCall(argument);
         }
 
         [Action]
         public void WithRequiredStringArgs(string argument1, string argument2)
         {
-            this.MethodArguments = new object[] { argument1, argument2 };
+            this.LogMethodCall(argument1, argument2);
         }
 
         [Action]
         public void WithOptionalStringArg(string argument = "not-passed")
         {
-            this.MethodArguments = new object[] { argument };
+            this.LogMethodCall(argument);
         }
 
         [Action]
@@ -91,19 +106,19 @@ namespace Odin.Tests.Lib
             string argument2 = "value2-not-passed", 
             string argument3 = "value3-not-passed")
         {
-            this.MethodArguments = new object[] { argument1, argument2, argument3 };
+            this.LogMethodCall(argument1, argument2, argument3);
         }
 
         [Action]
         public void WithSwitch(bool argument)
         {
-            this.MethodArguments = new object[] { argument };
+            this.LogMethodCall(argument);
         }
 
         [Action]
         public void WithArgumentsOfVariousTypes(int i, long j)
         {
-            
+            this.LogMethodCall(i, j);
         }
     }
 }
