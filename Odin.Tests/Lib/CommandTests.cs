@@ -90,7 +90,10 @@ namespace Odin.Tests.Lib
         public void GenerateInvocation_WhenArgumentsAreInvalid()
         {
             // When
-            Assert.Throws<UnmappedParameterException>(() => this.Subject.GetAction("too", "many", "arguments", "passed"));
+            var result = this.Subject.Execute("too", "many", "arguments", "passed");
+
+            result.ShouldBe(-1);
+            this.Logger.ErrorBuilder.ToString().ShouldBe("Could not interpret the command. You sent [too, many, arguments, passed].");
         }
 
         [Fact]

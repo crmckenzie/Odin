@@ -223,11 +223,11 @@ namespace Odin
             }
             catch (UnresolvableActionException)
             {
-                this.HandleCommandError($"Could not find a matching command. You sent [{args.Join(", ")}]");
+                this.HandleCommandError($"Could not find a matching command. You sent [{args.Join(", ")}].");
             }
             catch (UnmappedParameterException)
             {
-                this.HandleCommandError($"Could not interpret the command. You sent [{args.Join(", ")}]");
+                this.HandleCommandError($"Could not interpret the command. You sent [{args.Join(", ")}].");
             }
             catch (ParameterMisMatchException)
             {
@@ -267,11 +267,17 @@ namespace Odin
         /// <param name="tokens"></param>
         /// <returns></returns>
         /// <remarks>Useful in testing your command structure.</remarks>
-        public Action GetAction(params string[] tokens)
+        private Action GetAction(params string[] tokens)
         {
             var token = tokens.FirstOrDefault();
-            var subCommandAction = GetSubCommandActionByToken(tokens, token);
-            return subCommandAction.Found ? subCommandAction.SubCommand : GetAction(tokens, token);
+            var subCommand = SubCommands.FirstOrDefault(cmd => cmd.IsIdentifiedBy(token));
+
+            if (subCommand == null)
+                return GetAction(tokens, token);
+
+            var theRest = tokens.Skip(1).ToArray();
+            var action = subCommand.GetAction(theRest);
+            return action ?? GetAction(tokens, token);
         }
 
         private Action GetAction(string[] tokens, string token)
@@ -288,16 +294,6 @@ namespace Odin
             var args = tokens.Skip(tokensProcessed).ToArray();
             action.SetParameterValues(args);
             return action;
-        }
-
-        internal (bool Found, Action SubCommand) GetSubCommandActionByToken(string[] tokens, string token)
-        {
-            var subCommand = SubCommands.FirstOrDefault(cmd => cmd.IsIdentifiedBy(token));
-            if (subCommand == null) return (Found: false, SubCommand: null);
-
-            var theRest = tokens.Skip(1).ToArray();
-            var action = subCommand.GetAction(theRest);
-            return (Found: action != null, SubCommand: subCommand.GetAction(theRest));
         }
 
         internal Command GetSubCommandByToken(string token)
