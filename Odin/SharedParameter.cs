@@ -25,7 +25,7 @@ namespace Odin
             _propertyInfo = propertyInfo;
         }
 
-        public override IConventions Conventions => _command.Conventions;
+        internal override IConventions Conventions => _command.Conventions;
 
         /// <summary>
         /// The description of the parameter.
@@ -56,11 +56,13 @@ namespace Odin
         /// <summary>
         /// Gets the <see cref="ParserAttribute"/> associated with this parameter.
         /// </summary>
-        public override ParserAttribute ParserAttribute => _propertyInfo.GetCustomAttribute<ParserAttribute>();
+        protected override ParserAttribute ParserAttribute => _propertyInfo.GetCustomAttribute<ParserAttribute>();
+
         /// <summary>
         /// Gets the Type of the parameter.
         /// </summary>
         public override Type ParameterType => _propertyInfo.PropertyType;
+
         /// <summary>
         /// Gets the conventional name of the parameter.
         /// </summary>
@@ -81,7 +83,7 @@ namespace Odin
             return this.LongOptionName == parameter.LongOptionName;
         }
 
-        internal void WriteToCommand()
+        internal void WriteValueToCommand()
         {
             _propertyInfo.SetValue(_command, this.Value);
         }

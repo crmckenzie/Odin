@@ -233,20 +233,15 @@ namespace Odin.Help
             builder.AppendLine(string.Empty);
         }
 
-        private string GetDescription(Action method)
+        private string GetDescription(Action action)
         {
-            var builder = new System.Text.StringBuilder();
-            if (method.Aliases.Any())
+            var builder = new StringBuilder();
+            if (action.Aliases.Any())
             {
                 builder.Append("aliases: ");
-                builder.AppendLine(method.Aliases.Join(", "));
+                builder.AppendLine(action.Aliases.Join(", "));
             }
-            var descriptionAttr = method.MethodInfo.GetCustomAttribute<DescriptionAttribute>();
-
-            if (descriptionAttr != null)
-            {
-                builder.Append(descriptionAttr.Description);
-            }
+            builder.Append(action.GetDescription());
 
             return builder.ToString();
         }
@@ -257,7 +252,7 @@ namespace Odin.Help
 
             if (parameter.IsBoolean())
             {
-                var line = $"{parameter.Conventions.GetNegatedLongOptionName(parameter.Name)} to negate";
+                var line = $"{parameter.GetNegatedLongOptionName()} to negate";
                 builder.AppendLine(line);
             }
 

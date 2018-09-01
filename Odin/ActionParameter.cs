@@ -22,14 +22,14 @@ namespace Odin
         /// <param name="parameterInfo"></param>
         public ActionParameter(Action action, ParameterInfo parameterInfo)
         {
-            Action = action;
-            _parameterInfo = parameterInfo;
+            this.Action = action;
+            this._parameterInfo = parameterInfo;
 
-            ConfigureDefaultValue();
+            this.ConfigureDefaultValue();
         }
         private Action Action { get; }
 
-        public override IConventions Conventions => Action.Conventions;
+        internal override IConventions Conventions => Action.Conventions;
 
         /// <summary>
         /// Gets the description of the Parameter
@@ -56,7 +56,7 @@ namespace Odin
         /// <summary>
         /// Gets the <see cref="ParserAttribute"/> associated with the Parameter
         /// </summary>
-        public override ParserAttribute ParserAttribute => _parameterInfo.GetCustomAttribute<ParserAttribute>();
+        protected override ParserAttribute ParserAttribute => _parameterInfo.GetCustomAttribute<ParserAttribute>();
 
         /// <summary>
         /// Gets the <see cref="AliasAttribute"/> associated with the Parameter

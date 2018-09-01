@@ -12,6 +12,8 @@ using Odin.Logging;
 
 namespace Odin
 {
+    using System;
+
     /// <summary>
     /// Base class an Odin command.
     /// </summary>
@@ -201,19 +203,19 @@ namespace Odin
         /// <returns>0 if successful.</returns>
         public int Execute(params string[] args)
         {
-            if (ShouldExit(args))
-                return Exit(displayHelp: true);
-
-            const int commandFailed = -1;
-            const int commandSucceeded = 0;
 
             try
             {
+                const int commandSucceeded = 0;
+
+                if (this.ShouldExit(args))
+                    return this.Exit(displayHelp: true);
+
                 var action = this.GetAction(args);
                 var exitCode = action.Invoke();
                 if (exitCode != commandSucceeded)
                 {
-                    HandleCommandError($"Command Failed: {string.Join(" ", args)}");
+                    this.HandleCommandError($"Command Failed: {string.Join(" ", args)}");
                 }
 
                 return exitCode;
@@ -221,24 +223,23 @@ namespace Odin
             }
             catch (UnresolvableActionException)
             {
-                HandleCommandError($"Could not interpret the command. You sent [{args.Join(", ")}]");
-                return commandFailed;
+                this.HandleCommandError($"Could not find a matching command. You sent [{args.Join(", ")}]");
             }
             catch (UnmappedParameterException)
             {
-                HandleCommandError($"Could not interpret the command. You sent [{args.Join(", ")}]");
-                return commandFailed;
+                this.HandleCommandError($"Could not interpret the command. You sent [{args.Join(", ")}]");
             }
             catch (ParameterMisMatchException)
             {
-                HandleCommandError($"Unrecognized command sequence: {string.Join(" ", args)}\n");
-                return commandFailed;
+                this.HandleCommandError($"Unrecognized command sequence: {string.Join(" ", args)}\n");
             }
             catch (ParameterConversionException pce)
             {
-                HandleCommandError(pce.Message);
-                return commandFailed;
+                this.HandleCommandError(pce.Message);
             }
+
+            const int commandFailed = -1;
+            return commandFailed;
 
         }
 
@@ -268,9 +269,9 @@ namespace Odin
         /// <remarks>Useful in testing your command structure.</remarks>
         public Action GetAction(params string[] tokens)
         {
-                var token = tokens.FirstOrDefault();
-                var subCommandAction = GetSubCommandActionByToken(tokens, token);
-                return subCommandAction.Found ? subCommandAction.SubCommand : GetAction(tokens, token);
+            var token = tokens.FirstOrDefault();
+            var subCommandAction = GetSubCommandActionByToken(tokens, token);
+            return subCommandAction.Found ? subCommandAction.SubCommand : GetAction(tokens, token);
         }
 
         private Action GetAction(string[] tokens, string token)

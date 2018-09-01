@@ -49,17 +49,23 @@ namespace Odin
         /// <summary>
         /// Gets the MethodInfo wrapped by the action.
         /// </summary>
-        public MethodInfo MethodInfo { get; }
+        private MethodInfo MethodInfo { get; }
 
         /// <summary>
         /// Gets the command the action is tied to.
         /// </summary>
         public Command Command { get; }
 
+        public string GetDescription()
+        {
+            var descriptionAttr = MethodInfo.GetCustomAttribute<DescriptionAttribute>();
+            return descriptionAttr?.Description ?? "";
+        }
+
         /// <summary>
         /// Gets the conventions used in the command tree.
         /// </summary>
-        public IConventions Conventions => Command.Conventions;
+        internal IConventions Conventions => Command.Conventions;
 
         /// <summary>
         /// Gets the conventional name of the action.
@@ -79,7 +85,7 @@ namespace Odin
         /// <summary>
         /// Gets the list of identifiers representing the action.
         /// </summary>
-        public string[] Identifiers => Aliases.Concat(new string[] {this.Name}).ToArray();
+        public string[] Identifiers => Aliases.Concat(new[] {this.Name}).ToArray();
 
         private Parameter FindByToken(string token)
         {
@@ -107,7 +113,7 @@ namespace Odin
         /// True if the action is invokable. Otherwise false.
         /// </summary>
         /// <returns></returns>
-        private bool CanInvoke()
+        private bool AllParametersHaveAValue()
         {
             return Parameters.All(row => row.IsValueSet());
         }
@@ -118,16 +124,15 @@ namespace Odin
         /// <returns>0 for success.</returns>
         internal int Invoke()
         {
-            if (!CanInvoke())
+            if (!AllParametersHaveAValue())
             {
                 throw new ParameterMisMatchException($"Unable to supply required parameters to \n");
             }
 
-            this.SharedParameters.ToList().ForEach(cp => cp.WriteToCommand());
+            this.SharedParameters.ToList().ForEach(cp => cp.WriteValueToCommand());
             this.Command.OnBeforeExecute(this);
 
-            var result = InvokeMethod();
-            var exitCode = ConvertToExitCode(result);
+            var exitCode = InvokeMethod();
 
             return this.Command.OnAfterExecute(this, exitCode);
         }
@@ -145,15 +150,15 @@ namespace Odin
             }
         }
 
-        private object InvokeMethod()
+        private int InvokeMethod()
         {
             var args = Parameters
                     .OrderBy(map => map.Position)
                     .Select(row => row.Value)
                     .ToArray()
                 ;
-            var result = MethodInfo.Invoke(Command, args);
-            return result;
+            var rawResult = MethodInfo.Invoke(Command, args);
+            return ConvertToExitCode(rawResult);
         }
 
         internal void SetParameterValues(string[] tokens)
@@ -163,28 +168,23 @@ namespace Odin
             {
                 var token = tokens[index];
                 var parameter = FindParameter(token, index);
-                if (parameter == null)
-                    throw new UnmappedParameterException(token, Name);
-
-                try
-                {
-                    var result = parameter.Parse(tokens, index);
-                    parameter.Value = result.Value;
-                    index += result.TokensProcessed;
-                }
-                catch (Exception e)
-                {
-                    throw new ParameterConversionException(parameter, token, e);
-                }
+                var result = parameter.Parse(tokens, index);
+                parameter.Value = result.Value;
+                index += result.TokensProcessed;
             }
         }
 
-        private Parameter FindParameter(string token, int i)
+        private Parameter FindParameter(string token, int index)
         {
             var parameter = FindByToken(token);
             if (parameter != null) return parameter;
 
-            return Conventions.IsParameterName(token) ? null : FindByIndex(i);
+            parameter =  Conventions.IsParameterName(token) ? null : FindByIndex(index);
+
+            if (parameter == null)
+                throw new UnmappedParameterException(token, Name);
+
+            return parameter;
         }
 
         internal IEnumerable<IGrouping<string, string>> GetDuplicateAliases()

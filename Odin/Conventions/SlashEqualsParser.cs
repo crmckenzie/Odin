@@ -48,7 +48,7 @@ namespace Odin.Conventions
 
             if (_parameter.IsBoolean())
             {
-                var value = !_parameter.Conventions.IsNegatedLongOptionName(_parameter.Name, token);
+                var value = !_parameter.IsNegatedLongOptionName(token);
                 return new ParseResult()
                 {
                     Value = value,

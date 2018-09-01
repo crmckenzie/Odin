@@ -66,7 +66,11 @@ namespace Odin.Conventions
 
         private bool ArgIsIdentifier(string[] tokens, int indexOfCurrentArg)
         {
-            return indexOfCurrentArg < tokens.Length && _parameter.Conventions.IsParameterName(tokens[indexOfCurrentArg]);
+            var tokenIsInRange = indexOfCurrentArg < tokens.Length;
+            if (!tokenIsInRange) return false;
+
+            var token = tokens[indexOfCurrentArg];
+            return _parameter.IsParameterName(token);
         }
 
         private static ParseResult ParseNameValuePair(Parameter parameter, string[] tokens, int i)
@@ -90,7 +94,7 @@ namespace Odin.Conventions
         {
             var tokensToParse = tokens
                 .Skip(1)
-                .TakeUntil(_parameter.Conventions.IsParameterName);
+                .TakeUntil(_parameter.IsParameterName);
 
             var elementType = parameter.ParameterType.GetElementType();
 
