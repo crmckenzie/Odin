@@ -5,7 +5,7 @@
     only:
     - master
 
-  version: 1.0.0.{build}
+  version: 0.3.0.{build}
 
   init:
   - ps: |
@@ -50,7 +50,7 @@
 # release branches
 # compile, test, release beta version to nuget
 -
-  version: 1.0.0.{build}
+  version: 0.3.0.{build}
 
   branches:
     only:
@@ -99,7 +99,7 @@
 # all other branches
 # compile, test
 -
-  version: 1.0.0.{build}
+  version: 0.3.0.{build}
 
   before_build:
   - dotnet restore
