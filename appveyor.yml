@@ -24,9 +24,6 @@
   build_script:
   - ps: dotnet build -c Release /p:AssemblyVersion=$($env:AssemblyVersion) /p:ProductVersion=$($env:AssemblyVersion)
 
-  build:
-    verbosity: minimal
-
   after_build:
   - ps: dotnet pack .\Odin\Odin.csproj /p:PackageVersion="$($env:PackageVersion)"
 
@@ -72,9 +69,6 @@
 
   build_script:
   - ps: dotnet build -c Release /p:AssemblyVersion=$($env:AssemblyVersion) /p:ProductVersion=$($env:AssemblyVersion)
-
-  build:
-    verbosity: minimal
 
   after_build:
   - ps: dotnet pack .\Odin\Odin.csproj /p:PackageVersion="$env:PackageVersion"
