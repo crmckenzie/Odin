@@ -6,3 +6,5 @@ _*
 *.suo
 .vs/
 *.nupkg
+
+*.coverage
