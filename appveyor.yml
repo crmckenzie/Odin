@@ -64,7 +64,9 @@
   - ps: dotnet build -c Release /p:AssemblyVersion=$($env:AssemblyVersion) /p:ProductVersion=$($env:AssemblyVersion)
 
   after_build:
-  - ps: dotnet pack .\Odin\Odin.csproj /p:PackageVersion="$env:PackageVersion" -o .
+  - ps: |
+      pwd
+      dotnet pack .\Odin\Odin.csproj /p:PackageVersion="$env:PackageVersion" -o .
 
   artifacts:
   - path: 'Odin-Commands*.nupkg'
