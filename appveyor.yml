@@ -55,7 +55,10 @@
       $env:PackageVersion = "{0}.{1}.{2}-beta-{3}" -f $version.Major, $version.Minor, $version.Build, $version.Revision
 
   before_build:
-  - dotnet restore
+  - ps: |
+      write-host "Output contents of working directory."
+      dir
+      dotnet restore
 
   build_script:
   - ps: dotnet build -c Release /p:AssemblyVersion=$($env:AssemblyVersion) /p:ProductVersion=$($env:AssemblyVersion)
