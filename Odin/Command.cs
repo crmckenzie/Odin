@@ -1,18 +1,19 @@
-using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Data;
 using System.Linq;
 using System.Reflection;
 using System.Text;
 using Odin.Attributes;
-using Odin.Configuration;
+using Odin.Conventions;
 using Odin.Exceptions;
+using Odin.Help;
 using Odin.Logging;
 
 namespace Odin
 {
+    using System;
+
     /// <summary>
     /// Base class an Odin command.
     /// </summary>
@@ -23,12 +24,16 @@ namespace Odin
     /// </remarks>
     public abstract class Command
     {
+        const int CommandSucceeded = 0;
+        const int CommandFailed = -1;
+
+
         /// <summary>
         /// Base class an Odin command.
         /// </summary>
         protected Command()
         {
-            _conventions = new HyphenCaseConvention();
+            _conventions = new KebabCaseConvention();
             _helpWriter = new DefaultHelpWriter();
 
             _subCommands = new List<Command>();
@@ -43,6 +48,66 @@ namespace Odin
         /// </summary>
         public bool DisplayHelpWhenArgsAreEmpty { get; set; }
 
+        internal ReadOnlyCollection<SharedParameter> SharedParameters { get; set; }
+        private ILogger _logger = new ConsoleLogger();
+        /// <summary>
+        /// Gets the logger for the command tree.
+        /// </summary>
+        protected internal virtual ILogger Logger => IsRoot() ? _logger : Parent.Logger;
+
+        private IConventions _conventions;
+        private IHelpWriter _helpWriter;
+
+        /// <summary>
+        /// Gets the helpwriter for the command tree.
+        /// </summary>
+        internal IHelpWriter HelpWriter => IsRoot() ? _helpWriter : Parent.HelpWriter;
+
+        /// <summary>
+        /// Gets the conventions for the command tree.
+        /// </summary>
+        internal IConventions Conventions => IsRoot() ? _conventions : Parent.Conventions;
+
+        /// <summary>
+        /// Gets the conventional name of the command.
+        /// </summary>
+        public virtual string Name => Conventions.GetCommandName(this);
+
+        /// <summary>
+        /// Gets the aliases applied to the command.
+        /// </summary>
+        internal virtual string[] Aliases => GetType().GetCustomAttribute<AliasAttribute>()?.Aliases.ToArray() ?? new string[] { };
+
+        /// <summary>
+        /// Gets all of the identifiers applied to the command.
+        /// </summary>
+        internal string[] Identifiers => Aliases.Concat(new string[] { this.Name }).ToArray();
+
+        /// <summary>
+        /// True if the token matches the command, otherwise false.
+        /// </summary>
+        /// <param name="token"></param>
+        /// <returns></returns>
+        internal virtual bool IsIdentifiedBy(string token)
+        {
+            return token == Name || Aliases.Contains(token);
+        }
+
+        private readonly List<Command> _subCommands;
+
+        /// <summary>
+        /// Gets the subcommands registered with the current command.
+        /// </summary>
+        public IReadOnlyCollection<Command> SubCommands => this._subCommands.AsReadOnly();
+
+        private List<Action> _actions;
+
+        /// <summary>
+        /// Gets the actions registered with the current command.
+        /// </summary>
+        internal IReadOnlyCollection<Action> Actions => this._actions.AsReadOnly();
+
+
         /// <summary>
         /// Sets the convention to be used with the command. Only conventions applied to the root command are used.
         /// </summary>
@@ -53,26 +118,6 @@ namespace Odin
             _conventions = conventions;
             return this;
         }
-
-        private void InitializeActions()
-        {
-            this._actions = this
-                .GetType()
-                .GetMethods()
-                .Where(m => m.GetCustomAttribute<ActionAttribute>() != null)
-                .Select(row => new MethodInvocation(this, row))
-                .ToList()
-                ;
-
-            this.CommonParameters  = this.GetType().GetProperties()
-                .Where(row => row.GetCustomAttribute<ParameterAttribute>() != null)
-                .Select(row => new CommonParameter(this, row))
-                .ToList()
-                .AsReadOnly()
-                ;
-        }
-
-        internal ReadOnlyCollection<CommonParameter> CommonParameters { get; set; }
 
         /// <summary>
         /// Sets the logger to be used with the command. Only the logger applied to the root command is used.
@@ -96,6 +141,24 @@ namespace Odin
             return this;
         }
 
+        private void InitializeActions()
+        {
+            this._actions = this
+                .GetType()
+                .GetMethods()
+                .Where(m => m.GetCustomAttribute<ActionAttribute>() != null)
+                .Select(row => new Action(this, row))
+                .ToList()
+                ;
+
+            this.SharedParameters = this.GetType().GetProperties()
+                .Where(row => row.GetCustomAttribute<ParameterAttribute>() != null)
+                .Select(row => new SharedParameter(this, row))
+                .ToList()
+                .AsReadOnly()
+                ;
+        }
+
         private void SetParent(Command parent)
         {
             this.Parent = parent;
@@ -104,71 +167,7 @@ namespace Odin
         /// <summary>
         /// Gets the parent of the command.
         /// </summary>
-        public Command Parent { get; private set; }
-
-        private ILogger _logger = new ConsoleLogger();
-        /// <summary>
-        /// Gets the logger for the command tree.
-        /// </summary>
-        public virtual ILogger Logger => IsRoot() ? _logger : Parent.Logger;
-
-        private  IConventions _conventions;
-        private IHelpWriter _helpWriter;
-
-        /// <summary>
-        /// Gets the helpwriter for the command tree.
-        /// </summary>
-        public IHelpWriter HelpWriter => IsRoot() ? _helpWriter : Parent.HelpWriter;
-
-        /// <summary>
-        /// Gets the conventions for the command tree.
-        /// </summary>
-        public IConventions Conventions => IsRoot() ? _conventions : Parent.Conventions ;
-
-        /// <summary>
-        /// Gets the conventional name of the command.
-        /// </summary>
-        public virtual string Name => Conventions.GetCommandName(this);
-
-        /// <summary>
-        /// Gets the aliases applied to the command.
-        /// </summary>
-        public virtual string[] Aliases
-        {
-            get { return this.GetType().GetCustomAttribute<AliasAttribute>()?.Aliases.ToArray() ?? new string[] { }; }
-        }
-
-        /// <summary>
-        /// Gets all of the identifiers applied to the command.
-        /// </summary>
-        public string[] Identifiers
-        {
-            get { return Aliases.Concat(new string[] {this.Name}).ToArray(); }
-        }
-
-        /// <summary>
-        /// True if the token matches the command, otherwise false.
-        /// </summary>
-        /// <param name="token"></param>
-        /// <returns></returns>
-        public virtual bool IsIdentifiedBy(string token)
-        {
-            return token == Name || Aliases.Contains(token);
-        }
-
-        private List<Command> _subCommands;
-
-        /// <summary>
-        /// Gets the subcommands registered with the current command.
-        /// </summary>
-        public IReadOnlyCollection<Command> SubCommands => this._subCommands.AsReadOnly();
-
-        private List<MethodInvocation> _actions;
-
-        /// <summary>
-        /// Gets the actions registered with the current command.
-        /// </summary>
-        public IReadOnlyCollection<MethodInvocation> Actions => this._actions.AsReadOnly();
+        internal Command Parent { get; private set; }
 
         /// <summary>
         /// Adds a command to the command tree.
@@ -186,7 +185,7 @@ namespace Odin
         /// Called after arguments are parsed but before the invocation is executed.
         /// </summary>
         /// <param name="invocation"></param>
-        protected internal virtual void OnBeforeExecute(MethodInvocation invocation)
+        protected internal virtual void OnBeforeExecute(Action invocation)
         {
         }
 
@@ -196,7 +195,7 @@ namespace Odin
         /// <param name="invocation"></param>
         /// <param name="exitCode"></param>
         /// <returns></returns>
-        protected internal virtual int OnAfterExecute(MethodInvocation invocation, int exitCode)
+        protected internal virtual int OnAfterExecute(Action invocation, int exitCode)
         {
             return exitCode;
         }
@@ -208,37 +207,55 @@ namespace Odin
         /// <returns>0 if successful.</returns>
         public int Execute(params string[] args)
         {
-            if (this.DisplayHelpWhenArgsAreEmpty && !args.Any())
-            {
-                this.Help();
-                return 0;
-            }
 
-            var result = -1;
-
-            MethodInvocation invocation;
             try
             {
-                invocation = this.GenerateInvocation(args);
+
+                if (this.DisplayHelpWhenArgsAreEmpty && args.Empty())
+                    return this.Exit(displayHelp: true);
+
+                var action = this.GetAction(args);
+                var exitCode = action.Execute();
+                if (exitCode != CommandSucceeded)
+                {
+                    this.LogErrorAndDisplayHelp($"Command Failed: {string.Join(" ", args)}");
+                }
+
+                return exitCode;
+
+            }
+            catch (UnresolvableActionException)
+            {
+                this.LogErrorAndDisplayHelp($"Could not find a matching command. You sent [{args.Join(", ")}].");
             }
             catch (UnmappedParameterException)
             {
-                this.Logger.Error($"Could not interpret the command. You sent [{args.Join(", ")}]");
-                this.Help();
-                return result;
+                this.LogErrorAndDisplayHelp($"Could not interpret the command. You sent [{args.Join(", ")}].");
             }
-
-            if (invocation?.CanInvoke() == true)
+            catch (ParameterMismatchException)
             {
-                result =  invocation.Invoke();
+                this.LogErrorAndDisplayHelp($"Unrecognized command sequence: {args.Join(" ")}\n");
+            }
+            catch (ParameterConversionException pce)
+            {
+                this.LogErrorAndDisplayHelp(pce.Message);
             }
 
-            if (result == 0)
-                return result;
+            return CommandFailed;
 
-            this.Logger.Error("Unrecognized command sequence: {0}\n", string.Join(" ", args));
+        }
+
+        private void LogErrorAndDisplayHelp(string errorMessage)
+        {
+            this.Logger.Error(errorMessage);
             this.Help();
-            return result;
+        }
+
+        private int Exit(bool displayHelp = false)
+        {
+            if (displayHelp)
+                this.Help();
+            return 0;
         }
 
         /// <summary>
@@ -247,52 +264,50 @@ namespace Odin
         /// <param name="tokens"></param>
         /// <returns></returns>
         /// <remarks>Useful in testing your command structure.</remarks>
-        public MethodInvocation GenerateInvocation(params string[] tokens)
+        private Action GetAction(params string[] tokens)
         {
-            try
-            {
-                var token = tokens.FirstOrDefault();
-                var subCommand = GetSubCommandByToken(token);
-                if (subCommand != null)
-                {
-                    var theRest = tokens.Skip(1).ToArray();
-                    return subCommand.GenerateInvocation(theRest);
-                }
+            var token = tokens.FirstOrDefault();
+            var subCommand = SubCommands.FirstOrDefault(cmd => cmd.IsIdentifiedBy(token));
 
-                var action = GetActionByToken(token);
-                var toSkip = 1;
-                if (action == null)
-                {
-                    toSkip = 0;
-                    action = GetDefaultAction();
-                }
+            if (subCommand == null)
+                return GetAction(tokens, token);
 
-                var args = tokens.Skip(toSkip).ToArray();
-                action?.SetParameterValues(args);
-                return action;
-            }
-            catch (ParameterConversionException pce)
-            {
-                this.Logger.Error(pce.Message);
-                return null;
-            }
+            var theRest = tokens.Skip(1).ToArray();
+            var action = subCommand.GetAction(theRest);
+            return action ?? GetAction(tokens, token);
         }
 
-        private MethodInvocation GetActionByToken(string token)
+        private Action GetAction(string[] tokens, string token)
         {
-            return _actions.FirstOrDefault(action => action.Identifiers.Contains(token));
+            var action = GetActionByToken(token);
+            var tokensProcessed = action == null ? 0 : 1;
+            action = action ?? GetDefaultAction();
+
+            if (action == null)
+            {
+                throw new UnresolvableActionException();
+            }
+
+            var args = tokens.Skip(tokensProcessed).ToArray();
+            action.SetParameterValues(args);
+            return action;
         }
 
-        private Command GetSubCommandByToken(string token)
+        internal Command GetSubCommandByToken(string token)
         {
             return SubCommands.FirstOrDefault(cmd => cmd.IsIdentifiedBy(token));
+        }
+
+        internal Action GetActionByToken(string token)
+        {
+            return _actions.FirstOrDefault(action => action.Identifiers.Contains(token));
         }
 
         /// <summary>
         /// Returns the default action for the command.
         /// </summary>
         /// <returns></returns>
-        public MethodInvocation GetDefaultAction()
+        internal Action GetDefaultAction()
         {
             return this.Actions.FirstOrDefault(row => row.IsDefault);
         }
@@ -329,7 +344,6 @@ namespace Odin
             if (messages.Any())
                 yield return new ValidationResult(this.Name, messages);
 
-
             var validationResults = this.SubCommands.SelectMany(cmd => cmd.Validate());
             foreach (var validationResult in validationResults)
             {
@@ -339,57 +353,68 @@ namespace Odin
 
         private IEnumerable<string> GetValidationMessages()
         {
-            var defaultActions = this.Actions.Where(row => row.IsDefault).ToArray();
-            if (defaultActions.Count() > 1)
-            {
-                var actionNames = defaultActions.Select(row => row.Name).Join(", ");
-                yield return $"There is more than one default action: {actionNames}.";
-            }
 
+            var defaultActionResults = ValidateDefaultActions();
+            var executableActionResults = ValidateExecutableActions();
+            var actionResults = ValidateActions();
+            var commonParameterResults = ValidateSharedParameters();
+
+            return defaultActionResults
+                    .Concat(executableActionResults)
+                    .Concat(actionResults)
+                    .Concat(commonParameterResults)
+                ;
+        }
+
+        private IEnumerable<string> ValidateDefaultActions()
+        {
+            var defaultActions = this.Actions.Where(row => row.IsDefault).ToArray();
+            if (defaultActions.Length <= 1)
+                return Enumerable.Empty<string>();
+
+            var actionNames = defaultActions
+                .Select(row => row.Name)
+                .Join(", ")
+                ;
+
+            return new[]
+            {
+                $"There is more than one default action: {actionNames}."
+            };
+        }
+
+        private IEnumerable<string> ValidateExecutableActions()
+        {
+            var actions = GetDuplicateActionNames();
+            var messages = actions.Select(matchingName => $"There is more than one executable action named '{matchingName}'.");
+            return messages;
+        }
+
+        private IEnumerable<string> ValidateSharedParameters()
+        {
+            var aliases = GetDuplicatedSharedParameterAliases();
+            var validationResults = aliases.Select(item => $"The alias '{item.Key}' is duplicated amongst shared parameters.");
+            return validationResults;
+        }
+
+        private IEnumerable<string> ValidateActions()
+        {
+            return this._actions.SelectMany(a => a.GetValidationMessages());
+        }
+
+        private IEnumerable<IGrouping<string, string>> GetDuplicatedSharedParameterAliases()
+        {
+            var aliases = this.SharedParameters.SelectMany(row => row.Aliases);
+            var duplicates = aliases.GroupBy((s) => s).Where(row => row.Count() > 1);
+            return duplicates;
+        }
+
+        private IEnumerable<string> GetDuplicateActionNames()
+        {
             var actionIdentifiers = this.Actions.SelectMany(action => action.Identifiers);
             var subCommandIdentifiers = this.SubCommands.SelectMany(cmd => cmd.Identifiers);
             var matchingNames = actionIdentifiers.Intersect(subCommandIdentifiers);
-
-            foreach (var matchingName in matchingNames)
-            {
-                yield return $"There is more than one executable action named '{matchingName}'.";
-            }
-
-            foreach (var action in this._actions)
-            {
-                var aliases = action.MethodParameters.SelectMany(row => row.Aliases);
-                var duplicates = aliases.GroupBy((s) => s).Where(row => row.Count() > 1);
-                foreach (var dup in duplicates)
-                {
-                    yield return $"The alias '{dup.Key}' is duplicated for action '{action.Name}'.";
-                }
-
-                foreach (var parameter in action.MethodParameters)
-                {
-                    foreach (var commonParameter in CommonParameters)
-                    {
-                        if (commonParameter.LongOptionName == parameter.LongOptionName)
-                        {
-                            yield return $"The common parameter name '{parameter.LongOptionName}' conflicts with a parameter defined for action '{action.Name}'.";
-                        }
-
-                        foreach (var alias in commonParameter.Aliases.Where(alias => parameter.Aliases.Contains(alias)))
-                        {
-                            yield return
-                                $"The alias '{alias}' for common parameter '{commonParameter.LongOptionName}' is duplicated for parameter '{parameter.LongOptionName}' on action '{action.Name}'."
-                                ;
-                        }
-                    }
-                }
-            }
-
-            var commonParameterAliases = this.CommonParameters.SelectMany(row => row.Aliases);
-            var commonParameterDuplicates = commonParameterAliases.GroupBy((s) => s).Where(row => row.Count() > 1);
-            foreach (var dup in commonParameterDuplicates)
-            {
-                yield return $"The alias '{dup.Key}' is duplicated amongst common parameters.";
-            }
-
+            return matchingNames;
         }
     }
 }

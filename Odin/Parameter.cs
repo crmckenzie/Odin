@@ -1,7 +1,8 @@
 using System;
 using System.Linq;
 using Odin.Attributes;
-using Odin.Configuration;
+using Odin.Conventions;
+using Odin.Exceptions;
 using Odin.Parsing;
 
 namespace Odin
@@ -9,7 +10,7 @@ namespace Odin
     /// <summary>
     /// Base class representing parameters passed to an Action
     /// </summary>
-    public abstract class Parameter
+    public abstract class Parameter : IParser
     {
         private bool _isSet;
         private object _value;
@@ -32,7 +33,7 @@ namespace Odin
         /// <summary>
         /// Gets the <see cref="ParserAttribute"/> associated with this parameter.
         /// </summary>
-        public abstract ParserAttribute ParserAttribute { get; }
+        protected abstract ParserAttribute ParserAttribute { get; }
 
         /// <summary>
         /// Gets the conventional name of the parameter.
@@ -44,7 +45,6 @@ namespace Odin
         /// </summary>
         public abstract Type ParameterType { get; }
 
-
         /// <summary>
         /// Gets the <see cref="AliasAttribute"/> associated with this parameter.
         /// </summary>
@@ -53,15 +53,14 @@ namespace Odin
         /// <summary>
         /// Gets the conventions used in the command tree.
         /// </summary>
-        public abstract IConventions Conventions { get;  }
-
+        internal abstract IConventions Conventions { get;  }
 
         /// <summary>
         /// Gets or sets the value of the parameter.
         /// </summary>
         public virtual object Value
         {
-            get { return _value; }
+            get => _value;
             set
             {
                 _value = value;
@@ -84,7 +83,7 @@ namespace Odin
                 if (AliasAttribute == null)
                     return new string[] { };
 
-                return AliasAttribute.Aliases.Select(a => Conventions.GetShortOptionName(a)).ToArray();
+                return Conventions.GetShortOptionNames(AliasAttribute);
             }
         }
 
@@ -97,11 +96,12 @@ namespace Odin
         {
             if (Conventions.IsMatchingParameter(this, token))
                 return true;
+
             if (Aliases.Contains(token))
                 return true;
 
-            if (IsBoolean() && Conventions.IsNegatedLongOptionName(this.Name, token))
-                return true;
+            if (IsBoolean())
+                return Conventions.IsNegatedLongOptionName(this.Name, token);
 
             return false;
         }
@@ -128,7 +128,7 @@ namespace Odin
         /// True if the parameter has a custom parser. Otherwise false.
         /// </summary>
         /// <returns></returns>
-        public bool HasCustomParser()
+        private bool HasCustomParser()
         {
             return ParserAttribute != null;
         }
@@ -144,6 +144,57 @@ namespace Odin
                 return false;
 
             return Conventions.IsNegatedLongOptionName(Name, token);
+        }
+
+        private IParser CreateCustomParser()
+        {
+            if (!ParserAttribute.ParserType.Implements<IParser>())
+                throw new ArgumentOutOfRangeException($"'{ParserAttribute.ParserType.FullName}' is not an implementation of '{typeof(IParser).FullName}.'");
+
+            var constructor = ParserAttribute.ParserType.GetConstructor(typeof(Parameter));
+            if (constructor == null)
+            {
+                throw new TypeInitializationException(
+                    $"Could not find a constructor with the signature ({typeof(Parameter).Name}).", null);
+            }
+
+            var parameters = new object[] { this };
+            var instance = constructor.Invoke(parameters);
+            var typedInstance = (IParser)instance;
+            return typedInstance;
+        }
+
+        internal IParser CreateParser()
+        {
+            return HasCustomParser() ? CreateCustomParser() : Conventions.CreateParser(this);
+        }
+
+        public ParseResult Parse(string[] tokens, int tokenIndex)
+        {
+            try
+            {
+                var parser = CreateParser();
+                return parser.Parse(tokens, tokenIndex);
+            }
+            catch (Exception e)
+            {
+                throw new ParameterConversionException(this, tokens[tokenIndex], e);
+            }
+        }
+
+        public bool IsNegatedLongOptionName(string token)
+        {
+            return Conventions.IsNegatedLongOptionName(Name, token);
+        }
+
+        public bool IsParameterName(string token)
+        {
+            return Conventions.IsParameterName(token);
+        }
+
+        public string GetNegatedLongOptionName()
+        {
+            return Conventions.GetNegatedLongOptionName(Name);
         }
     }
 }

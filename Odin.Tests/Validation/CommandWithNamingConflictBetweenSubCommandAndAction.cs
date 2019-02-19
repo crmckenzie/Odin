@@ -1,5 +1,5 @@
 using Odin.Attributes;
-using Odin.Demo;
+using KatasCommand = Odin.Tests.Samples.Demo.KatasCommand;
 
 namespace Odin.Tests.Validation
 {

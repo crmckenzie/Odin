@@ -1,17 +1,15 @@
-﻿using System;
-using System.Linq;
-using NSubstitute;
-using NUnit.Framework;
-using Odin.Demo;
-using Shouldly;
+﻿using Odin.Tests.Samples.Demo;
 
-namespace Odin.Tests
+namespace Odin.Tests.Lib
 {
-    [TestFixture]
+    using System;
+    using Shouldly;
+
+    using Xunit;
+
     public class CommandInvocationTests
     {
-        [SetUp]
-        public void BeforeEach()
+        public CommandInvocationTests()
         {
             this.Logger = new StringBuilderLogger();
             this.SubCommand = new SubCommand();
@@ -29,53 +27,53 @@ namespace Odin.Tests
 
         #region ActionExecution
 
-        [Test]
+        [Fact]
         public void OnlyActionMethodsAreInterpretedAsActions()
         {
             // Given
-            var args = new[] { "NotAnAction" };
+            var methodThatExistsButNotDecoratedWithActionAttribute = "NotAnAction";
+            var args = new[] { methodThatExistsButNotDecoratedWithActionAttribute };
 
             // When
-            var result = this.Subject.GenerateInvocation(args);
+            var result = this.Subject.Execute(args);
 
             // Then
-            result.ShouldNotBeNull();
-            result.Name.ShouldBe("do-something");
-            result.MethodParameters[0].Value.ShouldBe("NotAnAction");
-            result.MethodParameters[1].Value.ShouldBe(Type.Missing);
-            result.MethodParameters[2].Value.ShouldBe(Type.Missing);
+            var defaultAction = "DoSomething";
+            this.Subject.MethodCalled.ShouldBe(defaultAction);
+
+            this.Subject.MethodArguments[0].ShouldBe(methodThatExistsButNotDecoratedWithActionAttribute);
+            this.Subject.MethodArguments[1].ShouldBe("value2-not-passed");
+            this.Subject.MethodArguments[2].ShouldBe("value3-not-passed");
         }
 
-        [Test]
+        [Fact]
         public void CanExecuteAMethodThatIsAnAction()
         {
             // Given
-            var args = new[] { "do-something" };
+            var args = new[] { "DoSomething" };
 
             // When
-            var result = this.Subject.GenerateInvocation(args);
+            var result = this.Subject.Execute(args);
 
             // Then
-            result.ShouldNotBeNull();
-            result.MethodParameters.Count.ShouldBe(3);
-            result.MethodParameters.ShouldAllBe(pv=> pv.Value == Type.Missing);
+            this.Subject.MethodCalled.ShouldBe("DoSomething");
         }
 
-        [Test]
+        [Fact]
         public void ReturnsResultFromAction()
         {
             // Given
             var args = new[] { "always-returns-minus2" };
 
             // When
-            var result = this.Subject.GenerateInvocation(args);
+            var result = this.Subject.Execute(args);
 
             // Then
-            result.ShouldNotBeNull();
-            result.MethodParameters.Count.ShouldBe(0);
+            this.Subject.MethodCalled.ShouldBe("AlwaysReturnsMinus2");
+            result.ShouldBe(-2);
         }
 
-        [Test]
+        [Fact]
         public void BeforeAndAfterEventsAreExecuted()
         {
             // Given
@@ -91,7 +89,7 @@ namespace Odin.Tests
         }
 
 
-        [Test]
+        [Fact]
         public void BeforeAndAfterEventsAreExecutedOnSubCommand()
         {
             // Given
@@ -112,223 +110,190 @@ namespace Odin.Tests
 
         #region Required arguments
 
-        [Test]
+        [Fact]
         public void WithRequiredStringArg()
         {
             var args = new[] { "with-required-string-arg", "--argument", "value" };
 
-            var result =this.Subject.GenerateInvocation(args);
+            var result = this.Subject.Execute(args);
 
-            result.ShouldNotBeNull();
-            result.MethodParameters.Count.ShouldBe(1);
-            result.MethodParameters[0].Name.ShouldBe("argument");
-            result.MethodParameters[0].Value.ShouldBe("value");
+            this.Subject.MethodCalled.ShouldBe("WithRequiredStringArg");
+            this.Subject.MethodArguments[0].ShouldBe("value");
         }
 
-        [Test]
+        [Fact]
         public void WithMultipleRequiredStringArgs()
         {
             var args = new[] { "with-required-string-args", "--argument1", "value1", "--argument2", "value2" };
 
-            var result = this.Subject.GenerateInvocation(args);
+            var result = this.Subject.Execute(args);
 
-            result.ShouldNotBeNull();
-            result.MethodParameters.Count.ShouldBe(2);
-            result.MethodParameters[0].Name.ShouldBe("argument1");
-            result.MethodParameters[0].Value.ShouldBe("value1");
-            result.MethodParameters[1].Name.ShouldBe("argument2");
-            result.MethodParameters[1].Value.ShouldBe("value2");
+            this.Subject.MethodCalled.ShouldBe("WithRequiredStringArgs");
+            this.Subject.MethodArguments.ShouldBe(new[] { "value1", "value2" });
         }
 
-        [Test]
+        [Fact]
         public void CanMatchArgsByParameterOrder()
         {
             var args = new[] { "with-required-string-args", "value1", "value2" };
 
-            var result = this.Subject.GenerateInvocation(args);
+            var result = this.Subject.Execute(args);
 
-            result.ShouldNotBeNull();
-            result.MethodParameters.Count.ShouldBe(2);
-            result.MethodParameters[0].Name.ShouldBe("argument1");
-            result.MethodParameters[0].Value.ShouldBe("value1");
-            result.MethodParameters[1].Name.ShouldBe("argument2");
-            result.MethodParameters[1].Value.ShouldBe("value2");
+            this.Subject.MethodCalled.ShouldBe("WithRequiredStringArgs");
+            this.Subject.MethodArguments.ShouldBe(new[] { "value1", "value2" });
         }
 
         #endregion
 
         #region Switches
 
-        [Test]
+        [Fact]
         public void SwitchWithValue()
         {
             var args = new[] { "with-switch", "--argument", "true" };
 
-            var result = this.Subject.GenerateInvocation(args);
+            var result = this.Subject.Execute(args);
 
-            result.ShouldNotBeNull();
-            result.MethodParameters.Count.ShouldBe(1);
-            result.MethodParameters[0].Name.ShouldBe("argument");
-            result.MethodParameters[0].Value.ShouldBe(true);
+            this.Subject.MethodCalled.ShouldBe("WithSwitch");
+            this.Subject.MethodArguments.ShouldBe(new object[] { true });
         }
 
-        [Test]
+        [Fact]
         public void SwitchWithoutValue()
         {
             var args = new[] { "with-switch", "--argument"};
 
-            var result = this.Subject.GenerateInvocation(args);
+            var result = this.Subject.Execute(args);
 
-            result.ShouldNotBeNull();
-            result.MethodParameters.Count.ShouldBe(1);
-            result.MethodParameters[0].Name.ShouldBe("argument");
-            result.MethodParameters[0].Value.ShouldBe(true);
+            this.Subject.MethodCalled.ShouldBe("WithSwitch");
+            this.Subject.MethodArguments.ShouldBe(new object[] { true });
         }
 
-        [Test]
+        [Fact]
+        public void NegativeSwitch()
+        {
+            var args = new[] { "with-switch", "--no-argument" };
+
+            var result = this.Subject.Execute(args);
+
+            result.ShouldBe(0);
+            this.Subject.MethodCalled.ShouldBe("WithSwitch");
+            this.Subject.MethodArguments.ShouldBe(new object[] { false });
+        }
+
+        [Fact]
         public void SwitchNotGiven()
         {
             var args = new[] { "with-switch"};
 
-            var result = this.Subject.GenerateInvocation(args);
 
-            result.ShouldNotBeNull();
-            result.MethodParameters.Count.ShouldBe(1);
-            result.MethodParameters[0].Name.ShouldBe("argument");
-            result.MethodParameters[0].Value.ShouldBe(false);
+            var result = this.Subject.Execute(args);
+
+            this.Subject.MethodCalled.ShouldBe("WithSwitch");
+            this.Subject.MethodArguments.ShouldBe(new object[] { false });
         }
 
         #endregion
 
         #region Optional arguments
 
-        [Test]
+        [Fact]
         public void WithOptionalStringArg_DoNotPassIt()
         {
             var args = new[] { "with-optional-string-arg" };
 
-            var result = this.Subject.GenerateInvocation(args);
+            var result = this.Subject.Execute(args);
 
-            result.ShouldNotBeNull();
-            result.MethodParameters.Count.ShouldBe(1);
-            result.MethodParameters[0].Name.ShouldBe("argument");
-            result.MethodParameters[0].Value.ShouldBe(Type.Missing);
+            this.Subject.MethodCalled.ShouldBe("WithOptionalStringArg");
+            var defaultValueForMethod = "not-passed";
+            this.Subject.MethodArguments.ShouldBe(new[] { defaultValueForMethod });
         }
 
-        [Test]
+        [Fact]
         public void WithOptionalStringArg_PassIt()
         {
             var args = new[] { "with-optional-string-arg", "--argument", "value1" };
 
-            var result = this.Subject.GenerateInvocation(args);
 
-            result.ShouldNotBeNull();
-            result.MethodParameters.Count.ShouldBe(1);
-            result.MethodParameters[0].Name.ShouldBe("argument");
-            result.MethodParameters[0].Value.ShouldBe("value1");
+            var result = this.Subject.Execute(args);
+
+            this.Subject.MethodCalled.ShouldBe("WithOptionalStringArg");
+            this.Subject.MethodArguments.ShouldBe(new[] { "value1" });
         }
 
-        [Test]
+        [Fact]
         public void WithOptionalStringArgs_PassThemAll()
         {
             var args = new[] { "with-optional-string-args", "--argument1", "value1", "--argument2", "value2", "--argument3", "value3" };
 
             this.Subject.Execute(args);
 
-            var result = this.Subject.GenerateInvocation(args);
+            this.Subject.Execute(args);
 
-            result.ShouldNotBeNull();
-            result.MethodParameters.Count.ShouldBe(3);
-            result.MethodParameters[0].Name.ShouldBe("argument1");
-            result.MethodParameters[0].Value.ShouldBe("value1");
-            result.MethodParameters[1].Name.ShouldBe("argument2");
-            result.MethodParameters[1].Value.ShouldBe("value2");
-            result.MethodParameters[2].Name.ShouldBe("argument3");
-            result.MethodParameters[2].Value.ShouldBe("value3");
+            var result = this.Subject.Execute(args);
+
+            this.Subject.MethodCalled.ShouldBe("WithOptionalStringArgs");
+            this.Subject.MethodArguments.ShouldBe(new[] { "value1", "value2", "value3" });
         }
 
-        [Test]
+        [Fact]
         public void WithOptionalStringArgs_PassHead()
         {
             var args = new[] { "with-optional-string-args", "--argument1", "value1" };
 
-            var result = this.Subject.GenerateInvocation(args);
+            var result = this.Subject.Execute(args);
 
-            result.ShouldNotBeNull();
-            result.MethodParameters.Count.ShouldBe(3);
-            result.MethodParameters[0].Name.ShouldBe("argument1");
-            result.MethodParameters[0].Value.ShouldBe("value1");
-            result.MethodParameters[1].Name.ShouldBe("argument2");
-            result.MethodParameters[1].Value.ShouldBe(Type.Missing);
-            result.MethodParameters[2].Name.ShouldBe("argument3");
-            result.MethodParameters[2].Value.ShouldBe(Type.Missing);
+            this.Subject.MethodCalled.ShouldBe("WithOptionalStringArgs");
+            this.Subject.MethodArguments.ShouldBe(new[] { "value1", "value2-not-passed", "value3-not-passed" });
         }
 
-        [Test]
+        [Fact]
         public void WithOptionalStringArgs_PassBody()
         {
             var args = new[] { "with-optional-string-args", "--argument2", "value2" };
 
-            var result = this.Subject.GenerateInvocation(args);
-
-            result.ShouldNotBeNull();
-            result.MethodParameters.Count.ShouldBe(3);
-            result.MethodParameters[0].Name.ShouldBe("argument1");
-            result.MethodParameters[0].Value.ShouldBe(Type.Missing);
-            result.MethodParameters[1].Name.ShouldBe("argument2");
-            result.MethodParameters[1].Value.ShouldBe("value2");
-            result.MethodParameters[2].Name.ShouldBe("argument3");
-            result.MethodParameters[2].Value.ShouldBe(Type.Missing);
+            var result = this.Subject.Execute(args);
+            this.Subject.MethodCalled.ShouldBe("WithOptionalStringArgs");
+            this.Subject.MethodArguments.ShouldBe(new[] { "value1-not-passed", "value2", "value3-not-passed" });
         }
 
-        [Test]
+        [Fact]
         public void WithOptionalStringArgs_PassNone()
         {
             var args = new[] { "with-optional-string-args" };
 
-            var result = this.Subject.GenerateInvocation(args);
+            var result = this.Subject.Execute(args);
 
-            result.ShouldNotBeNull();
-            result.MethodParameters.Count.ShouldBe(3);
-            result.MethodParameters[0].Name.ShouldBe("argument1");
-            result.MethodParameters[0].Value.ShouldBe(Type.Missing);
-            result.MethodParameters[1].Name.ShouldBe("argument2");
-            result.MethodParameters[1].Value.ShouldBe(Type.Missing);
-            result.MethodParameters[2].Name.ShouldBe("argument3");
-            result.MethodParameters[2].Value.ShouldBe(Type.Missing);
+            this.Subject.MethodCalled.ShouldBe("WithOptionalStringArgs");
+            this.Subject.MethodArguments.ShouldBe(new[] { "value1-not-passed", "value2-not-passed", "value3-not-passed" });
         }
 
-        [Test]
+        [Fact]
         public void WithOptionalStringArgs_PassTail()
         {
             var args = new[] { "with-optional-string-args", "--argument3", "value3" };
 
-            var result = this.Subject.GenerateInvocation(args);
+            var result = this.Subject.Execute(args);
 
-            result.ShouldNotBeNull();
-            result.MethodParameters.Count.ShouldBe(3);
-            result.MethodParameters[0].Name.ShouldBe("argument1");
-            result.MethodParameters[0].Value.ShouldBe(Type.Missing);
-            result.MethodParameters[1].Name.ShouldBe("argument2");
-            result.MethodParameters[1].Value.ShouldBe(Type.Missing);
-            result.MethodParameters[2].Name.ShouldBe("argument3");
-            result.MethodParameters[2].Value.ShouldBe("value3");
+            this.Subject.MethodCalled.ShouldBe("WithOptionalStringArgs");
+            this.Subject.MethodArguments.ShouldBe(new[] { "value1-not-passed", "value2-not-passed", "value3" });
         }
 
         #endregion
 
         #region SubCommands
 
-        [Test]
+        [Fact]
         public void ExecuteSubCommand()
         {
             var args = new[] { "sub" };
 
-            var result = this.Subject.GenerateInvocation(args);
+            var result = this.Subject.Execute(args);
 
-            result.ShouldNotBeNull();
-            result.Command.ShouldBe(this.SubCommand);
-            result.MethodParameters.Count.ShouldBe(0);
+            this.Subject.MethodCalled.ShouldBe(null);
+            this.Subject.MethodArguments.ShouldBe(null);
+
+            this.SubCommand.MethodCalled.ShouldBe("DoSomething");
         }
 
         #endregion

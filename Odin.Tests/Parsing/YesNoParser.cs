@@ -1,5 +1,4 @@
-﻿using Odin.Configuration;
-using Odin.Parsing;
+﻿using Odin.Parsing;
 
 namespace Odin.Tests.Parsing
 {
@@ -7,9 +6,9 @@ namespace Odin.Tests.Parsing
     {
         private readonly Parameter _parameterValue;
 
-        public ParseResult Parse(string[] tokens, int i)
+        public ParseResult Parse(string[] tokens, int tokenIndex)
         {
-            var token = tokens[i];
+            var token = tokens[tokenIndex];
             var result = new ParseResult()
             {
                 TokensProcessed = 1
@@ -17,7 +16,7 @@ namespace Odin.Tests.Parsing
 
             if (this._parameterValue.IsIdentifiedBy(token))
             {
-                token = tokens[i + 1];
+                token = tokens[tokenIndex + 1];
                 result.TokensProcessed++;
             }
 

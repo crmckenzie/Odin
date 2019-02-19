@@ -1,15 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Odin.Attributes;
-using Odin.Demo;
-using Odin.Logging;
+﻿using System.Diagnostics;
 
-namespace Odin.Tests
+namespace Odin.Tests.Lib
 {
+    using System.ComponentModel;
+
+    using Odin.Attributes;
+
     [Description("Provides a component of testability for subcommands.")]
     public class SubCommand : Command
     {
@@ -17,7 +13,20 @@ namespace Odin.Tests
         [Action(IsDefault = true)]
         public virtual void DoSomething()
         {
-            this.Logger.Info("Do something!");
+            this.LogMethodCall();
+            this.Logger.Info("Do some SubCommand stuff!");
         }
+
+        private void LogMethodCall(params object[] arguments)
+        {
+            var stackTrace = new StackTrace();
+            var methodBase = stackTrace.GetFrame(1).GetMethod();
+            this.MethodCalled = methodBase.Name;
+            this.MethodArguments = arguments;
+        }
+
+        public object[] MethodArguments { get; set; }
+
+        public string MethodCalled { get; set; }
     }
 }

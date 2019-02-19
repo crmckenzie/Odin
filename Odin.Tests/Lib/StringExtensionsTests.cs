@@ -4,16 +4,16 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using NUnit.Framework;
-using Odin.Configuration;
+using Odin.Conventions;
 using Shouldly;
 
 namespace Odin.Tests.Lib
 {
+    using Xunit;
 
-    [TestFixture]
     public class StringExtensionsTests
     {
-        [Test]
+        [Fact]
         public void PageinateSolidText()
         {
             var str = "abcdefghijklmnopqrstuvwxyz";
@@ -24,7 +24,7 @@ namespace Odin.Tests.Lib
             results[0].ShouldBe(str);
         }
 
-        [Test]
+        [Fact]
         public void PaginateNormalText()
         {
             var str = "The quick brown fox jumped over the lazy dog.";
@@ -39,7 +39,7 @@ namespace Odin.Tests.Lib
             results[4].ShouldBe("lazy dog.");
         }
 
-        [Test]
+        [Fact]
         public void PaginateTextWithLineBreaks()
         {
             var text = 

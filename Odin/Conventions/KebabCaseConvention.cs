@@ -1,0 +1,100 @@
+using Odin.Parsing;
+
+namespace Odin.Conventions
+{
+    /// <summary>
+    /// Provides a convention for hyphen-case command-line argument styles.
+    /// </summary>
+    /// <remarks>
+    /// All command identifiers are lower-cased.
+    /// Word breaks are denoted by -'s.
+    /// Long option names begin with --
+    /// Short option names begin with -
+    /// </remarks>
+    public class KebabCaseConvention : IConventions
+    {
+        /// <summary>
+        /// Returns the hyphen-cased name of the command.
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        public string GetCommandName(Command command)
+        {
+            var name = command.GetType().Name;
+            var hyphenCased = name.Replace("Command", "").KebabCase();
+            return hyphenCased;
+        }
+
+        /// <summary>
+        /// Returns the hyphen-cased long option name for a parameter.
+        /// </summary>
+        /// <param name="parameterName"></param>
+        /// <returns></returns>
+        public string GetLongOptionName(string parameterName)
+        {
+            return $"--{parameterName.KebabCase()}";
+        }
+
+        /// <summary>
+        /// Returns the hyphen-cased name of an action.
+        /// </summary>
+        /// <param name="actionName"></param>
+        /// <returns></returns>
+        public string GetActionName(string actionName)
+        {
+            return actionName.KebabCase();
+        }
+
+        /// <summary>
+        /// Returns the short version of a parameter name.
+        /// </summary>
+        /// <param name="alias"></param>
+        /// <returns></returns>
+        public string GetShortOptionName(string alias)
+        {
+            return $"-{alias}";
+        }
+
+        /// <summary>
+        /// Returns true of the token matches the parameter name. Otherwise false.
+        /// </summary>
+        /// <param name="parameterName"></param>
+        /// <param name="token"></param>
+        /// <returns></returns>
+        public bool IsMatchingParameterName(string parameterName, string token)
+        {
+            return GetLongOptionName(parameterName) == token;
+        }
+
+        /// <summary>
+        /// Returns the negative version of a boolean switch.
+        /// </summary>
+        /// <param name="parameterName"></param>
+        /// <returns></returns>
+        public string GetNegatedLongOptionName(string parameterName)
+        {
+            return $"--no-{parameterName.KebabCase()}";
+        }
+
+        /// <summary>
+        /// Returns a parser able to process the parameter.
+        /// </summary>
+        /// <param name="parameter"></param>
+        /// <returns></returns>
+        public IParser CreateParser(Parameter parameter)
+        {
+            return new KebabCaseParser(parameter);
+        }
+
+        /// <summary>
+        /// Returns true of token represents a parameter name. Otherwise false.
+        /// </summary>
+        /// <param name="token"></param>
+        /// <returns></returns>
+        public bool IsParameterName(string token)
+        {
+            return token.StartsWith("--") || token.StartsWith("-");
+        }
+
+    }
+}

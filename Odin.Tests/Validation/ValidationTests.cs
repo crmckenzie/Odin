@@ -4,10 +4,11 @@ using Shouldly;
 
 namespace Odin.Tests.Validation
 {
-    [TestFixture]
+    using Xunit;
+
     public class ValidationTests
     {
-        [Test]
+        [Fact]
         public void WithMultipleDefaultActions()
         {
             // Given
@@ -22,7 +23,7 @@ namespace Odin.Tests.Validation
             results[0].Messages[0].ShouldBe("There is more than one default action: action1, action2.");
         }
 
-        [Test]
+        [Fact]
         public void SubCommandActionNamingConflict()
         {
             // Given
@@ -37,7 +38,7 @@ namespace Odin.Tests.Validation
             results[0].Messages[0].ShouldBe("There is more than one executable action named 'katas'.");
         }
 
-        [Test]
+        [Fact]
         public void ValidationIncludesResultsFromSubCommands()
         {
             // Given
@@ -54,11 +55,11 @@ namespace Odin.Tests.Validation
             results[1].Messages[0].ShouldBe("There is more than one default action: action1, action2.");
         }
 
-        [Test]
+        [Fact]
         public void DuplicatedParameterAliases()
         {
             // Given
-            var cmd = new CommandWithMethodParameterAliasDuplication();
+            var cmd = new CommandWithActionParameterAliasDuplication();
 
             // When
             var results = cmd.Validate().ToArray();
@@ -68,46 +69,46 @@ namespace Odin.Tests.Validation
             results[0].Messages[0].ShouldBe("The alias '-p' is duplicated for action 'action1'.");
         }
 
-        [Test]
-        public void CommandAndMethodParameterNameConflict()
+        [Fact]
+        public void CommandAndActionParameterNameConflict()
         {
             // Given
-            var cmd = new CommandWithCommonParameterAndMethodParameterNameConflict();
+            var cmd = new CommandWithSharedParameterAndActionParameterNameConflict();
 
             // When
             var results = cmd.Validate().ToArray();
 
             // Then
             results.Length.ShouldBe(1);
-            results[0].Messages[0].ShouldBe("The common parameter name '--param1' conflicts with a parameter defined for action 'action1'.");
+            results[0].Messages[0].ShouldBe("The shared parameter name '--param1' conflicts with a parameter defined for action 'action1'.");
         }
 
-        [Test]
-        public void CommonParameterAliasDuplication()
+        [Fact]
+        public void SharedParameterAliasDuplication()
         {
             // Given
-            var cmd = new CommandWithCommonParameterAliasDuplication();
+            var cmd = new CommandWithSharedParameterAliasDuplication();
 
             // When
             var results = cmd.Validate().ToArray();
 
             // Then
             results.Length.ShouldBe(1);
-            results[0].Messages[0].ShouldBe("The alias '-p' is duplicated amongst common parameters.");
+            results[0].Messages[0].ShouldBe("The alias '-p' is duplicated amongst shared parameters.");
         }
 
-        [Test]
-        public void CommonParameterAndMethodParameterAliasConflict()
+        [Fact]
+        public void SharedParameterAndActionParameterAliasConflict()
         {
             // Given
-            var cmd = new CommandWithCommonParameterAndMethodParameterAliasConflict();
+            var cmd = new CommandWithSharedParameterAndActionParameterAliasConflict();
 
             // When
             var results = cmd.Validate().ToArray();
 
             // Then
             results.Length.ShouldBe(1);
-            results[0].Messages[0].ShouldBe("The alias '-p' for common parameter '--common-parameter' is duplicated for parameter '--param1' on action 'action1'.");
+            results[0].Messages[0].ShouldBe("The alias '-p' for shared parameter '--shared-parameter' is duplicated for parameter '--param1' on action 'action1'.");
         }
 
     }

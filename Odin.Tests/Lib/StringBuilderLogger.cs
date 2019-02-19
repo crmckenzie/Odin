@@ -1,8 +1,9 @@
-using System.Text;
-using Odin.Logging;
-
-namespace Odin.Tests
+namespace Odin.Tests.Lib
 {
+    using System.Text;
+
+    using Odin.Logging;
+
     public class StringBuilderLogger : ILogger
     {
         public StringBuilderLogger()

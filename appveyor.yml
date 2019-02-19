@@ -5,35 +5,22 @@
     only:
     - master
 
-  version: 0.2.3.{build}
+  version: 0.3.0.{build}
 
   init:
   - ps: |
       $version = new-object System.Version $env:APPVEYOR_BUILD_VERSION
+      $env:AssemblyVersion = $Version.ToString()
       $env:PackageVersion = "{0}.{1}.{2}" -f $version.Major, $version.Minor, $version.Build
 
-  assembly_info:
-    patch: true
-    file: '**\AssemblyInfo.*'
-    assembly_version: '$(APPVEYOR_BUILD_VERSION)'
-    assembly_file_version: '$(APPVEYOR_BUILD_VERSION)'
-    assembly_informational_version: '$(APPVEYOR_BUILD_VERSION)'
-
-  configuration: Release
-
-  nuget:
-    account_feed: true
-    project_feed: true
-    disable_publish_on_pr: true
-
   before_build:
-  - nuget restore
+  - dotnet restore
 
-  build:
-    verbosity: minimal
+  build_script:
+  - ps: dotnet build -c Release /p:AssemblyVersion=$($env:AssemblyVersion) /p:ProductVersion=$($env:AssemblyVersion)
 
   after_build:
-  - ps: nuget pack Odin-Commands.nuspec -version "$env:PackageVersion"
+  - ps: dotnet pack .\Odin\Odin.csproj /p:PackageVersion="$($env:PackageVersion)" -o $(pwd).Path
 
   artifacts:
   - path: 'Odin-Commands*.nupkg'
@@ -42,7 +29,7 @@
   deploy:
   - provider: NuGet
     api_key:
-      secure: oZLUyd94wnic5VlRfHZnlopK4I2tNOT30JMOp0nWrH/i+ZOyVYKayPbfy407OZdL
+      secure: rjdM45vvxrIcK6Jk66jXXSZTSVI7LfxoV9PoXDyGQvk9hZsDSuRSuiDxu7G45k3A
     artifact: odin-nuget-package
 
   notifications:
@@ -55,7 +42,7 @@
 # release branches
 # compile, test, release beta version to nuget
 -
-  version: 0.2.3.{build}
+  version: 0.3.0.{build}
 
   branches:
     only:
@@ -64,30 +51,22 @@
   init:
   - ps: |
       $version = new-object System.Version $env:APPVEYOR_BUILD_VERSION
+      $env:AssemblyVersion = $Version.ToString()
       $env:PackageVersion = "{0}.{1}.{2}-beta-{3}" -f $version.Major, $version.Minor, $version.Build, $version.Revision
 
-  assembly_info:
-    patch: true
-    file: '**\AssemblyInfo.*'
-    assembly_version: '$(APPVEYOR_BUILD_VERSION)'
-    assembly_file_version: '$(APPVEYOR_BUILD_VERSION)'
-    assembly_informational_version: '$(PackageVersion)'
-
-  configuration: Release
-
-  nuget:
-    account_feed: true
-    project_feed: true
-    disable_publish_on_pr: true
-
   before_build:
-  - nuget restore
+  - ps: |
+      write-host "Output contents of working directory."
+      dir
+      dotnet restore
 
-  build:
-    verbosity: minimal
+  build_script:
+  - ps: dotnet build -c Release /p:AssemblyVersion=$($env:AssemblyVersion) /p:ProductVersion=$($env:AssemblyVersion)
 
   after_build:
-  - ps: nuget pack Odin-Commands.nuspec -version "$env:PackageVersion"
+  - ps: |
+      pwd
+      dotnet pack .\Odin\Odin.csproj /p:PackageVersion="$env:PackageVersion" -o $(pwd).Path
 
   artifacts:
   - path: 'Odin-Commands*.nupkg'
@@ -96,7 +75,7 @@
   deploy:
   - provider: NuGet
     api_key:
-      secure: oZLUyd94wnic5VlRfHZnlopK4I2tNOT30JMOp0nWrH/i+ZOyVYKayPbfy407OZdL
+      secure: rjdM45vvxrIcK6Jk66jXXSZTSVI7LfxoV9PoXDyGQvk9hZsDSuRSuiDxu7G45k3A
     artifact: odin-nuget-package
 
   notifications:
@@ -109,15 +88,13 @@
 # all other branches
 # compile, test
 -
-  version: 0.2.3.{build}
-
-  configuration: Release
+  version: 0.3.0.{build}
 
   before_build:
-  - nuget restore
+  - dotnet restore
 
-  build:
-    verbosity: minimal
+  build_script:
+  - ps: dotnet build -c Release
 
   notifications:
   - provider: Webhook
